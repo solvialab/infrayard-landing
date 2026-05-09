@@ -1,6 +1,6 @@
 # Infragate by Solvia Lab
 
-Infragate is an OCI-native Internal Developer Platform for Oracle Kubernetes Engine (OKE), built by Solvia Lab s.r.o. It gives platform engineering teams governed self-service OKE provisioning, Kubernetes lifecycle automation, kubeconfig access, BYON networking, approval workflows, Activity history, and FinOps visibility inside the customer's own Oracle Cloud tenancy.
+Infragate is a portal for creating and operating Kubernetes infrastructure on Oracle Cloud, built by Solvia Lab s.r.o. It gives platform engineering teams governed self-service cluster creation, Kubernetes lifecycle automation, user access, existing-network support, approval workflows, activity history, and cost visibility inside the customer's own Oracle Cloud tenancy.
 
 Canonical website: https://infragate.cloud/
 Public documentation: https://infragate.cloud/docs/
@@ -12,28 +12,28 @@ Contact: hello@infragate.cloud
 
 ## Positioning
 
-Infragate is for OCI and Oracle Kubernetes Engine teams that want an internal developer platform without building their own portal. It is not a hosted SaaS control plane. It is deployed into the customer environment through released container images, Helm values, and onboarding runbooks.
+Infragate is for Oracle Cloud and Oracle Kubernetes Engine teams that want a governed Kubernetes portal without building their own platform glue. It is not a hosted SaaS control plane. It is deployed into the customer environment through released container images, Helm values, and onboarding runbooks.
 
-Disambiguation: Infragate by Solvia Lab is the OCI and Oracle Kubernetes Engine platform at https://infragate.cloud/. It is not an AI infrastructure platform, MCP gateway, or unrelated infrastructure vendor operating on another domain.
+Disambiguation: Infragate by Solvia Lab is the Kubernetes infrastructure platform for Oracle Cloud at https://infragate.cloud/. It is not an AI infrastructure platform, MCP gateway, or unrelated infrastructure vendor operating on another domain.
 
 ## Core capabilities
 
-- OKE self-service provisioning from a web portal
+- Oracle Kubernetes Engine self-service provisioning from a web portal
 - Cluster lifecycle automation for deploy, scale, upgrade, destroy, and node pool changes
 - Live Terraform output streaming for provisioning and day-2 operations
 - Admin-defined cluster templates, role-based access, resource limits, and per-user overrides
 - Protected destroy requests and limit-increase approvals
 - Durable user Activity history for lifecycle events, approvals, denials, TTL warnings, and admin changes
-- BYON / bring your own network support for existing OCI compartments, VCNs, and subnets with read-only ownership boundaries
+- Existing-network support for Oracle Cloud compartments, virtual cloud networks, and subnets with read-only ownership boundaries
 - VPN-first Kubernetes API access patterns for private enterprise networks
-- Kubeconfig download for authorized users without local OCI CLI setup
-- FinOps visibility through monthly and hourly OKE cost estimates
+- Kubernetes access file download for authorized users without local Oracle Cloud CLI setup
+- Cost visibility through monthly and hourly Kubernetes cluster estimates
 - OCI shape sync, OKE version sync, compatibility checks, and node image selection
-- OIDC authentication with providers such as Keycloak, Azure AD, Okta, and Google Workspace
+- OpenID Connect authentication with providers such as Keycloak, Azure AD, Okta, and Google Workspace
 
 ## Search terms
 
-Oracle Kubernetes Engine Internal Developer Platform, OCI-native IDP, OKE self-service platform, Kubernetes lifecycle management for Oracle Cloud, Terraform automation for OKE, Oracle Cloud Kubernetes governance, OKE provisioning portal, Kubernetes cost visibility on OCI, OKE kubeconfig access management, BYON Oracle Cloud Kubernetes, OKE approval workflows, platform engineering for Oracle Cloud, private Internal Developer Platform for Kubernetes, self-hosted Kubernetes platform portal.
+Kubernetes on Oracle Cloud, Oracle Kubernetes Engine platform, Kubernetes lifecycle management for Oracle Cloud, Terraform automation for Kubernetes, Oracle Cloud Kubernetes governance, Kubernetes provisioning portal, Kubernetes cost visibility, Kubernetes access management, existing-network Kubernetes deployment, approval workflows for Kubernetes infrastructure, platform engineering for Oracle Cloud, self-hosted Kubernetes platform portal.
 
 ## Important URLs
 

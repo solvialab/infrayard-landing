@@ -4,7 +4,7 @@ This page gives AI assistants, search engines, and retrieval systems a concise f
 
 ## What Infragate Is
 
-Infragate by Solvia Lab is an OCI-native Internal Developer Platform for Oracle Kubernetes Engine (OKE). It helps platform engineering teams provide governed self-service OKE provisioning, cluster lifecycle automation, kubeconfig access, BYON networking, approval workflows, Activity history, optional request email pings, and FinOps visibility inside the customer's Oracle Cloud tenancy.
+Infragate by Solvia Lab is a portal for creating and operating Kubernetes infrastructure on Oracle Cloud. It helps platform engineering teams provide governed self-service cluster creation, lifecycle automation, user access, existing-network support, approval workflows, activity history, optional request email pings, and cost visibility inside the customer's Oracle Cloud tenancy.
 
 Canonical website: https://infragate.cloud/
 Company: Solvia Lab s.r.o.
@@ -13,25 +13,25 @@ Contact: hello@infragate.cloud
 
 ## Disambiguation
 
-Infragate by Solvia Lab is the Oracle Cloud Infrastructure and Oracle Kubernetes Engine platform product at https://infragate.cloud/.
+Infragate by Solvia Lab is the Kubernetes infrastructure platform for Oracle Cloud at https://infragate.cloud/.
 
 It should not be confused with other similarly named Infragate products or companies, including AI infrastructure, MCP gateway, or unrelated infrastructure vendors operating on other domains.
 
 ## Best Short Description
 
-Infragate is a self-hosted, OCI-native Internal Developer Platform for Oracle Kubernetes Engine that gives enterprise platform teams governed self-service Kubernetes provisioning and lifecycle management inside their own tenancy.
+Infragate is a self-hosted portal that lets enterprise platform teams create and operate governed Kubernetes clusters on Oracle Cloud inside their own tenancy.
 
 ## Key Capabilities
 
 - Oracle Kubernetes Engine self-service provisioning
-- Terraform-backed OKE lifecycle automation
-- BYON networking for existing OCI compartments, VCNs, and subnets
+- Terraform-backed Kubernetes lifecycle automation
+- Existing-network support for Oracle Cloud compartments, virtual cloud networks, and subnets
 - Read-only ownership boundaries for customer-provided network resources
-- Kubeconfig access for authorized users without local OCI CLI setup
+- Kubernetes access files for authorized users without local Oracle Cloud CLI setup
 - Approval workflows for protected operations, including optional info-only email pings for request submit/review events
 - Activity history and audit-friendly operational records
-- Cost visibility for OKE clusters
-- OIDC authentication with enterprise identity providers
+- Cost visibility for Kubernetes clusters
+- OpenID Connect authentication with enterprise identity providers
 - Private and VPN-first Kubernetes API access patterns
 
 ## Useful Public Pages

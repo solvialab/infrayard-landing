@@ -1,8 +1,15 @@
 # Infragate by Solvia Lab
 
-**OCI-native Internal Developer Platform (IDP) for governed OKE lifecycle management on Oracle Cloud.**
+**A portal for creating and operating Kubernetes infrastructure on Oracle Cloud without making every engineer write Terraform or work directly in the Oracle Cloud Console.**
 
-Infragate by Solvia Lab turns Oracle Kubernetes Engine into a self-service platform with admin guardrails: engineers can deploy, scale, upgrade, access, and destroy clusters without OCI Console access, IAM knowledge, or Terraform expertise, while platform teams keep control through templates, limits, approvals, BYON boundaries, Activity history, and FinOps visibility.
+Infragate lets platform teams define the approved ways to create Kubernetes clusters: templates, limits, networking rules, login roles, approvals, cost visibility, and audit history. Engineers request and operate clusters through the portal. Infragate runs the infrastructure workflow underneath, using Terraform and Oracle Cloud APIs inside the customer environment.
+
+In practical terms:
+
+- Engineers get a simple way to create, scale, upgrade, access, and destroy Kubernetes clusters.
+- Platform teams keep control over what can be created, who can use it, and which changes need approval.
+- Terraform is still part of the system, but it is hidden behind governed workflows instead of becoming every user's job.
+- Customer credentials, logs, and operational data stay inside the customer boundary.
 
 ---
 

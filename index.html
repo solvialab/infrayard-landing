@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Infragate | OCI-native IDP for OKE</title>
-  <meta name="description" content="Infragate by Solvia Lab is an OCI-native Internal Developer Platform for Oracle Kubernetes Engine: governed self-service OKE provisioning, lifecycle automation, BYON networking, kubeconfig access, FinOps visibility, approvals, Activity history, and admin control inside your tenancy.">
+  <title>Infragate | Kubernetes infrastructure on Oracle Cloud, without the manual glue</title>
+  <meta name="description" content="Infragate helps teams create and operate production-ready Kubernetes clusters on Oracle Cloud through a simple portal. It handles Terraform-based provisioning, networking, access, approvals, cost visibility, and audit history inside your tenancy.">
   <link rel="canonical" href="https://infragate.cloud/">
   <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48x48.png">
@@ -17,19 +17,19 @@
   <link rel="alternate" type="text/markdown" href="/ai.md" title="Infragate AI facts and disambiguation">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://infragate.cloud/">
-  <meta property="og:title" content="Infragate | OCI-native IDP for OKE">
-  <meta property="og:description" content="Infragate by Solvia Lab delivers governed self-service OKE provisioning, lifecycle automation, BYON networking, kubeconfig access, FinOps visibility, approvals, Activity history, and admin control inside your tenancy.">
+  <meta property="og:title" content="Infragate | Kubernetes infrastructure on Oracle Cloud, without the manual glue">
+  <meta property="og:description" content="Create and operate production-ready Kubernetes clusters on Oracle Cloud through a simple portal. Terraform, networking, access, approvals, costs, and audit history stay inside your tenancy.">
   <meta property="og:site_name" content="Infragate">
   <meta property="og:locale" content="en_US">
   <meta property="og:image" content="https://infragate.cloud/assets/og-image.png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="Infragate admin requests dashboard for OKE approvals and platform governance">
+  <meta property="og:image:alt" content="Infragate dashboard for Kubernetes infrastructure approvals and governance on Oracle Cloud">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="Infragate | OCI-native IDP for OKE">
-  <meta name="twitter:description" content="Infragate by Solvia Lab delivers governed self-service OKE provisioning, lifecycle automation, BYON networking, kubeconfig access, FinOps visibility, approvals, Activity history, and admin control inside your tenancy.">
+  <meta name="twitter:title" content="Infragate | Kubernetes infrastructure on Oracle Cloud, without the manual glue">
+  <meta name="twitter:description" content="Create and operate production-ready Kubernetes clusters on Oracle Cloud through a simple portal. Terraform, networking, access, approvals, costs, and audit history stay inside your tenancy.">
   <meta name="twitter:image" content="https://infragate.cloud/assets/og-image.png">
-  <meta name="twitter:image:alt" content="Infragate admin requests dashboard for OKE approvals and platform governance">
+  <meta name="twitter:image:alt" content="Infragate dashboard for Kubernetes infrastructure approvals and governance on Oracle Cloud">
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -41,7 +41,7 @@
         "legalName": "Solvia Lab s.r.o.",
         "url": "https://solvialab.tech/",
         "logo": "https://infragate.cloud/assets/infragate-logo.png",
-        "disambiguatingDescription": "Solvia Lab s.r.o. builds Infragate, the OCI-native Internal Developer Platform for Oracle Kubernetes Engine at infragate.cloud.",
+        "disambiguatingDescription": "Solvia Lab s.r.o. builds Infragate, a platform for creating and operating Kubernetes infrastructure on Oracle Cloud at infragate.cloud.",
         "sameAs": [
           "https://github.com/solvialab/infragate-landing",
           "https://www.linkedin.com/company/112238202/",
@@ -74,9 +74,9 @@
         "mainEntityOfPage": "https://infragate.cloud/",
         "image": "https://infragate.cloud/assets/og-image.png",
         "screenshot": "https://infragate.cloud/assets/og-image.png",
-        "description": "Infragate by Solvia Lab is an OCI-native Internal Developer Platform for Oracle Kubernetes Engine lifecycle management, self-service provisioning, BYON networking, kubeconfig access, approvals, Activity history, and FinOps visibility.",
-        "disambiguatingDescription": "Infragate by Solvia Lab is the Oracle Cloud Infrastructure and Oracle Kubernetes Engine platform product at infragate.cloud, not an AI infrastructure platform, MCP gateway, or unrelated Infragate vendor on another domain.",
-        "keywords": "Oracle Kubernetes Engine, OKE, OCI, Internal Developer Platform, platform engineering, Kubernetes governance, Terraform automation, BYON networking, kubeconfig access, FinOps",
+        "description": "Infragate by Solvia Lab helps teams create and operate production-ready Kubernetes clusters on Oracle Cloud through a simple portal, with Terraform-based provisioning, networking, access, approvals, audit history, and cost visibility.",
+        "disambiguatingDescription": "Infragate by Solvia Lab is the Kubernetes infrastructure platform for Oracle Cloud at infragate.cloud, not an AI infrastructure platform, MCP gateway, or unrelated Infragate vendor on another domain.",
+        "keywords": "Oracle Cloud Infrastructure, Oracle Kubernetes Engine, Kubernetes platform, platform engineering, Terraform automation, Kubernetes governance, networking, kubeconfig access, cost visibility",
         "audience": {
           "@type": "Audience",
           "audienceType": "Platform engineering teams using Oracle Cloud Infrastructure and Oracle Kubernetes Engine"
@@ -136,37 +136,37 @@
           {
             "@type": "Question",
             "name": "What is Infragate?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Infragate by Solvia Lab is an OCI-native Internal Developer Platform for Oracle Kubernetes Engine. It gives platform teams governed self-service provisioning, lifecycle automation, kubeconfig access, BYON networking, approvals, Activity history, and cost visibility inside the customer tenancy." }
+            "acceptedAnswer": { "@type": "Answer", "text": "Infragate is a portal for creating and operating Kubernetes clusters on Oracle Cloud. It handles the infrastructure workflow, access, limits, approvals, costs, and audit history so engineers do not need to assemble everything manually." }
           },
           {
             "@type": "Question",
             "name": "Where does Infragate run?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Infragate runs inside your OCI tenancy or customer-managed Kubernetes environment. There is no external SaaS control plane; application services, credentials, logs, and operational data stay inside the customer boundary." }
+            "acceptedAnswer": { "@type": "Answer", "text": "Infragate runs inside your Oracle Cloud tenancy or customer-managed Kubernetes environment. There is no external SaaS control plane; application services, credentials, logs, and operational data stay inside the customer boundary." }
           },
           {
             "@type": "Question",
             "name": "Does Infragate require public internet access?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Production deployments are designed for private and VPN-first environments. The OKE API endpoint should be reachable from the Infragate runner and approved corporate or VPN CIDRs, while public access can remain restricted." }
+            "acceptedAnswer": { "@type": "Answer", "text": "Production deployments are designed for private and VPN-first environments. The Kubernetes API endpoint should be reachable from the Infragate runner and approved corporate or VPN networks, while public access can remain restricted." }
           },
           {
             "@type": "Question",
-            "name": "Do engineers need Terraform or OCI Console access?",
-            "acceptedAnswer": { "@type": "Answer", "text": "No. Engineers request and operate clusters through the web portal, while platform administrators control templates, limits, approvals, OCI configuration, and access policies." }
+            "name": "Do engineers need Terraform or Oracle Cloud Console access?",
+            "acceptedAnswer": { "@type": "Answer", "text": "No. Engineers request and operate clusters through the web portal, while platform administrators control templates, limits, approvals, Oracle Cloud configuration, and access policies." }
           },
           {
             "@type": "Question",
-            "name": "Can users download kubeconfig?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Yes. Authorized users can download kubeconfig for clusters they are allowed to access. Network reachability to the private or public OKE API endpoint still needs to match the customer network design." }
+            "name": "What does Infragate do with Terraform?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Terraform is the provisioning engine underneath Infragate. Users do not write Terraform to request a cluster; they use approved forms and templates. Admins can inspect the run output and keep governance around what can be created." }
           },
           {
             "@type": "Question",
-            "name": "What does BYON mean in Infragate?",
-            "acceptedAnswer": { "@type": "Answer", "text": "BYON means bring your own network. Infragate can deploy OKE clusters into existing customer compartments, VCNs, and subnets while treating customer-owned route tables, security lists, and gateways as read-only prerequisites." }
+            "name": "Can Infragate use our existing network?",
+            "acceptedAnswer": { "@type": "Answer", "text": "Yes. Infragate can create clusters in existing Oracle Cloud compartments, virtual cloud networks, and subnets. Customer-owned route tables, security lists, and gateways remain prerequisites rather than resources Infragate takes over." }
           },
           {
             "@type": "Question",
             "name": "Is Infragate production-ready today?",
-            "acceptedAnswer": { "@type": "Answer", "text": "Core OKE lifecycle workflows are available today: provisioning, scaling, Kubernetes upgrades, destroy workflows, kubeconfig access, BYON networking, costs, approvals, Activity history, and admin controls. AI advisor and Gatekeeper-style automation are roadmap items." }
+            "acceptedAnswer": { "@type": "Answer", "text": "Core lifecycle workflows are available today: create, scale, upgrade, destroy, user access, existing-network support, cost visibility, approvals, activity history, and admin controls. AI advisor and policy automation are roadmap items." }
           },
           {
             "@type": "Question",
@@ -309,26 +309,20 @@
     @media (min-width: 768px) {
       .stat-number { font-size: 2.8rem; }
     }
-                /* Premium section pills (enterprise badge style) */
+    /* Section labels */
     .section-pill {
       display: inline-flex;
       align-items: center;
-      padding: 0.34rem 0.72rem;
-      border-radius: 8px;
-      border: 1px solid #d6e0e8;
-      background: #f8fafc;
-      color: #3b5265;
-      font-size: 0.65rem;
-      font-weight: 700;
-      letter-spacing: 0.11em;
+      padding: 0.28rem 0.62rem;
+      border-radius: 7px;
+      border: 1px solid #c7d6e1;
+      background: rgba(239, 246, 250, 0.82);
+      color: #24475d;
+      font-size: 0.68rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
       text-transform: uppercase;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.85);
-      transition: border-color 0.18s ease, background-color 0.18s ease, color 0.18s ease;
-    }
-    .section-pill:hover {
-      border-color: #b9c7d3;
-      background: #f2f6fa;
-      color: #2a4154;
+      box-shadow: 0 1px 0 rgba(255,255,255,0.75);
     }
     .section-pill::before {
       display: none;
@@ -338,15 +332,10 @@
       display: none;
     }
     .dark .section-pill {
-      border-color: #324556;
-      background: #0f1a26;
-      color: #a7bbcc;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
-    }
-        .dark .section-pill:hover {
-      border-color: #3f5568;
-      background: #132132;
-      color: #bfd0de;
+      border-color: rgba(91, 184, 216, 0.28);
+      background: rgba(91, 184, 216, 0.08);
+      color: #9DD9EE;
+      box-shadow: none;
     }
 
     /* Comparison table polish */
@@ -437,14 +426,9 @@
       box-shadow: 0 18px 34px -20px rgba(15, 23, 42, 0.4);
     }
     html:not(.dark) .section-pill {
-      border-color: #b2c3d2;
-      background: #e6eef5;
-      color: #2a4154;
-    }
-    html:not(.dark) .section-pill:hover {
-      border-color: #93a9bd;
-      background: #dde8f2;
-      color: #23394b;
+      border-color: #c7d6e1;
+      background: rgba(239, 246, 250, 0.82);
+      color: #24475d;
     }
     html:not(.dark) .compare-table th:not(:first-child),
     html:not(.dark) .compare-table td:not(:first-child) {
@@ -591,6 +575,11 @@
     .reveal.visible {
       opacity: 1;
       transform: translateY(0) translateX(0) scale(1) rotate(0deg);
+    }
+    .no-js .reveal,
+    .reveal.fallback-visible {
+      opacity: 1;
+      transform: none;
     }
 
     /* Floating blobs */
@@ -1464,13 +1453,13 @@
       <a href="#" onclick="event.preventDefault();window.scrollTo({top:0,behavior:'smooth'})" class="flex items-center gap-2">
         <svg width="32" height="32" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" class="flex-shrink-0 md:w-9 md:h-9"><rect width="28" height="28" rx="7" fill="#1B2B4B"/><rect x="6" y="8" width="4" height="13" rx="1.5" fill="white" opacity="0.95"/><rect x="18" y="8" width="4" height="13" rx="1.5" fill="white" opacity="0.95"/><path d="M6 12 Q14 5 22 12" stroke="#4F6AF5" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>
         <span class="font-bold text-xl md:text-2xl tracking-tight text-gray-800 dark:text-white">Infragate</span>
-        <span class="hidden md:inline-block ml-3 text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 px-2.5 py-1 rounded-md border border-gray-200 dark:border-gray-700" style="opacity:0;animation:fadeSlideUp 0.5s ease-out 0.6s forwards">OCI Native</span>
+        <span class="hidden md:inline-block ml-3 text-xs font-medium bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 px-2.5 py-1 rounded-md border border-gray-200 dark:border-gray-700" style="opacity:0;animation:fadeSlideUp 0.5s ease-out 0.6s forwards">Oracle Cloud + Kubernetes</span>
       </a>
       <div class="hidden lg:flex gap-6 text-sm font-medium text-gray-600 dark:text-gray-400" id="desktopNav">
-        <a href="#features" class="nav-item hover:text-[#1C5D7A] dark:hover:text-[#5BB8D8] transition">Features</a>
+        <a href="#overview" class="nav-item hover:text-[#1C5D7A] dark:hover:text-[#5BB8D8] transition">Overview</a>
         
         <a href="#why-infragate" class="nav-item hover:text-[#1C5D7A] dark:hover:text-[#5BB8D8] transition">Why Infragate</a>
-        <a href="#ga-roadmap" class="nav-item hover:text-[#1C5D7A] dark:hover:text-[#5BB8D8] transition">GA vs Roadmap</a>
+        <a href="#ga-roadmap" class="nav-item hover:text-[#1C5D7A] dark:hover:text-[#5BB8D8] transition">Status</a>
         <a href="#pricing" class="nav-item hover:text-[#1C5D7A] dark:hover:text-[#5BB8D8] transition">Pricing</a>
         <a href="#faq" class="nav-item hover:text-[#1C5D7A] dark:hover:text-[#5BB8D8] transition">FAQ</a>
       </div>
@@ -1492,10 +1481,10 @@
     </div>
     <!-- Mobile/tablet menu -->
     <div id="mobileNav" class="mobile-nav flex-col gap-3 pb-4 lg:hidden">
-      <a href="#features" class="mobile-nav-item text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-[#1C5D7A] dark:hover:text-[#5BB8D8] py-2">Features</a>
+      <a href="#overview" class="mobile-nav-item text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-[#1C5D7A] dark:hover:text-[#5BB8D8] py-2">Overview</a>
       
       <a href="#why-infragate" class="mobile-nav-item text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-[#1C5D7A] dark:hover:text-[#5BB8D8] py-2">Why Infragate</a>
-      <a href="#ga-roadmap" class="mobile-nav-item text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-[#1C5D7A] dark:hover:text-[#5BB8D8] py-2">GA vs Roadmap</a>
+      <a href="#ga-roadmap" class="mobile-nav-item text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-[#1C5D7A] dark:hover:text-[#5BB8D8] py-2">Status</a>
       <a href="#pricing" class="mobile-nav-item text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-[#1C5D7A] dark:hover:text-[#5BB8D8] py-2">Pricing</a>
       <a href="#faq" class="mobile-nav-item text-sm font-medium text-gray-600 dark:text-gray-400 hover:text-[#1C5D7A] dark:hover:text-[#5BB8D8] py-2">FAQ</a>
       <div class="border-t border-gray-100 dark:border-gray-800 mt-2 pt-3 flex gap-3">
@@ -1516,31 +1505,52 @@
     <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
       <div class="hero-copy max-w-2xl mx-auto lg:mx-0 lg:max-w-none">
         <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight leading-tight text-gray-900 dark:text-white reveal from-left text-center lg:text-left" style="width:100%;max-width:min(42rem,calc(100vw - 2rem));margin-left:auto;margin-right:auto;">
-          Infragate <span class="block lg:inline"><span class="shimmer-text">OCI-native IDP for OKE</span></span>
+          Infragate builds Kubernetes on Oracle Cloud for you
         </h1>
         <p class="text-base sm:text-lg text-gray-600 dark:text-gray-400 max-w-xl mt-4 sm:mt-6 leading-relaxed reveal from-left mx-auto lg:mx-0 text-center lg:text-left" style="width:100%;max-width:min(36rem,calc(100vw - 2rem));margin-left:auto;margin-right:auto;transition-delay: 0.15s;">
-          Infragate by Solvia Lab turns OKE into a governed internal platform: self-service provisioning, scaling, Kubernetes upgrades, kubeconfig access, BYON networking, cost visibility, approval workflows, and durable Activity history through a single web portal. No Terraform to write, no CLI to learn, no OCI Console to navigate. Runs entirely in your tenancy.
+          A simple portal for teams that need production-ready Kubernetes clusters on Oracle Cloud without writing all the Terraform, networking, access, approvals, and day-2 automation by hand. It runs in your tenancy, so your credentials, logs, and operational data stay with you.
         </p>
         <div class="flex flex-col sm:flex-row gap-3 mt-6 sm:mt-8 reveal from-left justify-center lg:justify-start" style="transition-delay: 0.22s;">
           <button onclick="openDemoModal()" class="btn-solid-premium px-7 py-3 text-sm font-semibold rounded-lg cursor-pointer cta-btn">Book a discovery call</button>
           <a href="/docs/" class="inline-flex items-center justify-center gap-2 px-7 py-3 text-sm font-semibold text-[#1C5D7A] dark:text-[#5BB8D8] border border-[#1C5D7A]/30 dark:border-[#5BB8D8]/30 rounded-lg hover:bg-[#EFF6FA] dark:hover:bg-[#5BB8D8]/10 transition cta-btn"><i class="fas fa-book text-xs"></i> Read the Docs</a>
         </div>
         <div class="flex flex-wrap gap-3 sm:gap-4 mt-6 sm:mt-8 text-xs sm:text-sm text-gray-500 dark:text-gray-400 reveal from-left stagger-children justify-center lg:justify-start" style="transition-delay: 0.3s;">
-          <span><i class="fas fa-check-circle text-emerald-600 dark:text-emerald-400 mr-1"></i> Live Terraform streaming</span>
-          <span><i class="fas fa-chart-line text-[#1C5D7A] dark:text-[#5BB8D8] mr-1"></i> Real-time cost preview</span>
-          <span><i class="fas fa-shield-alt text-[#1C5D7A] dark:text-[#5BB8D8] mr-1"></i> Governed self-service</span>
-          <span><i class="fas fa-database text-[#1C5D7A] dark:text-[#5BB8D8] mr-1"></i> 100% in-tenancy</span>
+          <span><i class="fas fa-check-circle text-emerald-600 dark:text-emerald-400 mr-1"></i> Create clusters from a portal</span>
+          <span><i class="fas fa-code text-[#1C5D7A] dark:text-[#5BB8D8] mr-1"></i> Terraform handled under the hood</span>
+          <span><i class="fas fa-shield-alt text-[#1C5D7A] dark:text-[#5BB8D8] mr-1"></i> Admin approvals and limits</span>
+          <span><i class="fas fa-database text-[#1C5D7A] dark:text-[#5BB8D8] mr-1"></i> Runs inside your tenancy</span>
         </div>
       </div>
       <div class="relative reveal from-right w-full max-w-2xl mx-auto lg:mx-0 lg:max-w-none" style="transition-delay: 0.2s;">
-        <div class="terminal shadow-2xl border border-gray-200 dark:border-gray-700 overflow-hidden animated-border w-full">
-          <div class="bg-gray-800 px-4 py-2 flex items-center gap-2 border-b border-gray-700">
-            <div class="w-3 h-3 rounded-full bg-red-500" style="animation:scaleIn 0.3s ease 0.5s both"></div>
-            <div class="w-3 h-3 rounded-full bg-yellow-500" style="animation:scaleIn 0.3s ease 0.65s both"></div>
-            <div class="w-3 h-3 rounded-full bg-green-500" style="animation:scaleIn 0.3s ease 0.8s both"></div>
-            <span class="text-gray-400 text-xs ml-2">Terraform output replay (sanitized)</span>
+        <div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-2xl shadow-2xl overflow-hidden animated-border">
+          <div class="relative min-h-[220px] sm:min-h-[300px] bg-[#0B1120] flex items-center justify-center px-6 py-10">
+            <div class="absolute inset-0 opacity-70" style="background: radial-gradient(circle at 25% 20%, rgba(91,184,216,0.22), transparent 34%), radial-gradient(circle at 80% 70%, rgba(16,185,129,0.16), transparent 32%);"></div>
+            <div class="relative text-center max-w-md mx-auto">
+              <div class="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-white text-[#1C5D7A] shadow-xl shadow-black/20">
+                <i class="fas fa-play text-xl ml-1"></i>
+              </div>
+              <div class="text-xs font-semibold uppercase tracking-wider text-[#7DD3FC]">Demo slot</div>
+              <div class="mt-2 text-2xl sm:text-3xl font-bold text-white">Recorded walkthrough goes here</div>
+              <p class="mt-3 text-sm leading-relaxed text-gray-300">Until the real demo is uploaded, this block stays honest and does not pretend to be product footage.</p>
+            </div>
           </div>
-          <div id="terraformOutput" class="p-4 text-gray-300 text-sm font-mono space-y-1 bg-[#0F172A] h-[280px] md:h-[320px] overflow-hidden">
+          <div class="grid grid-cols-2 gap-3 p-4 bg-gray-50 dark:bg-gray-900/80">
+            <div class="rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-3">
+              <div class="text-xs font-semibold text-gray-500 dark:text-gray-400">1. Request</div>
+              <div class="text-sm font-bold text-gray-900 dark:text-white mt-1">Pick a template</div>
+            </div>
+            <div class="rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-3">
+              <div class="text-xs font-semibold text-gray-500 dark:text-gray-400">2. Review</div>
+              <div class="text-sm font-bold text-gray-900 dark:text-white mt-1">See cost + limits</div>
+            </div>
+            <div class="rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-3">
+              <div class="text-xs font-semibold text-gray-500 dark:text-gray-400">3. Apply</div>
+              <div class="text-sm font-bold text-gray-900 dark:text-white mt-1">Terraform runs safely</div>
+            </div>
+            <div class="rounded-xl bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-3">
+              <div class="text-xs font-semibold text-gray-500 dark:text-gray-400">4. Operate</div>
+              <div class="text-sm font-bold text-gray-900 dark:text-white mt-1">Scale, upgrade, audit</div>
+            </div>
           </div>
         </div>
         <div class="absolute -bottom-4 -left-4 w-32 h-32 bg-[#1C5D7A]/10 rounded-full blur-2xl -z-10"></div>
@@ -1555,72 +1565,104 @@
     <div class="flex flex-col md:flex-row items-center justify-center md:justify-between gap-3 md:gap-6 text-sm text-gray-600 dark:text-gray-400">
       <div class="flex items-center gap-2.5 text-center md:text-left">
         <i class="fas fa-cloud text-[#1C5D7A] dark:text-[#5BB8D8]"></i>
-        <span>Built by Solvia Lab on Oracle Cloud - native to <strong class="text-gray-800 dark:text-gray-200">OKE</strong>, <strong class="text-gray-800 dark:text-gray-200">IAM</strong>, <strong class="text-gray-800 dark:text-gray-200">VCN</strong>, and <strong class="text-gray-800 dark:text-gray-200">Object Storage</strong></span>
+        <span>Built by Solvia Lab for <strong class="text-gray-800 dark:text-gray-200">Oracle Cloud Infrastructure</strong> and <strong class="text-gray-800 dark:text-gray-200">Oracle Kubernetes Engine</strong></span>
       </div>
       <div class="hidden md:block h-5 w-px bg-gray-200 dark:bg-gray-700"></div>
       <div class="flex items-center gap-2.5 text-center md:text-left">
         <i class="fas fa-tag text-emerald-600 dark:text-emerald-400"></i>
-        <span class="font-semibold text-gray-800 dark:text-gray-200"><span class="text-emerald-600 dark:text-emerald-400">No markup</span> on OCI resources - billed directly by Oracle</span>
+        <span class="font-semibold text-gray-800 dark:text-gray-200"><span class="text-emerald-600 dark:text-emerald-400">No markup</span> on Oracle Cloud resources - billed directly by Oracle</span>
       </div>
     </div>
   </div>
 </div>
+
+<!-- Plain overview -->
+<div id="overview" class="anchor-target"></div>
+<section class="py-14 md:py-18 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+  <div class="grid lg:grid-cols-[0.95fr_1.05fr] gap-8 lg:gap-12 items-start">
+    <div class="reveal">
+      <span class="section-pill">Overview</span>
+      <h2 class="text-3xl md:text-4xl font-bold mt-4 mb-4 text-gray-900 dark:text-white">What Infragate actually does</h2>
+      <p class="text-gray-600 dark:text-gray-400 leading-relaxed">
+        Infragate gives your engineers a controlled button for creating Kubernetes environments on Oracle Cloud. Your platform team defines the templates, limits, network rules, identity rules, and approval rules. Users request a cluster, Infragate runs the infrastructure workflow, and everyone gets a visible audit trail.
+      </p>
+    </div>
+    <div class="grid sm:grid-cols-2 gap-4 stagger-children">
+      <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900/60 p-5">
+        <div class="text-sm font-bold text-gray-900 dark:text-white">It creates</div>
+        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Kubernetes clusters, worker pools, networking, access files, cost estimates, and lifecycle jobs.</p>
+      </div>
+      <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900/60 p-5">
+        <div class="text-sm font-bold text-gray-900 dark:text-white">It does not replace</div>
+        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Oracle Cloud. Resources are still created in your tenancy and billed by Oracle.</p>
+      </div>
+      <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900/60 p-5">
+        <div class="text-sm font-bold text-gray-900 dark:text-white">Terraform role</div>
+        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Terraform is the engine underneath. Engineers use the portal; admins decide what can be created.</p>
+      </div>
+      <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900/60 p-5">
+        <div class="text-sm font-bold text-gray-900 dark:text-white">Who it is for</div>
+        <p class="mt-2 text-sm text-gray-600 dark:text-gray-400">Platform, DevOps, and cloud teams standardizing Kubernetes on Oracle Cloud.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
 <!-- Features Grid -->
 <div id="features" class="anchor-target"></div>
 <section class="py-14 md:py-18 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative overflow-hidden">
   <div class="blob" style="width:250px;height:250px;background:#8b5cf6;top:20%;right:-40px;animation-delay:-6s"></div>
   <div class="text-center max-w-2xl mx-auto mb-10 reveal">
-    <span class="section-pill">Platform capabilities</span>
-    <h2 class="text-3xl md:text-4xl font-bold mt-4 mb-4 text-gray-900 dark:text-white">Complete cluster lifecycle<br>at your fingertips</h2>
-    <p class="text-gray-600 dark:text-gray-400">Infragate is more than a provisioning UI: it combines OKE lifecycle automation, network ownership boundaries, access delivery, FinOps visibility, approval workflows, and audit-ready Activity history in one in-tenancy platform.</p>
+    <span class="section-pill">What you get</span>
+    <h2 class="text-3xl md:text-4xl font-bold mt-4 mb-4 text-gray-900 dark:text-white">One place to request, create, and operate clusters</h2>
+    <p class="text-gray-600 dark:text-gray-400">The landing page version: fewer tools, fewer handoffs, fewer manual cloud steps. The docs can go deep on the exact Terraform, Oracle Cloud, and security details.</p>
   </div>
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 stagger-children text-center sm:text-left">
     <div class="glass-card rounded-2xl p-6 tilt-card flex flex-col items-center sm:items-start">
       <div class="feature-icon mb-4"><i class="fas fa-mouse-pointer text-xl text-[#1C5D7A] dark:text-[#5BB8D8]"></i></div>
-      <h3 class="text-xl font-bold text-gray-900 dark:text-white">One-click deploy</h3>
-      <p class="text-gray-500 dark:text-gray-400 mt-2">Engineers provision fully managed OKE clusters from admin-approved templates or custom configs with automatic compartment, VCN, subnet, security list, and node pool creation - no manual steps.</p>
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white">Create a cluster</h3>
+      <p class="text-gray-500 dark:text-gray-400 mt-2">Engineers choose an approved template or custom configuration. Infragate creates the Oracle Kubernetes Engine cluster and the required cloud resources.</p>
     </div>
     <div class="glass-card rounded-2xl p-6 tilt-card flex flex-col items-center sm:items-start">
       <div class="feature-icon mb-4"><i class="fas fa-layer-group text-xl text-[#1C5D7A] dark:text-[#5BB8D8]"></i></div>
-      <h3 class="text-xl font-bold text-gray-900 dark:text-white">Scaling + K8s upgrades</h3>
-      <p class="text-gray-500 dark:text-gray-400 mt-2">Add or remove node pools, scale to zero, adjust OCPU, RAM, and storage per pool from the UI. Dedicated Kubernetes upgrade flow filters OCI-compatible versions and renders Basic-tier worker refresh steps from live pool counts.</p>
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white">Scale and upgrade</h3>
+      <p class="text-gray-500 dark:text-gray-400 mt-2">Add or remove worker pools, change CPU and memory, scale environments down, and run Kubernetes upgrades through guided workflows.</p>
     </div>
     <div class="glass-card rounded-2xl p-6 tilt-card flex flex-col items-center sm:items-start">
       <div class="feature-icon mb-4"><i class="fas fa-chart-simple text-xl text-[#1C5D7A] dark:text-[#5BB8D8]"></i></div>
-      <h3 class="text-xl font-bold text-gray-900 dark:text-white">Live cost preview</h3>
-      <p class="text-gray-500 dark:text-gray-400 mt-2">Monthly and hourly estimates update live as you configure pools. Cost visible on deploy form, dashboard cards, detail page, and admin panels.</p>
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white">Preview cost</h3>
+      <p class="text-gray-500 dark:text-gray-400 mt-2">See hourly and monthly estimates before creating or changing a cluster. Admins can review total estimated spend across active clusters.</p>
     </div>
     <div class="glass-card rounded-2xl p-6 tilt-card flex flex-col items-center sm:items-start">
       <div class="feature-icon mb-4"><i class="fas fa-hourglass-half text-xl text-[#1C5D7A] dark:text-[#5BB8D8]"></i></div>
-      <h3 class="text-xl font-bold text-gray-900 dark:text-white">Approvals + Activity</h3>
-      <p class="text-gray-500 dark:text-gray-400 mt-2">Protected destroys, limit-increase requests, TTL warnings, lifecycle events, K8s upgrade recommendations, and admin limit changes all flow into durable Activity history with unread tracking. Optional email pings cover request submit/approve/deny, admin-initiated scale/upgrade/destroy on user-owned clusters (every state), and per-cluster upgrade-recommended notifications when a newer enabled K8s version becomes available.</p>
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white">Approve risky changes</h3>
+      <p class="text-gray-500 dark:text-gray-400 mt-2">Require approval for protected destroys and higher resource limits. Users and admins get a clear history of what happened, who approved it, and when.</p>
     </div>
 
     <div class="glass-card rounded-2xl p-6 tilt-card flex flex-col items-center sm:items-start">
       <div class="feature-icon mb-4"><i class="fas fa-network-wired text-xl text-[#1C5D7A] dark:text-[#5BB8D8]"></i></div>
-      <h3 class="text-xl font-bold text-gray-900 dark:text-white">CIDR pool management</h3>
-      <p class="text-gray-500 dark:text-gray-400 mt-2">Admin-managed /24 ranges - each cluster consumes one on deploy and releases on destroy. No overlaps, automatic allocation.</p>
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white">Manage network ranges</h3>
+      <p class="text-gray-500 dark:text-gray-400 mt-2">Admins define the available network ranges. Infragate allocates one per cluster and prevents overlap.</p>
     </div>
     <div class="glass-card rounded-2xl p-6 tilt-card flex flex-col items-center sm:items-start">
       <div class="feature-icon mb-4"><i class="fas fa-key text-xl text-[#1C5D7A] dark:text-[#5BB8D8]"></i></div>
-      <h3 class="text-xl font-bold text-gray-900 dark:text-white">Kubeconfig + SSH keys</h3>
-      <p class="text-gray-500 dark:text-gray-400 mt-2">Download kubectl-ready kubeconfig without OCI CLI or local OCI config. Admins can expose the OKE API only to runner and VPN/corporate CIDRs; future agent mode removes direct endpoint access.</p>
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white">Give users access</h3>
+      <p class="text-gray-500 dark:text-gray-400 mt-2">Authorized users can download Kubernetes access files without learning the Oracle Cloud CLI. Network access still follows your private or VPN design.</p>
     </div>
     <div class="glass-card rounded-2xl p-6 tilt-card flex flex-col items-center sm:items-start">
       <div class="feature-icon mb-4"><i class="fas fa-terminal text-xl text-[#1C5D7A] dark:text-[#5BB8D8]"></i></div>
-      <h3 class="text-xl font-bold text-gray-900 dark:text-white">Live Terraform streaming</h3>
-      <p class="text-gray-500 dark:text-gray-400 mt-2">Watch <code class="text-xs bg-gray-100 dark:bg-gray-800 px-1 rounded">terraform init</code>, <code class="text-xs bg-gray-100 dark:bg-gray-800 px-1 rounded">plan</code>, and <code class="text-xs bg-gray-100 dark:bg-gray-800 px-1 rounded">apply</code> output stream in real time via SSE during deploy, scale, upgrade, and destroy.</p>
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white">See what Terraform is doing</h3>
+      <p class="text-gray-500 dark:text-gray-400 mt-2">Terraform runs are visible during deploy, scale, upgrade, and destroy, so the platform team can inspect the infrastructure workflow instead of guessing.</p>
     </div>
     <div class="glass-card rounded-2xl p-6 tilt-card flex flex-col items-center sm:items-start">
       <div class="feature-icon mb-4"><i class="fas fa-plug text-xl text-[#1C5D7A] dark:text-[#5BB8D8]"></i></div>
-      <h3 class="text-xl font-bold text-gray-900 dark:text-white">Bring your own infra</h3>
-      <p class="text-gray-500 dark:text-gray-400 mt-2">Supply existing VCN, compartment, or subnet OCIDs via the Advanced tab. Existing subnet overrides are validated against the supplied VCN; BYO compartments are validated against the install-time anchor subtree before Terraform runs (out-of-subtree compartments rejected with a clear 400 instead of mid-apply IAM failure); BYO resources stay read-only.</p>
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white">Use existing cloud pieces</h3>
+      <p class="text-gray-500 dark:text-gray-400 mt-2">Point Infragate at existing compartments, virtual cloud networks, or subnets when your organization already owns those foundations.</p>
     </div>
     <div class="glass-card rounded-2xl p-6 tilt-card flex flex-col items-center sm:items-start">
       <div class="feature-icon mb-4"><i class="fas fa-gauge-high text-xl text-[#1C5D7A] dark:text-[#5BB8D8]"></i></div>
-      <h3 class="text-xl font-bold text-gray-900 dark:text-white">Resource limits</h3>
-      <p class="text-gray-500 dark:text-gray-400 mt-2">Two-tier limit system: global defaults + per-user overrides for clusters, pools, nodes, OCPU, RAM, storage, and tier. Users can submit higher-limit requests from deploy/scale; admins approve granted values from Requests.</p>
+      <h3 class="text-xl font-bold text-gray-900 dark:text-white">Set resource limits</h3>
+      <p class="text-gray-500 dark:text-gray-400 mt-2">Define global and per-user limits for clusters, worker pools, CPU, memory, and storage. Users can request more when they need it.</p>
     </div>
   </div>
 </section>
@@ -1631,9 +1673,9 @@
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="grid md:grid-cols-2 gap-6 lg:gap-12 items-center">
       <div>
-        <span class="section-pill reveal" style="display:flex;width:max-content;margin-left:auto;margin-right:auto">Cluster templates &amp; RBAC</span>
-        <h2 class="text-3xl md:text-4xl font-bold mt-5 mb-5 text-gray-900 dark:text-white reveal text-center md:text-left" style="transition-delay:0.1s">Golden paths with role-based gating</h2>
-        <p class="text-gray-600 dark:text-gray-400 mb-6 reveal text-center md:text-left" style="transition-delay:0.2s">Admins define pre-approved templates (K8s version, shape, image, pools, TTL, destroy protection, and role access). Assign required Keycloak or Azure AD roles so users only see templates they're authorised for. Selecting a template pre-fills and locks resource fields - users can still set cluster name, CIDR, and advanced overrides. Template values can exceed user limits since they represent admin-approved configurations, and template shape/K8s choices are compatibility-checked before save.</p>
+        <span class="section-pill reveal" style="display:flex;width:max-content;margin-left:auto;margin-right:auto">Templates &amp; access</span>
+        <h2 class="text-3xl md:text-4xl font-bold mt-5 mb-5 text-gray-900 dark:text-white reveal text-center md:text-left" style="transition-delay:0.1s">Turn your preferred setups into safe choices</h2>
+        <p class="text-gray-600 dark:text-gray-400 mb-6 reveal text-center md:text-left" style="transition-delay:0.2s">Admins define approved cluster templates: Kubernetes version, machine shape, worker pools, expiry time, destroy protection, and who can use them. Users only see the choices they are allowed to use, so the portal stays simple.</p>
         <div class="bg-white dark:bg-gray-800 rounded-xl p-5 border border-gray-200 dark:border-gray-700 shadow-sm reveal scale-up mx-auto md:mx-0 max-w-lg" style="transition-delay:0.3s">
           <div class="flex flex-wrap justify-between items-center gap-2">
             <span class="font-bold text-gray-800 dark:text-white">Template: PROD - HA</span>
@@ -1651,7 +1693,7 @@
       <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-xl border border-gray-200 dark:border-gray-700 p-6 reveal from-right" style="transition-delay:0.2s">
         <div class="flex items-center gap-2 border-b border-gray-100 dark:border-gray-700 pb-3 mb-4">
           <i class="fas fa-id-badge text-[#1C5D7A] dark:text-[#5BB8D8] text-xl"></i>
-          <span class="font-semibold text-gray-900 dark:text-white">OIDC role mapping (Keycloak / Azure AD / Okta)</span>
+          <span class="font-semibold text-gray-900 dark:text-white">Login role mapping (Keycloak / Azure AD / Okta)</span>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 stagger-children">
           <div class="bg-gray-50 dark:bg-gray-900/50 p-3 rounded-lg">
@@ -1680,32 +1722,32 @@
 <div id="finops" class="anchor-target"></div>
 <section class="py-14 md:py-18 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 overflow-hidden">
   <div class="text-center mb-10 reveal">
-    <span class="section-pill">FinOps native</span>
-    <h2 class="text-3xl md:text-4xl font-bold mt-4 text-gray-900 dark:text-white">Cost visibility &amp; governance</h2>
-    <p class="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mt-3">Real-time cost previews, cluster-level breakdowns, and global spend dashboards - no surprises. Both server-side and client-side cost engines produce identical results.</p>
+    <span class="section-pill">Cost visibility</span>
+    <h2 class="text-3xl md:text-4xl font-bold mt-4 text-gray-900 dark:text-white">Show the cost before and after changes</h2>
+    <p class="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mt-3">Users see estimates while they configure a cluster. Admins can track estimated spend across active clusters and adjust rates for custom Oracle contracts.</p>
   </div>
   <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6 stagger-children text-center sm:text-left">
     <div class="border border-gray-200 dark:border-gray-700 rounded-2xl p-6 bg-white dark:bg-gray-800/50 shadow-sm hover-lift flex flex-col items-center sm:items-start">
       <div class="w-10 h-10 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
         <i class="fas fa-dollar-sign text-lg text-[#1C5D7A] dark:text-[#5BB8D8]"></i>
       </div>
-      <h3 class="font-bold text-lg text-gray-900 dark:text-white">Deploy cost summary</h3>
-      <p class="text-gray-500 dark:text-gray-400 text-sm mt-2">Hourly &amp; monthly cost updates live as you configure node pools, shape, and tier. Also shown in the deploy plan confirm modal.</p>
+      <h3 class="font-bold text-lg text-gray-900 dark:text-white">Before creation</h3>
+      <p class="text-gray-500 dark:text-gray-400 text-sm mt-2">Hourly and monthly estimates update as users choose worker pools, machine shape, and cluster tier.</p>
       <div class="mt-3 bg-gray-50 dark:bg-gray-900/50 p-3 rounded-lg text-sm font-mono text-gray-600 dark:text-gray-400">$0.025/OCPU&middot;hr + $0.0015/GB RAM</div>
     </div>
     <div class="border border-gray-200 dark:border-gray-700 rounded-2xl p-6 bg-white dark:bg-gray-800/50 shadow-sm hover-lift flex flex-col items-center sm:items-start">
       <div class="w-10 h-10 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
         <i class="fas fa-chart-pie text-lg text-[#1C5D7A] dark:text-[#5BB8D8]"></i>
       </div>
-      <h3 class="font-bold text-lg text-gray-900 dark:text-white">Cluster cost cards</h3>
-      <p class="text-gray-500 dark:text-gray-400 text-sm mt-2">Dashboard cards show estimated monthly cost per cluster. Detail page shows full breakdown: per-pool cost, control plane cost, total with hourly rate.</p>
+      <h3 class="font-bold text-lg text-gray-900 dark:text-white">Per cluster</h3>
+      <p class="text-gray-500 dark:text-gray-400 text-sm mt-2">Dashboard cards and detail pages show estimated cost per cluster, including worker pools and control plane tier.</p>
     </div>
     <div class="border border-gray-200 dark:border-gray-700 rounded-2xl p-6 bg-white dark:bg-gray-800/50 shadow-sm hover-lift flex flex-col items-center sm:items-start">
       <div class="w-10 h-10 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-4">
         <i class="fas fa-chart-line text-lg text-[#1C5D7A] dark:text-[#5BB8D8]"></i>
       </div>
-      <h3 class="font-bold text-lg text-gray-900 dark:text-white">Admin spend overview</h3>
-      <p class="text-gray-500 dark:text-gray-400 text-sm mt-2">Total monthly spend across all active clusters in the admin stats bar. Shape-specific rate overrides supported for custom OCI enterprise contracts.</p>
+      <h3 class="font-bold text-lg text-gray-900 dark:text-white">For admins</h3>
+      <p class="text-gray-500 dark:text-gray-400 text-sm mt-2">Admins see total estimated monthly spend across active clusters and can use custom rates for enterprise contracts.</p>
     </div>
   </div>
   <div class="mt-10 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800/50 dark:to-gray-900/50 rounded-2xl p-6 border border-gray-200 dark:border-gray-700 flex flex-col sm:flex-row justify-between items-center gap-4 reveal scale-up" style="transition-delay:0.3s">
@@ -1723,40 +1765,40 @@
 <section class="bg-gray-50 dark:bg-gray-900/50 py-14 md:py-18 wave-divider">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center mb-10 reveal">
-      <span class="section-pill">Admin &amp; governance</span>
-      <h2 class="text-3xl md:text-4xl font-bold mt-4 text-gray-900 dark:text-white"><span data-count-to="6" data-count-duration="1000">6</span> dedicated admin panels</h2>
-        <p class="text-gray-600 dark:text-gray-400 mt-2">Global oversight, resource limits, configuration, templates, Requests, Activity-backed approvals, optional email pings (requests, admin-initiated cluster actions, K8s upgrade recommendations), and audit logs - all changes take effect immediately.</p>
+      <span class="section-pill">Admin controls</span>
+      <h2 class="text-3xl md:text-4xl font-bold mt-4 text-gray-900 dark:text-white">The platform team stays in control</h2>
+        <p class="text-gray-600 dark:text-gray-400 mt-2">Admins manage allowed resources, templates, requests, approvals, configuration, and audit history from one place.</p>
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-6 gap-4 stagger-children text-center sm:text-left mx-auto">
       <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border-l-4 border-[#1C5D7A] dark:border-[#5BB8D8] hover-lift flex flex-col items-center sm:items-start">
         <i class="fas fa-globe text-[#1C5D7A] dark:text-[#5BB8D8] text-xl"></i>
-        <h4 class="font-bold mt-2 text-gray-900 dark:text-white">All Clusters</h4>
-        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Every cluster across all users with status, owner, CIDR, K8s version, tier, resources, cost, and age. Stats bar with total spend.</p>
+        <h4 class="font-bold mt-2 text-gray-900 dark:text-white">All clusters</h4>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">See every cluster, owner, status, Kubernetes version, resources, cost, and age.</p>
       </div>
       <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border-l-4 border-[#1C5D7A] dark:border-[#5BB8D8] hover-lift flex flex-col items-center sm:items-start">
         <i class="fas fa-users text-[#1C5D7A] dark:text-[#5BB8D8] text-xl"></i>
-        <h4 class="font-bold mt-2 text-gray-900 dark:text-white">Users &amp; Limits</h4>
-        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Per-user overrides for any combination of limits and tier. Users can request higher limits; admins approve, adjust, deny, or reset to global defaults with Activity notifications.</p>
+        <h4 class="font-bold mt-2 text-gray-900 dark:text-white">Users &amp; limits</h4>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Set global defaults and per-user exceptions for resource limits.</p>
       </div>
       <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border-l-4 border-[#1C5D7A] dark:border-[#5BB8D8] hover-lift flex flex-col items-center sm:items-start">
         <i class="fas fa-sliders text-[#1C5D7A] dark:text-[#5BB8D8] text-xl"></i>
         <h4 class="font-bold mt-2 text-gray-900 dark:text-white">Configuration</h4>
-        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">CIDR pool, OCI-synced VM shapes, K8s versions (background auto-sync, default daily, plus on-demand Refresh from OCI), node images, global resource limits, and fallback manual curation. No restart needed.</p>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Manage network ranges, machine shapes, Kubernetes versions, images, and default limits.</p>
       </div>
       <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border-l-4 border-[#1C5D7A] dark:border-[#5BB8D8] hover-lift flex flex-col items-center sm:items-start">
         <i class="fas fa-layer-group text-[#1C5D7A] dark:text-[#5BB8D8] text-xl"></i>
-        <h4 class="font-bold mt-2 text-gray-900 dark:text-white">Cluster Templates</h4>
-        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Template table with live cost preview in add/edit modal. Enable/disable toggle and permanent delete.</p>
+        <h4 class="font-bold mt-2 text-gray-900 dark:text-white">Cluster templates</h4>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Publish approved cluster sizes and settings for different teams or environments.</p>
       </div>
       <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border-l-4 border-[#1C5D7A] dark:border-[#5BB8D8] hover-lift flex flex-col items-center sm:items-start">
         <i class="fas fa-inbox text-[#1C5D7A] dark:text-[#5BB8D8] text-xl"></i>
         <h4 class="font-bold mt-2 text-gray-900 dark:text-white">Requests</h4>
-        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Shared approval queue for protected-cluster destroy requests and higher-limit requests. Live nav badges; optional info-only email pings; destroy approval opens the Terraform plan before force-destroy, while limit approval writes granted overrides.</p>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Review protected destroy requests and higher-limit requests before they take effect.</p>
       </div>
       <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border-l-4 border-[#1C5D7A] dark:border-[#5BB8D8] hover-lift flex flex-col items-center sm:items-start">
         <i class="fas fa-clock-rotate-left text-[#1C5D7A] dark:text-[#5BB8D8] text-xl"></i>
-        <h4 class="font-bold mt-2 text-gray-900 dark:text-white">Audit Log</h4>
-        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Append-only record of every deploy, scale, upgrade, and destroy. Filterable by user, operation, status, and duration.</p>
+        <h4 class="font-bold mt-2 text-gray-900 dark:text-white">Audit log</h4>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Keep a searchable record of deploy, scale, upgrade, and destroy actions.</p>
       </div>
     </div>
   </div>
@@ -1767,14 +1809,14 @@
 <section class="py-14 md:py-18 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 overflow-hidden">
   <div class="grid md:grid-cols-2 gap-6 lg:gap-12 items-center">
     <div>
-      <span class="section-pill reveal" style="display:flex;width:max-content;margin-left:auto;margin-right:auto">Deployment flexibility</span>
-      <h2 class="text-3xl md:text-4xl font-bold mt-4 mb-5 text-gray-900 dark:text-white reveal text-center md:text-left" style="transition-delay:0.1s">Helm chart, OKE, or any Kubernetes</h2>
+      <span class="section-pill reveal" style="display:flex;width:max-content;margin-left:auto;margin-right:auto">How it is installed</span>
+      <h2 class="text-3xl md:text-4xl font-bold mt-4 mb-5 text-gray-900 dark:text-white reveal text-center md:text-left" style="transition-delay:0.1s">Installed in your environment</h2>
       <ul class="space-y-3 text-gray-600 dark:text-gray-400 stagger-children max-w-xl mx-auto md:mx-0">
-        <li class="flex gap-2"><i class="fas fa-check-circle text-emerald-600 dark:text-emerald-400 mt-1 flex-shrink-0"></i> <span><strong class="text-gray-900 dark:text-white">Existing OKE cluster</strong> - deploy into your Oracle Kubernetes Engine cluster via Helm in minutes. Pre-configured for OCI Block Volumes, nginx ingress, and OCI load balancer.</span></li>
-        <li class="flex gap-2"><i class="fas fa-check-circle text-emerald-600 dark:text-emerald-400 mt-1 flex-shrink-0"></i> <span><strong class="text-gray-900 dark:text-white">Helm chart</strong> - single chart with configurable values, ingress-nginx with OCI load balancer annotations. Supports <code class="text-xs bg-gray-100 dark:bg-gray-800 px-1 rounded">imagePullSecrets</code> for private registries.</span></li>
+        <li class="flex gap-2"><i class="fas fa-check-circle text-emerald-600 dark:text-emerald-400 mt-1 flex-shrink-0"></i> <span><strong class="text-gray-900 dark:text-white">Existing Oracle Kubernetes Engine cluster</strong> - deploy Infragate into your own cluster with Helm.</span></li>
+        <li class="flex gap-2"><i class="fas fa-check-circle text-emerald-600 dark:text-emerald-400 mt-1 flex-shrink-0"></i> <span><strong class="text-gray-900 dark:text-white">Helm chart</strong> - configurable deployment values for ingress, storage, identity, limits, and Oracle Cloud settings.</span></li>
         <li class="flex gap-2"><i class="fas fa-check-circle text-emerald-600 dark:text-emerald-400 mt-1 flex-shrink-0"></i> <span><strong class="text-gray-900 dark:text-white">Customer delivery model</strong> - read-only registry token, released images, and Helm values. Customers pull images into their own tenancy; no source access or build system required.</span></li>
         <li class="flex gap-2"><i class="fas fa-check-circle text-emerald-600 dark:text-emerald-400 mt-1 flex-shrink-0"></i> <span><strong class="text-gray-900 dark:text-white">Single VM (k3s) on OCI Always Free</strong> - ARM-compatible, control-plane tolerations for single-node scheduling.</span></li>
-        <li class="flex gap-2"><i class="fas fa-check-circle text-emerald-600 dark:text-emerald-400 mt-1 flex-shrink-0"></i> <span><strong class="text-gray-900 dark:text-white">Any OIDC provider</strong> - bundled Keycloak, or connect Azure AD, Okta, Google Workspace. PKCE flow, no client secrets in frontend.</span></li>
+        <li class="flex gap-2"><i class="fas fa-check-circle text-emerald-600 dark:text-emerald-400 mt-1 flex-shrink-0"></i> <span><strong class="text-gray-900 dark:text-white">Your identity provider</strong> - use bundled Keycloak or connect Azure AD, Okta, or Google Workspace.</span></li>
       </ul>
     </div>
     <!-- Customer install path animation -->
@@ -1862,30 +1904,30 @@
   <div class="blob" style="width:250px;height:250px;background:#10b981;bottom:-60px;right:-30px;animation-delay:-4s"></div>
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="text-center mb-10 reveal">
-      <span class="section-pill">Identity &amp; security</span>
-      <h2 class="text-3xl md:text-4xl font-bold mt-4 text-gray-900 dark:text-white">Enterprise-grade access control</h2>
-      <p class="text-gray-600 dark:text-gray-400 mt-2">Zero external dependencies. No data leaves your tenancy. No SaaS control plane.</p>
+      <span class="section-pill">Access &amp; security</span>
+      <h2 class="text-3xl md:text-4xl font-bold mt-4 text-gray-900 dark:text-white">Use your login system and keep data in your boundary</h2>
+      <p class="text-gray-600 dark:text-gray-400 mt-2">Infragate is installed in your environment. There is no hosted SaaS control plane that needs your credentials or operational data.</p>
     </div>
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 stagger-children text-center sm:text-left">
       <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-gray-700 hover-lift flex flex-col items-center sm:items-start">
         <i class="fas fa-id-card text-[#1C5D7A] dark:text-[#5BB8D8] text-xl"></i>
-        <h4 class="font-bold mt-3 text-gray-900 dark:text-white">Any OIDC Provider</h4>
-        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Keycloak (bundled), Azure AD, Okta, Google Workspace - any OIDC-compliant IdP.</p>
+        <h4 class="font-bold mt-3 text-gray-900 dark:text-white">Your identity provider</h4>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Use bundled Keycloak or connect Azure AD, Okta, Google Workspace, or another OpenID Connect provider.</p>
       </div>
       <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-gray-700 hover-lift flex flex-col items-center sm:items-start">
         <i class="fas fa-fingerprint text-[#1C5D7A] dark:text-[#5BB8D8] text-xl"></i>
-        <h4 class="font-bold mt-3 text-gray-900 dark:text-white">PKCE Auth Flow</h4>
-        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Authorization Code + PKCE. No client secrets stored in the frontend. Auto token refresh.</p>
+        <h4 class="font-bold mt-3 text-gray-900 dark:text-white">Browser-safe login</h4>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Uses the Authorization Code flow with PKCE, so frontend code does not store client secrets.</p>
       </div>
       <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-gray-700 hover-lift flex flex-col items-center sm:items-start">
         <i class="fas fa-user-check text-[#1C5D7A] dark:text-[#5BB8D8] text-xl"></i>
-        <h4 class="font-bold mt-3 text-gray-900 dark:text-white">Auto-provisioning</h4>
-        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">No user directory needed. Users auto-provisioned on first login from JWT <code class="bg-gray-100 dark:bg-gray-700 px-1 rounded">sub</code> claim.</p>
+        <h4 class="font-bold mt-3 text-gray-900 dark:text-white">User onboarding</h4>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Users can be created on first login, then governed by roles, templates, and resource limits.</p>
       </div>
       <div class="bg-white dark:bg-gray-800 rounded-xl p-5 shadow-sm border border-gray-200 dark:border-gray-700 hover-lift flex flex-col items-center sm:items-start">
         <i class="fas fa-bolt text-[#1C5D7A] dark:text-[#5BB8D8] text-xl"></i>
-        <h4 class="font-bold mt-3 text-gray-900 dark:text-white">Cached OIDC Discovery</h4>
-        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Well-known config cached in sessionStorage + nginx proxy layer. Zero network round-trips on load.</p>
+        <h4 class="font-bold mt-3 text-gray-900 dark:text-white">Faster auth startup</h4>
+        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Identity configuration is cached so normal page loads avoid unnecessary discovery calls.</p>
       </div>
     </div>
   </div>
@@ -1895,20 +1937,20 @@
 <div id="why-infragate" class="anchor-target"></div>
 <section class="py-14 md:py-18 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 bg-white dark:bg-gray-900">
   <div class="text-center mb-10">
-    <span class="section-pill">OCI-First & Sovereign</span>
-    <h2 class="text-3xl md:text-4xl font-bold mt-4 text-gray-900 dark:text-white">Why Infragate - OCI-native operating model</h2>
-    <p class="text-gray-600 dark:text-gray-400 max-w-3xl mx-auto mt-3">Designed for teams that want faster platform delivery while keeping control-plane operations, governance, and secrets management within their OCI boundary.</p>
+    <span class="section-pill">Why Infragate</span>
+    <h2 class="text-3xl md:text-4xl font-bold mt-4 text-gray-900 dark:text-white">Less platform assembly work, more control than hosted tools</h2>
+    <p class="text-gray-600 dark:text-gray-400 max-w-3xl mx-auto mt-3">For teams that want Kubernetes self-service on Oracle Cloud, but still need the platform, secrets, and operations to stay inside their own boundary.</p>
   </div>
 
   <div class="flex flex-wrap justify-center gap-2 sm:gap-3 max-w-4xl mx-auto mb-12">
     <span class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-gray-50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700">
-      <i class="fas fa-check text-xs text-[#355a72] dark:text-[#8fb8cb]"></i> Designed for OCI in-tenancy control planes
+      <i class="fas fa-check text-xs text-[#355a72] dark:text-[#8fb8cb]"></i> Designed for in-tenancy operation
     </span>
     <span class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-gray-50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700">
-      <i class="fas fa-check text-xs text-[#355a72] dark:text-[#8fb8cb]"></i> External SaaS callbacks not required
+      <i class="fas fa-check text-xs text-[#355a72] dark:text-[#8fb8cb]"></i> No external SaaS control plane required
     </span>
     <span class="inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium bg-gray-50 dark:bg-gray-800/50 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700">
-      <i class="fas fa-check text-xs text-[#355a72] dark:text-[#8fb8cb]"></i> Secrets retained in customer boundary
+      <i class="fas fa-check text-xs text-[#355a72] dark:text-[#8fb8cb]"></i> Secrets stay in the customer boundary
     </span>
   </div>
 
@@ -1917,7 +1959,7 @@
       <table class="compare-table hidden md:table w-full text-left">
         <thead>
           <tr class="border-b border-gray-200 dark:border-gray-700">
-            <th class="pb-6 text-gray-500 dark:text-gray-400 font-medium">Platform dimension</th>
+            <th class="pb-6 text-gray-500 dark:text-gray-400 font-medium">Question</th>
             <th class="pb-6 text-center text-gray-500 dark:text-gray-400 font-medium">DIY (Backstage + scripts)</th>
             <th class="pb-6 text-center text-gray-500 dark:text-gray-400 font-medium">Rafay</th>
             <th class="pb-6 text-center text-gray-500 dark:text-gray-400 font-medium">Quali (Torque)</th>
@@ -1926,14 +1968,14 @@
         </thead>
         <tbody class="divide-y divide-gray-200 dark:divide-gray-700 text-sm">
           <tr>
-            <td class="py-5 font-medium">Control plane location</td>
+            <td class="py-5 font-medium">Where does the product run?</td>
             <td class="py-5 text-center text-gray-500 dark:text-gray-400">Inside your tenancy (self-managed)</td>
             <td class="py-5 text-center text-gray-500 dark:text-gray-400">Vendor SaaS (self-host optional)</td>
             <td class="py-5 text-center text-gray-500 dark:text-gray-400">Vendor SaaS</td>
             <td class="py-5 text-center"><span class="compare-positive"><i class="fas fa-check-circle"></i><span>Inside your OCI tenancy</span></span></td>
           </tr>
           <tr>
-            <td class="py-5 font-medium">Outbound egress to third-party control plane</td>
+            <td class="py-5 font-medium">Does it need a third-party control plane?</td>
             <td class="py-5 text-center text-gray-500 dark:text-gray-400">Depends on selected integrations</td>
             <td class="py-5 text-center text-gray-500 dark:text-gray-400">Commonly required</td>
             <td class="py-5 text-center text-gray-500 dark:text-gray-400">Commonly required</td>
@@ -2064,33 +2106,33 @@
 <div id="ga-roadmap" class="anchor-target"></div>
 <section class="py-14 md:py-18 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 overflow-hidden">
   <div class="text-center mb-10 reveal">
-    <span class="section-pill">Product maturity</span>
-    <h2 class="text-3xl md:text-4xl font-bold mt-4 text-gray-900 dark:text-white">GA today vs roadmap next</h2>
-    <p class="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mt-3">Clear separation between production capabilities and planned capabilities. Roadmap items are phased, customer-validated, and release-gated.</p>
+    <span class="section-pill">Product status</span>
+    <h2 class="text-3xl md:text-4xl font-bold mt-4 text-gray-900 dark:text-white">What works today, what comes later</h2>
+    <p class="text-gray-600 dark:text-gray-400 max-w-2xl mx-auto mt-3">Clear separation between available product capabilities and roadmap ideas.</p>
   </div>
 
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 stagger-children">
     <div class="ga-today-card rounded-2xl border border-emerald-200/70 dark:border-emerald-700/60 bg-emerald-50/40 dark:bg-emerald-900/10 p-6">
       <div class="ga-today-chip inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-emerald-700 dark:text-emerald-300 bg-white dark:bg-gray-900/70 px-3 py-1 rounded-full border border-emerald-200 dark:border-emerald-700">
-        <i class="fas fa-check-circle"></i> GA today
+        <i class="fas fa-check-circle"></i> Available today
       </div>
       <ul class="mt-5 space-y-3 text-sm text-gray-700 dark:text-gray-300">
-        <li class="flex items-start gap-2"><i class="fas fa-check text-emerald-600 dark:text-emerald-400 mt-1 text-xs"></i><span>Deploy, scale, Kubernetes upgrade, and destroy with live Terraform logs</span></li>
-        <li class="flex items-start gap-2"><i class="fas fa-check text-emerald-600 dark:text-emerald-400 mt-1 text-xs"></i><span>Admin governance: limits, per-user override requests, templates, destroy approvals, Activity inbox, email pings (requests, admin actions, K8s upgrade recommendations), audit log, and OCI config sync (background K8s version auto-sync + on-demand shape/version refresh)</span></li>
-        <li class="flex items-start gap-2"><i class="fas fa-check text-emerald-600 dark:text-emerald-400 mt-1 text-xs"></i><span>Shape-aware Kubernetes compatibility filtering, OCI shape/version sync, and node-image auto-selection to prevent invalid deploy combinations</span></li>
-        <li class="flex items-start gap-2"><i class="fas fa-check text-emerald-600 dark:text-emerald-400 mt-1 text-xs"></i><span>VPN-first access: kubectl-ready kubeconfig plus OKE API endpoint allowlists for runner and corporate/VPN CIDRs</span></li>
-        <li class="flex items-start gap-2"><i class="fas fa-check text-emerald-600 dark:text-emerald-400 mt-1 text-xs"></i><span>FinOps visibility: live estimates, cluster-level cost cards, and admin total spend</span></li>
+        <li class="flex items-start gap-2"><i class="fas fa-check text-emerald-600 dark:text-emerald-400 mt-1 text-xs"></i><span>Create, scale, upgrade, and destroy Kubernetes clusters with visible Terraform logs</span></li>
+        <li class="flex items-start gap-2"><i class="fas fa-check text-emerald-600 dark:text-emerald-400 mt-1 text-xs"></i><span>Admin controls for templates, limits, approvals, requests, notifications, and audit history</span></li>
+        <li class="flex items-start gap-2"><i class="fas fa-check text-emerald-600 dark:text-emerald-400 mt-1 text-xs"></i><span>Compatibility checks for Kubernetes versions, machine shapes, and worker images</span></li>
+        <li class="flex items-start gap-2"><i class="fas fa-check text-emerald-600 dark:text-emerald-400 mt-1 text-xs"></i><span>Private-network friendly access with Kubernetes access files and endpoint allowlists</span></li>
+        <li class="flex items-start gap-2"><i class="fas fa-check text-emerald-600 dark:text-emerald-400 mt-1 text-xs"></i><span>Cost estimates at creation time, per cluster, and across active clusters</span></li>
       </ul>
     </div>
 
     <div class="rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900/50 p-6">
       <div class="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-[#1C5D7A] dark:text-[#5BB8D8] bg-[#EFF6FA] dark:bg-[#5BB8D8]/10 px-3 py-1 rounded-full border border-[#1C5D7A]/20 dark:border-[#5BB8D8]/30">
-        <i class="fas fa-map"></i> Roadmap next
+        <i class="fas fa-map"></i> Planned next
       </div>
       <ul class="mt-5 space-y-3 text-sm text-gray-700 dark:text-gray-300">
-        <li class="flex items-start gap-2"><i class="fas fa-arrow-right text-[#1C5D7A] dark:text-[#5BB8D8] mt-1 text-xs"></i><span>AI-assisted troubleshooting advisor: explain Terraform, OCI, OKE, IAM, quota, and networking failures before full Gatekeeper automation</span></li>
+        <li class="flex items-start gap-2"><i class="fas fa-arrow-right text-[#1C5D7A] dark:text-[#5BB8D8] mt-1 text-xs"></i><span>AI-assisted troubleshooting that explains Terraform, Oracle Cloud, quota, and networking failures</span></li>
         <li class="flex items-start gap-2"><i class="fas fa-arrow-right text-[#1C5D7A] dark:text-[#5BB8D8] mt-1 text-xs"></i><span>Cost watcher: idle-cluster detection, anomaly alerts, and right-sizing guidance</span></li>
-        <li class="flex items-start gap-2"><i class="fas fa-arrow-right text-[#1C5D7A] dark:text-[#5BB8D8] mt-1 text-xs"></i><span>In-cluster access agent for private-by-default environments with no public OKE API endpoint after bootstrap</span></li>
+        <li class="flex items-start gap-2"><i class="fas fa-arrow-right text-[#1C5D7A] dark:text-[#5BB8D8] mt-1 text-xs"></i><span>In-cluster access agent for environments with no public Kubernetes API endpoint after bootstrap</span></li>
         <li class="flex items-start gap-2"><i class="fas fa-arrow-right text-[#1C5D7A] dark:text-[#5BB8D8] mt-1 text-xs"></i><span>Policy guardrails: drift detection, Kubernetes lifecycle risk flags, and weekly compliance digests</span></li>
         <li class="flex items-start gap-2"><i class="fas fa-arrow-right text-[#1C5D7A] dark:text-[#5BB8D8] mt-1 text-xs"></i><span>Approval-gated remediation with full audit trail (suggest -> review -> apply)</span></li>
       </ul>
@@ -2173,7 +2215,7 @@
           <li class="flex items-start gap-2"><i class="fas fa-check text-emerald-500 mt-1 text-xs"></i><span>Air-gapped / mirrored registry delivery - LTS pinning</span></li>
           <li class="flex items-start gap-2"><i class="fas fa-check text-emerald-500 mt-1 text-xs"></i><span>Compliance support pack: SOC 2 / ISO questionnaires, DPA, and audit-evidence guidance</span></li>
           <li class="flex items-start gap-2"><i class="fas fa-check text-emerald-500 mt-1 text-xs"></i><span>Production incident escalation support and change-advisory guidance</span></li>
-          <li class="flex items-start gap-2"><i class="fas fa-check text-emerald-500 mt-1 text-xs"></i><span>Quarterly architecture and FinOps governance reviews</span></li>
+          <li class="flex items-start gap-2"><i class="fas fa-check text-emerald-500 mt-1 text-xs"></i><span>Quarterly architecture and cost governance reviews</span></li>
         </ul>
         <button onclick="openDemoModal('enterprise')" class="block w-full text-center px-5 py-3 text-sm font-semibold text-[#1C5D7A] dark:text-[#5BB8D8] border border-[#1C5D7A]/30 dark:border-[#5BB8D8]/30 rounded-lg hover:bg-[#EFF6FA] dark:hover:bg-[#5BB8D8]/10 transition cursor-pointer">Contact us</button>
       </div>
@@ -2224,7 +2266,7 @@
           <i class="fas fa-wand-magic-sparkles text-amber-300"></i>
         </div>
         <h3 class="text-white font-semibold text-sm mb-1">AI advisor + Gatekeeper roadmap</h3>
-        <p class="text-gray-300 text-xs leading-relaxed">Near-term scope: read-only troubleshooting explanations for Terraform, OCI, OKE, IAM, quota, and networking failures. Gatekeeper policy, drift, cost watcher, and approval-gated remediation stay on the roadmap for customer-shaped v1.1.</p>
+        <p class="text-gray-300 text-xs leading-relaxed">Near-term scope: read-only troubleshooting explanations for Terraform, Oracle Cloud, identity, quota, and networking failures. Policy guardrails, drift checks, cost watcher, and approval-gated remediation stay on the roadmap for customer-shaped v1.1.</p>
       </div>
     </div>
 
@@ -2247,51 +2289,51 @@
   <div class="max-w-6xl mx-auto">
     <div class="text-center mb-10 reveal">
       <div class="section-pill mb-4">Questions &amp; answers</div>
-      <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">The buying questions answered upfront</h2>
-      <p class="mt-4 text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">Short answers for platform teams, security reviewers, and buyers. The deeper implementation details live in the documentation.</p>
+      <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white">The questions people ask first</h2>
+      <p class="mt-4 text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">Short answers first. Deeper implementation details belong in the documentation.</p>
     </div>
 
     <div class="faq-accordion mx-auto max-w-3xl space-y-3">
       <div class="faq-item rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900/60 overflow-hidden reveal">
         <button type="button" class="faq-question flex cursor-pointer items-start justify-between gap-4 px-5 py-4 font-semibold text-gray-900 dark:text-white transition hover:bg-gray-50 dark:hover:bg-white/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5BB8D8]/60 focus-visible:ring-inset" aria-expanded="false"><span>What is Infragate?</span><i class="faq-chevron fas fa-chevron-down mt-1 text-xs text-[#1C5D7A] dark:text-[#5BB8D8]"></i></button>
         <div class="faq-answer" aria-hidden="true">
-          <p class="faq-answer-inner text-sm leading-relaxed text-gray-600 dark:text-gray-400">Infragate by Solvia Lab is an OCI-native Internal Developer Platform for Oracle Kubernetes Engine. It gives platform teams governed self-service provisioning, lifecycle automation, kubeconfig access, BYON networking, approvals, Activity history, and cost visibility inside the customer tenancy.</p>
+          <p class="faq-answer-inner text-sm leading-relaxed text-gray-600 dark:text-gray-400">Infragate is a portal for creating and operating Kubernetes clusters on Oracle Cloud. It handles the infrastructure workflow, access, limits, approvals, costs, and audit history so engineers do not need to assemble everything manually.</p>
         </div>
       </div>
       <div class="faq-item rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900/60 overflow-hidden reveal">
         <button type="button" class="faq-question flex cursor-pointer items-start justify-between gap-4 px-5 py-4 font-semibold text-gray-900 dark:text-white transition hover:bg-gray-50 dark:hover:bg-white/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5BB8D8]/60 focus-visible:ring-inset" aria-expanded="false"><span>Where does Infragate run?</span><i class="faq-chevron fas fa-chevron-down mt-1 text-xs text-[#1C5D7A] dark:text-[#5BB8D8]"></i></button>
         <div class="faq-answer" aria-hidden="true">
-          <p class="faq-answer-inner text-sm leading-relaxed text-gray-600 dark:text-gray-400">Inside your OCI tenancy or customer-managed Kubernetes environment. There is no external SaaS control plane; application services, credentials, logs, and operational data stay inside your boundary.</p>
+          <p class="faq-answer-inner text-sm leading-relaxed text-gray-600 dark:text-gray-400">Inside your Oracle Cloud tenancy or customer-managed Kubernetes environment. There is no external SaaS control plane; application services, credentials, logs, and operational data stay inside your boundary.</p>
         </div>
       </div>
       <div class="faq-item rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900/60 overflow-hidden reveal">
         <button type="button" class="faq-question flex cursor-pointer items-start justify-between gap-4 px-5 py-4 font-semibold text-gray-900 dark:text-white transition hover:bg-gray-50 dark:hover:bg-white/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5BB8D8]/60 focus-visible:ring-inset" aria-expanded="false"><span>Does it require public internet access?</span><i class="faq-chevron fas fa-chevron-down mt-1 text-xs text-[#1C5D7A] dark:text-[#5BB8D8]"></i></button>
         <div class="faq-answer" aria-hidden="true">
-          <p class="faq-answer-inner text-sm leading-relaxed text-gray-600 dark:text-gray-400">Production deployments are designed for VPN-first access. The Infragate runner and approved corporate/VPN CIDRs need network reachability to the OKE API endpoint; public access can stay restricted.</p>
+          <p class="faq-answer-inner text-sm leading-relaxed text-gray-600 dark:text-gray-400">Production deployments are designed for private or VPN-first access. The Infragate runner and approved corporate or VPN networks need reachability to the Kubernetes API endpoint; public access can stay restricted.</p>
         </div>
       </div>
       <div class="faq-item rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900/60 overflow-hidden reveal">
-        <button type="button" class="faq-question flex cursor-pointer items-start justify-between gap-4 px-5 py-4 font-semibold text-gray-900 dark:text-white transition hover:bg-gray-50 dark:hover:bg-white/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5BB8D8]/60 focus-visible:ring-inset" aria-expanded="false"><span>Do engineers need Terraform or OCI Console access?</span><i class="faq-chevron fas fa-chevron-down mt-1 text-xs text-[#1C5D7A] dark:text-[#5BB8D8]"></i></button>
+        <button type="button" class="faq-question flex cursor-pointer items-start justify-between gap-4 px-5 py-4 font-semibold text-gray-900 dark:text-white transition hover:bg-gray-50 dark:hover:bg-white/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5BB8D8]/60 focus-visible:ring-inset" aria-expanded="false"><span>Do engineers need Terraform or Oracle Cloud Console access?</span><i class="faq-chevron fas fa-chevron-down mt-1 text-xs text-[#1C5D7A] dark:text-[#5BB8D8]"></i></button>
         <div class="faq-answer" aria-hidden="true">
-          <p class="faq-answer-inner text-sm leading-relaxed text-gray-600 dark:text-gray-400">No. Engineers use the portal for provisioning and day-2 actions. Platform administrators control templates, limits, OCI configuration, approvals, RBAC, protected destroy rules, and audit history.</p>
+          <p class="faq-answer-inner text-sm leading-relaxed text-gray-600 dark:text-gray-400">No. Engineers use the portal for cluster creation and day-2 operations. Platform administrators control templates, limits, Oracle Cloud configuration, approvals, role access, protected destroy rules, and audit history.</p>
         </div>
       </div>
       <div class="faq-item rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900/60 overflow-hidden reveal">
-        <button type="button" class="faq-question flex cursor-pointer items-start justify-between gap-4 px-5 py-4 font-semibold text-gray-900 dark:text-white transition hover:bg-gray-50 dark:hover:bg-white/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5BB8D8]/60 focus-visible:ring-inset" aria-expanded="false"><span>Can users download kubeconfig?</span><i class="faq-chevron fas fa-chevron-down mt-1 text-xs text-[#1C5D7A] dark:text-[#5BB8D8]"></i></button>
+        <button type="button" class="faq-question flex cursor-pointer items-start justify-between gap-4 px-5 py-4 font-semibold text-gray-900 dark:text-white transition hover:bg-gray-50 dark:hover:bg-white/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5BB8D8]/60 focus-visible:ring-inset" aria-expanded="false"><span>What does it do with Terraform?</span><i class="faq-chevron fas fa-chevron-down mt-1 text-xs text-[#1C5D7A] dark:text-[#5BB8D8]"></i></button>
         <div class="faq-answer" aria-hidden="true">
-          <p class="faq-answer-inner text-sm leading-relaxed text-gray-600 dark:text-gray-400">Yes. Authorized users can download kubeconfig for clusters they are allowed to access. Network reachability still follows your cluster API endpoint design and VPN/private access model.</p>
+          <p class="faq-answer-inner text-sm leading-relaxed text-gray-600 dark:text-gray-400">Terraform is the provisioning engine underneath Infragate. Users do not write Terraform to request a cluster; they use approved forms and templates. Admins can inspect the run output and keep governance around what can be created.</p>
         </div>
       </div>
       <div class="faq-item rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900/60 overflow-hidden reveal">
-        <button type="button" class="faq-question flex cursor-pointer items-start justify-between gap-4 px-5 py-4 font-semibold text-gray-900 dark:text-white transition hover:bg-gray-50 dark:hover:bg-white/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5BB8D8]/60 focus-visible:ring-inset" aria-expanded="false"><span>What does BYON mean?</span><i class="faq-chevron fas fa-chevron-down mt-1 text-xs text-[#1C5D7A] dark:text-[#5BB8D8]"></i></button>
+        <button type="button" class="faq-question flex cursor-pointer items-start justify-between gap-4 px-5 py-4 font-semibold text-gray-900 dark:text-white transition hover:bg-gray-50 dark:hover:bg-white/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5BB8D8]/60 focus-visible:ring-inset" aria-expanded="false"><span>Can it use our existing network?</span><i class="faq-chevron fas fa-chevron-down mt-1 text-xs text-[#1C5D7A] dark:text-[#5BB8D8]"></i></button>
         <div class="faq-answer" aria-hidden="true">
-          <p class="faq-answer-inner text-sm leading-relaxed text-gray-600 dark:text-gray-400">BYON means bring your own network. Infragate can deploy OKE into existing customer compartments, VCNs, and subnets while treating customer-owned route tables, security lists, and gateways as read-only prerequisites.</p>
+          <p class="faq-answer-inner text-sm leading-relaxed text-gray-600 dark:text-gray-400">Yes. Infragate can create clusters in existing Oracle Cloud compartments, virtual cloud networks, and subnets. Customer-owned route tables, security lists, and gateways remain prerequisites rather than resources Infragate takes over.</p>
         </div>
       </div>
       <div class="faq-item rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900/60 overflow-hidden reveal">
         <button type="button" class="faq-question flex cursor-pointer items-start justify-between gap-4 px-5 py-4 font-semibold text-gray-900 dark:text-white transition hover:bg-gray-50 dark:hover:bg-white/5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#5BB8D8]/60 focus-visible:ring-inset" aria-expanded="false"><span>Is Infragate production-ready today?</span><i class="faq-chevron fas fa-chevron-down mt-1 text-xs text-[#1C5D7A] dark:text-[#5BB8D8]"></i></button>
         <div class="faq-answer" aria-hidden="true">
-          <p class="faq-answer-inner text-sm leading-relaxed text-gray-600 dark:text-gray-400">The core OKE lifecycle platform is available today: deploy, scale, upgrade, destroy, kubeconfig access, BYON networking, cost visibility, approvals, Activity history, and admin controls. AI advisor and Gatekeeper-style automation are roadmap items.</p>
+          <p class="faq-answer-inner text-sm leading-relaxed text-gray-600 dark:text-gray-400">The core lifecycle platform is available today: create, scale, upgrade, destroy, user access, existing-network support, cost visibility, approvals, activity history, and admin controls. AI advisor and policy automation are roadmap items.</p>
         </div>
       </div>
       <div class="faq-item rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900/60 overflow-hidden reveal">
@@ -2323,7 +2365,7 @@
           <svg width="22" height="22" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" class="flex-shrink-0"><rect width="28" height="28" rx="7" fill="#1B2B4B"/><rect x="6" y="8" width="4" height="13" rx="1.5" fill="white" opacity="0.95"/><rect x="18" y="8" width="4" height="13" rx="1.5" fill="white" opacity="0.95"/><path d="M6 12 Q14 5 22 12" stroke="#4F6AF5" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>
           <span class="font-bold text-sm text-gray-800 dark:text-white">Infragate by Solvia Lab</span>
         </div>
-        <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">OCI-native Internal Developer Platform for governed OKE lifecycle, access, networking, and cost control inside customer tenancies.</p>
+        <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">A portal for creating and operating Kubernetes infrastructure on Oracle Cloud, with access, networking, approvals, and cost visibility inside customer tenancies.</p>
       </div>
 
       <div>
@@ -2354,7 +2396,7 @@
 
     <div class="mt-8 border-t border-gray-200 dark:border-gray-800">
       <div class="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] items-center gap-4 py-5 text-xs sm:text-sm text-gray-400 dark:text-gray-500">
-        <div class="text-center md:text-left">Built for enterprise OCI tenancies</div>
+        <div class="text-center md:text-left">Built for enterprise Oracle Cloud tenancies</div>
         <nav class="flex flex-wrap items-center justify-center gap-x-3 gap-y-2" aria-label="Legal links">
           <a href="/legal/privacy.html" class="hover:text-gray-700 dark:hover:text-gray-200 transition">Privacy</a>
           <span class="h-3 w-px bg-gray-300 dark:bg-gray-700" aria-hidden="true"></span>
@@ -2500,7 +2542,7 @@
       title: 'Book a discovery call',
       subtitle: "30-min call to understand fit. We'll follow up with the platform tour and a deep-dive call if there's a match.",
       messageLabel: 'Tell us about your environment',
-      messagePlaceholder: "How many OCI tenancies / OKE clusters? Team size? Current workflow?",
+      messagePlaceholder: "How many Oracle Cloud tenancies / Kubernetes clusters? Team size? Current workflow?",
       submitText: 'Request a call',
       successMessage: 'Your request has been received.<br>We\'ll be in touch within one business day to schedule.',
       subject: 'Infragate Discovery Call Request'
@@ -2509,7 +2551,7 @@
       title: 'Start your evaluation',
       subtitle: 'EUR 2,500, 14 days, in your tenancy. Fee is credited toward Founding, Business, or Enterprise if you convert within 30 days. Kickoff scheduled within one business day.',
       messageLabel: 'Tell us about your environment',
-      messagePlaceholder: 'How many OCI tenancies / OKE clusters? What does success look like for the evaluation?',
+      messagePlaceholder: 'How many Oracle Cloud tenancies / Kubernetes clusters? What does success look like for the evaluation?',
       submitText: 'Start evaluation',
       successMessage: 'Your evaluation request has been received.<br>We\'ll be in touch to schedule the kickoff.',
       subject: 'Infragate Evaluation Request'
@@ -2684,7 +2726,7 @@
     });
   });
     // Active nav highlight on scroll - simple scroll-position approach (no IntersectionObserver)
-    var navSections = ['features','ga-roadmap','templates','finops','admin','deploy','identity'];
+    var navSections = ['overview','features','ga-roadmap','templates','finops','admin','deploy','identity'];
     var currentActive = null;
     var isNavClick = false;
     var scrollRaf = null;
@@ -2745,6 +2787,7 @@
   (function() {
     var container = document.getElementById('terraformOutput');
     var titleEl = document.querySelector('.terminal .bg-gray-800 .text-gray-400.text-xs.ml-2');
+    if (!container) return;
 
     var scenarios = [
       {
@@ -2891,6 +2934,15 @@
   // === SCROLL REVEAL OBSERVER ===
   (function() {
     var revealEls = document.querySelectorAll('.reveal, .stagger-children');
+    setTimeout(function() {
+      revealEls.forEach(function(el) {
+        if (!el.classList.contains('visible')) el.classList.add('fallback-visible');
+      });
+    }, 1200);
+    if (!('IntersectionObserver' in window)) {
+      revealEls.forEach(function(el) { el.classList.add('visible'); });
+      return;
+    }
     var observer = new IntersectionObserver(function(entries) {
       entries.forEach(function(entry) {
         if (entry.isIntersecting) {
