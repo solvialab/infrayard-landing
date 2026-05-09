@@ -226,7 +226,7 @@ Two first-class deployment paths, each tuned to its target environment. Both use
 | **Validation playbook** | Available during evaluation/POC | Available during evaluation/POC |
 
 - **Any Kubernetes** — the Helm chart also works on any K8s cluster that has an ingress controller and a default StorageClass; use `values.yaml` as a starting point and override for your environment
-- **Image delivery with any container registry** — release images can be consumed from GHCR or mirrored into your private registry (OCIR, GitLab CR, Harbor, Docker Hub, etc.). Helm chart supports `imagePullSecrets` for private registries.
+- **Image delivery with any container registry** — release images are published to GHCR as the canonical registry and mirrored 1:1 to OCIR and GitLab Container Registry from the single release pipeline. Customers can also mirror into Harbor, Docker Hub, or another approved registry. Helm chart supports `imagePullSecrets` for private registries.
 - **OCI Marketplace (planned)** — one-click "Launch Stack" deployment from OCI Console is planned for a future release
 - **In-cluster access agent (planned)** — outbound agent tunnel for private-by-default environments that do not allow public OKE API endpoints, even CIDR-restricted ones. This removes DRG/LPG pressure after bootstrap and gives Rancher-like kubeconfig behavior.
 

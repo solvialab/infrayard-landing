@@ -37,7 +37,7 @@ Pick the deployment path that matches your environment — both use the same Hel
 | Best for | Enterprise teams already running OKE | Dev/test, demos, Always Free tier |
 | Ingress controller | ingress-nginx + OCI flexible Load Balancer (installed separately) | Traefik (bundled with k3s, zero setup) |
 | Storage class | `oci-bv` (OCI Block Volume) | `local-path` (k3s default) |
-| Image pull policy | `IfNotPresent` (OKE nodes pull from GHCR) | `Always` (single VM refresh-on-restart) |
+| Image pull policy | `IfNotPresent` (OKE nodes pull from approved registry) | `Always` (single VM refresh-on-restart) |
 | Scheduling | No tolerations (OKE has dedicated workers) | Control-plane tolerations (single-node scheduling) |
 | Values file | `deploy/helm/values-oke.yaml` | `deploy/helm/values-k3s.yaml` |
 | Chart values `ingress.className` | `nginx` | `traefik` |
@@ -418,7 +418,7 @@ pytest tests/ -v --tb=short --cov=app --cov-report=term-missing
 
 ### CI pipeline (maintainer-owned)
 
-Infragate includes reference CI/CD pipelines for maintainers on GitHub and GitLab. These pipelines validate the repo and publish release images. Customer operators typically do not run these pipelines — they deploy versioned images from GHCR, OCIR, or an internal mirror.
+Infragate includes maintainer CI on GitHub and GitLab. GitHub Actions is the single release publisher for GHCR, GitLab Container Registry, and OCIR; GitLab CI is validation-only. Customer operators typically do not run these pipelines - they deploy versioned images from GHCR, OCIR, GitLab Container Registry, or an internal mirror.
 
 **GitHub Actions** (`.github/workflows/ci.yml`):
 
@@ -426,7 +426,7 @@ Infragate includes reference CI/CD pipelines for maintainers on GitHub and GitLa
 |---|---|
 | `test` | 160 Python unit tests with coverage |
 | `helm-lint` | Helm lint + template rendering (default + k3s + OKE values) |
-| `docker-build-push` | Build + push images to GHCR (`dev-latest` on DEV, `latest` on main) |
+| `docker-build-push` | Build + push the same images to GHCR, GitLab Container Registry, and OCIR |
 | `terraform-validate` | Core module and runner template |
 
 **GitLab CI** (`.gitlab-ci.yml`):
@@ -435,10 +435,9 @@ Infragate includes reference CI/CD pipelines for maintainers on GitHub and GitLa
 |---|---|
 | `test` | 160 Python unit tests with coverage |
 | `helm-lint` | Helm lint + template rendering (default + k3s + OKE values) |
-| `build-api` / `build-frontend` | Build + push images to GitLab Container Registry |
 | `terraform-validate` | Core module and runner template |
 
-Both use the same tagging scheme (`latest` / `dev-latest` + commit SHA) for maintainer release flow. For customer environments, prefer pinned release tags or digests from your approved registry. The Helm chart's `imagePullSecrets` support makes this work with any private container registry.
+The release publisher uses the same tagging scheme (`latest` / `dev-latest` + commit SHA, plus immutable `v*` release tags) across all three registries. GHCR is canonical, and GitLab Container Registry plus OCIR are 1:1 mirrors from the same build. For customer environments, prefer pinned release tags or digests from your approved registry. The Helm chart's `imagePullSecrets` support makes this work with any private container registry.
 
 ---
 

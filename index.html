@@ -294,12 +294,14 @@
       background: rgba(28, 93, 122, 0.35);
     }
     .stat-number {
-      font-size: 2.2rem;
+      font-size: 1.65rem;
       font-weight: 800;
+      line-height: 1.08;
       background: linear-gradient(135deg, #0B2B3F, #1C5D7A);
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
+      overflow-wrap: anywhere;
     }
     .dark .stat-number {
       background: linear-gradient(135deg, #5BB8D8, #7DD3FC);
@@ -307,7 +309,7 @@
       background-clip: text;
     }
     @media (min-width: 768px) {
-      .stat-number { font-size: 2.8rem; }
+      .stat-number { font-size: 2rem; }
     }
     /* Section labels */
     .section-pill {
@@ -723,11 +725,12 @@
       background: linear-gradient(90deg, #10b981, #34d399);
     }
     .stat-label {
-      font-size: 0.875rem;
+      font-size: 0.78rem;
       color: #6b7280;
       opacity: 0;
       transform: translateY(6px);
       transition: opacity 0.8s ease 0.6s, transform 0.8s ease 0.6s;
+      line-height: 1.35;
     }
     .dark .stat-label { color: #9ca3af; }
     .stat-card.active .stat-label {
@@ -1034,7 +1037,7 @@
     #menuToggle.open .line-3 { transform: translateY(-6px) rotate(-45deg); }
     /* Responsive fixes */
     @media (max-width: 767px) {
-      .stat-number { font-size: 1.6rem; }
+      .stat-number { font-size: 1.45rem; }
       .terminal { border-radius: 0.75rem; }
       .terminal .p-4 { padding: 0.75rem; }
       .terminal .text-sm { font-size: 0.7rem; }
@@ -1626,7 +1629,7 @@
     <div class="glass-card rounded-2xl p-6 tilt-card flex flex-col items-center sm:items-start">
       <div class="feature-icon mb-4"><i class="fas fa-layer-group text-xl text-[#1C5D7A] dark:text-[#5BB8D8]"></i></div>
       <h3 class="text-xl font-bold text-gray-900 dark:text-white">Scale and upgrade</h3>
-      <p class="text-gray-500 dark:text-gray-400 mt-2">Add or remove worker pools, change CPU and memory, scale environments down, and run Kubernetes upgrades through guided workflows.</p>
+      <p class="text-gray-500 dark:text-gray-400 mt-2">Add or remove worker pools, change CPU and memory, scale environments down, run Kubernetes upgrades, and clean up clusters through guided workflows.</p>
     </div>
     <div class="glass-card rounded-2xl p-6 tilt-card flex flex-col items-center sm:items-start">
       <div class="feature-icon mb-4"><i class="fas fa-chart-simple text-xl text-[#1C5D7A] dark:text-[#5BB8D8]"></i></div>
@@ -1642,7 +1645,7 @@
     <div class="glass-card rounded-2xl p-6 tilt-card flex flex-col items-center sm:items-start">
       <div class="feature-icon mb-4"><i class="fas fa-network-wired text-xl text-[#1C5D7A] dark:text-[#5BB8D8]"></i></div>
       <h3 class="text-xl font-bold text-gray-900 dark:text-white">Manage network ranges</h3>
-      <p class="text-gray-500 dark:text-gray-400 mt-2">Admins define the available network ranges. Infragate allocates one per cluster and prevents overlap.</p>
+      <p class="text-gray-500 dark:text-gray-400 mt-2">Admins define the available network ranges. Infragate allocates one per cluster, prevents overlap, and releases it when the cluster is destroyed.</p>
     </div>
     <div class="glass-card rounded-2xl p-6 tilt-card flex flex-col items-center sm:items-start">
       <div class="feature-icon mb-4"><i class="fas fa-key text-xl text-[#1C5D7A] dark:text-[#5BB8D8]"></i></div>
@@ -2074,30 +2077,40 @@
 
 <!-- Stats -->
 <div class="border-y border-gray-100 dark:border-gray-800 bg-white dark:bg-[#0B1120] py-12 md:py-16" id="statsSection">
-  <div class="max-w-6xl mx-auto px-4 sm:px-6 grid grid-cols-2 xs:grid-cols-4 gap-8 md:gap-10">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 grid grid-cols-2 xs:grid-cols-3 md:grid-cols-6 gap-7 md:gap-6">
     <div class="stat-card text-center" data-stat-index="0">
-      <div class="stat-number">12-20 min</div>
+      <div class="stat-number">12-20m</div>
       <div class="stat-bar-track"><div class="stat-bar-fill" data-fill="100"></div></div>
-      <div class="stat-label">Typical provisioning</div>
+      <div class="stat-label">Typical deploy time</div>
     </div>
     <div class="stat-card text-center" data-stat-index="1">
-      <div class="stat-number" data-count-to="160" data-count-suffix="+" data-count-duration="2800">160+</div>
-      <div class="stat-bar-track"><div class="stat-bar-fill" data-fill="100"></div></div>
-      <div class="stat-label">Automated tests</div>
-    </div>
-    <div class="stat-card text-center" data-stat-index="2">
-      <div class="stat-number" data-count-to="4" data-count-suffix="/4" data-count-duration="1600">4/4</div>
+      <div class="stat-number" data-count-to="4" data-count-duration="1600">4</div>
       <div class="stat-bar-track"><div class="stat-bar-fill" data-fill="100"></div></div>
       <div class="stat-label">Lifecycle ops</div>
     </div>
-    <div class="stat-card text-center" data-stat-index="3">
-      <div class="stat-number" data-count-to="100" data-count-suffix="%" data-count-duration="3000">100%</div>
+    <div class="stat-card text-center" data-stat-index="2">
+      <div class="stat-number">Paths</div>
       <div class="stat-bar-track"><div class="stat-bar-fill" data-fill="100"></div></div>
-      <div class="stat-label">In-tenancy</div>
+      <div class="stat-label">Approved templates</div>
+    </div>
+    <div class="stat-card text-center" data-stat-index="3">
+      <div class="stat-number">Cost</div>
+      <div class="stat-bar-track"><div class="stat-bar-fill" data-fill="100"></div></div>
+      <div class="stat-label">Live estimates</div>
+    </div>
+    <div class="stat-card text-center" data-stat-index="4">
+      <div class="stat-number">TTL</div>
+      <div class="stat-bar-track"><div class="stat-bar-fill" data-fill="100"></div></div>
+      <div class="stat-label">Auto-cleanup</div>
+    </div>
+    <div class="stat-card text-center" data-stat-index="5">
+      <div class="stat-number">Roles</div>
+      <div class="stat-bar-track"><div class="stat-bar-fill" data-fill="100"></div></div>
+      <div class="stat-label">Role-based access</div>
     </div>
   </div>
   <div class="max-w-6xl mx-auto px-4 sm:px-6 mt-4 text-center text-xs text-gray-500 dark:text-gray-400">
-    Provisioning time depends on OCI region capacity, shape/image availability, and tenancy limits.
+    Provisioning time depends on Oracle Cloud region capacity, shape/image availability, and tenancy limits.
   </div>
 </div>
 
