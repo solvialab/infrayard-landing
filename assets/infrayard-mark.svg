@@ -1,0 +1,20 @@
+<svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Infrayard mark</title>
+  <desc id="desc">A centered Infrayard monogram with a self-service yard path.</desc>
+  <defs>
+    <linearGradient id="yardPath" x1="20" y1="18" x2="44" y2="46" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#9AAEFF"/>
+      <stop offset="1" stop-color="#72D9A0"/>
+    </linearGradient>
+    <linearGradient id="plotFill" x1="21" y1="18" x2="43" y2="42" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F8FAFF"/>
+      <stop offset="1" stop-color="#E8EEF8"/>
+    </linearGradient>
+  </defs>
+  <rect width="64" height="64" rx="16" fill="#24334D"/>
+  <path d="M32 45V33.5M32 33.5L21.5 22.5M32 33.5L42.5 22.5" stroke="url(#yardPath)" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+  <rect x="17.5" y="18.5" width="8" height="8" rx="2.4" fill="url(#plotFill)"/>
+  <rect x="38.5" y="18.5" width="8" height="8" rx="2.4" fill="url(#plotFill)"/>
+  <rect x="28" y="41" width="8" height="8" rx="2.4" fill="url(#plotFill)"/>
+  <circle cx="32" cy="33.5" r="2.2" fill="#24334D"/>
+</svg>

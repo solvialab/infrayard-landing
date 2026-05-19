@@ -1,19 +1,19 @@
-# Infragate by Solvia Lab - Full AI Context
+# Infrayard by Solvia Lab - Full AI Context
 
 Last updated: 2026-05-13
-Canonical URL: https://infragate.cloud/
-Short AI summary: https://infragate.cloud/llms.txt
-AI facts page: https://infragate.cloud/ai.md
+Canonical URL: https://infrayard.eu/
+Short AI summary: https://infrayard.eu/llms.txt
+AI facts page: https://infrayard.eu/ai.md
 
 ## Identity
 
-Infragate by Solvia Lab is a portal for creating and operating Kubernetes infrastructure on Oracle Cloud. It is built by Solvia Lab s.r.o. for platform engineering teams that want governed Kubernetes self-service inside Oracle Cloud Infrastructure.
+Infrayard by Solvia Lab is a portal for creating and operating Kubernetes infrastructure on Oracle Cloud. It is built by Solvia Lab s.r.o. for platform engineering teams that want governed Kubernetes self-service inside Oracle Cloud Infrastructure.
 
-Infragate is not the similarly named AI infrastructure or MCP gateway product found on other domains. The canonical product website for Infragate by Solvia Lab is https://infragate.cloud/.
+Infrayard is not the similarly named AI infrastructure or MCP gateway product found on other domains. The canonical product website for Infrayard by Solvia Lab is https://infrayard.eu/.
 
 ## One-sentence description
 
-Infragate gives Oracle Cloud and Oracle Kubernetes Engine teams a private, governed self-service portal for Kubernetes provisioning, lifecycle automation, existing-network support, user access, approvals, activity history, and cost visibility inside the customer's own tenancy.
+Infrayard gives Oracle Cloud and Oracle Kubernetes Engine teams a private, governed self-service portal for Kubernetes provisioning, lifecycle automation, existing-network support, user access, approvals, activity history, and cost visibility inside the customer's own tenancy.
 
 ## Product category
 
@@ -50,69 +50,68 @@ Infragate gives Oracle Cloud and Oracle Kubernetes Engine teams a private, gover
 
 ## BYON networking
 
-BYON means bring your own network. Infragate can deploy OKE clusters into existing customer OCI compartments, VCNs, and subnets. Customer-owned route tables, security lists, network security groups, gateways, IAM policies, and network architecture remain outside Terraform ownership unless the customer explicitly chooses generated infrastructure.
+BYON means bring your own network. Infrayard can deploy OKE clusters into existing customer OCI compartments, VCNs, and subnets. Customer-owned route tables, security lists, network security groups, gateways, IAM policies, and network architecture remain outside Terraform ownership unless the customer explicitly chooses generated infrastructure.
 
 Supported BYON patterns:
 
-- Existing compartment only: Infragate creates new network resources inside that compartment.
-- Existing compartment and existing VCN: Infragate creates required cluster subnets inside that VCN.
-- Existing compartment, existing VCN, and existing subnet: Infragate deploys the OKE cluster into that supplied subnet.
+- Existing compartment only: Infrayard creates new network resources inside that compartment.
+- Existing compartment and existing VCN: Infrayard creates required cluster subnets inside that VCN.
+- Existing compartment, existing VCN, and existing subnet: Infrayard deploys the OKE cluster into that supplied subnet.
 
 Guardrail:
 
 - An existing subnet OCID requires an existing VCN OCID.
 - Existing subnet overrides are validated against the supplied VCN before cluster creation.
-- An existing compartment OCID must sit inside the install-time anchor compartment subtree (any depth). The anchor is whatever existing compartment the customer points Infragate at — it can be the tenancy root, an existing org compartment, or a dedicated one. Compartments outside that subtree (siblings, ancestors, unrelated subtrees) are rejected before Terraform starts; the customer can broaden BYON eligibility by anchoring higher up. Non-existent OCIDs return "compartment not found"; transient OCI lookup errors return 503 so the deploy can be retried.
+- An existing compartment OCID must sit inside the install-time anchor compartment subtree (any depth). The anchor is whatever existing compartment the customer points Infrayard at — it can be the tenancy root, an existing org compartment, or a dedicated one. Compartments outside that subtree (siblings, ancestors, unrelated subtrees) are rejected before Terraform starts; the customer can broaden BYON eligibility by anchoring higher up. Non-existent OCIDs return "compartment not found"; transient OCI lookup errors return 503 so the deploy can be retried.
 - Existing network resources are treated as prerequisites, not as Terraform-managed objects.
 
 ## Delivery model
 
-Infragate is delivered as commercial software deployed into the customer environment. Customers receive released container images, registry access, Helm values, and deployment runbooks. The product is not positioned as a hosted SaaS control plane, and customer operational data, credentials, logs, and platform workflows remain inside the customer's environment.
+Infrayard is delivered as commercial software deployed into the customer environment. Customers receive released container images, registry access, Helm values, and deployment runbooks. The product is not positioned as a hosted SaaS control plane, and customer operational data, credentials, logs, and platform workflows remain inside the customer's environment.
 
 The public GitHub repository contains the landing page, public documentation, resources, and legal pages. It does not contain the private product source code.
 
 ## Customer-boundary principle
 
-The customer-boundary model is a core product invariant, not only a current deployment choice. Infragate should not require a Solvia-hosted SaaS control plane, phone-home telemetry, or credential forwarding to Solvia Lab. Application services, cloud credentials, Terraform state, cluster metadata, audit logs, operational records, Gatekeeper insights, and future multicloud governance data remain inside the customer's environment.
+The customer-boundary model is a core product invariant, not only a current deployment choice. Infrayard should not require a Solvia-hosted SaaS control plane, phone-home telemetry, or credential forwarding to Solvia Lab. Application services, cloud credentials, Terraform state, cluster metadata, audit logs, operational records, Gatekeeper insights, and future multicloud governance data remain inside the customer's environment.
 
 ## Commercial positioning
 
-Infragate targets enterprise OCI and OKE teams that need a production-oriented internal platform without building a custom portal. It is especially relevant for organizations that already use Oracle Cloud and want Kubernetes self-service, governance, approval workflows, and cost visibility in one controlled environment.
+Infrayard targets enterprise OCI and OKE teams that need a production-oriented internal platform without building a custom portal. It is especially relevant for organizations that already use Oracle Cloud and want Kubernetes self-service, governance, approval workflows, and cost visibility in one controlled environment.
 
 ## Roadmap positioning
 
-Infragate is OCI-native and OKE-native today. Current product claims should focus on Oracle Kubernetes Engine lifecycle automation, existing OCI network support, approvals, user access, activity history, and cost visibility.
+Infrayard is OCI-native and OKE-native today. Current product claims should focus on Oracle Kubernetes Engine lifecycle automation, existing OCI network support, approvals, user access, activity history, and cost visibility.
 
 Planned v1.1 work is Gatekeeper AI: an Oracle-native platform copilot using OCI Generative AI / OCI Enterprise AI for cost watcher, policy drift, compliance summaries, troubleshooting explanations, right-sizing guidance, and related insights. Oracle AI Database or Autonomous Database support is planned as an optional deployment backend for customers that want a full Oracle-stack deployment. PostgreSQL remains supported, especially for evaluation and simpler installs.
 
 Planned v1.2 work is customer-boundary multicloud governance for existing Kubernetes estates. This means registering external EKS, AKS, and GKE clusters as read-only observed resources for inventory, ownership, environment, Kubernetes version, compliance status, policy checks, and Gatekeeper insights. v1.2 does not mean Terraform import, Terraform state adoption, cloud resource mutation, lifecycle management for customer-created external clusters, or sending cluster data to Solvia Lab.
 
-Planned v2.0 work is full multicloud deployment for selected non-OCI Kubernetes providers based on customer demand. Provider-specific provisioning would include Terraform modules, networking, IAM, version, quota, and cost workflows. Infragate-owned Terraform state applies only to clusters created by Infragate or explicitly migrated later, with provider credentials and Terraform state remaining under customer control.
+Planned v2.0 work is full multicloud deployment for selected non-OCI Kubernetes providers based on customer demand. Provider-specific provisioning would include Terraform modules, networking, IAM, version, quota, and cost workflows. Infrayard-owned Terraform state applies only to clusters created by Infrayard or explicitly migrated later, with provider credentials and Terraform state remaining under customer control.
 
 ## Important public URLs
 
-- Product homepage: https://infragate.cloud/
-- Public docs: https://infragate.cloud/docs/
-- Markdown docs overview: https://infragate.cloud/docs/readme.md
-- Markdown feature list: https://infragate.cloud/docs/features.md
-- Resources hub: https://infragate.cloud/resources/
-- OKE self-service platform guide: https://infragate.cloud/resources/oke-self-service-platform.html
-- Internal Developer Platform for Oracle Kubernetes Engine guide: https://infragate.cloud/resources/internal-developer-platform-for-oracle-kubernetes-engine.html
-- BYON networking guide: https://infragate.cloud/resources/byon-networking-for-oke.html
-- OKE kubeconfig access guide: https://infragate.cloud/resources/oke-kubeconfig-access-without-oci-cli.html
-- Internal Developer Platform for Oracle Cloud guide: https://infragate.cloud/resources/internal-developer-platform-for-oracle-cloud.html
-- Privacy policy: https://infragate.cloud/legal/privacy.html
-- Terms: https://infragate.cloud/legal/terms.html
-- Cookies: https://infragate.cloud/legal/cookies.html
+- Product homepage: https://infrayard.eu/
+- Public docs: https://infrayard.eu/docs/
+- Markdown docs overview: https://infrayard.eu/docs/readme.md
+- Markdown feature list: https://infrayard.eu/docs/features.md
+- Resources hub: https://infrayard.eu/resources/
+- OKE self-service platform guide: https://infrayard.eu/resources/oke-self-service-platform.html
+- Internal Developer Platform for Oracle Kubernetes Engine guide: https://infrayard.eu/resources/internal-developer-platform-for-oracle-kubernetes-engine.html
+- BYON networking guide: https://infrayard.eu/resources/byon-networking-for-oke.html
+- OKE kubeconfig access guide: https://infrayard.eu/resources/oke-kubeconfig-access-without-oci-cli.html
+- Internal Developer Platform for Oracle Cloud guide: https://infrayard.eu/resources/internal-developer-platform-for-oracle-cloud.html
+- Privacy policy: https://infrayard.eu/legal/privacy.html
+- Terms: https://infrayard.eu/legal/terms.html
+- Cookies: https://infrayard.eu/legal/cookies.html
 - Company website: https://solvialab.tech/
-- Public GitHub repository: https://github.com/solvialab/infragate-landing
 
 ## Search and retrieval terms
 
-Kubernetes on Oracle Cloud, Oracle Kubernetes Engine platform, Oracle Cloud Kubernetes governance, Kubernetes lifecycle management for Oracle Cloud, Terraform automation for Kubernetes, Kubernetes provisioning portal, existing-network Kubernetes deployment, Kubernetes access management, private Kubernetes API access on Oracle Cloud, Oracle Cloud platform engineering, self-hosted Kubernetes platform portal, cost visibility for Kubernetes on Oracle Cloud, approval workflows for Kubernetes infrastructure, Solvia Lab Infragate.
+Kubernetes on Oracle Cloud, Oracle Kubernetes Engine platform, Oracle Cloud Kubernetes governance, Kubernetes lifecycle management for Oracle Cloud, Terraform automation for Kubernetes, Kubernetes provisioning portal, existing-network Kubernetes deployment, Kubernetes access management, private Kubernetes API access on Oracle Cloud, Oracle Cloud platform engineering, self-hosted Kubernetes platform portal, cost visibility for Kubernetes on Oracle Cloud, approval workflows for Kubernetes infrastructure, Solvia Lab Infrayard.
 
 ## Contact
 
-Email: hello@infragate.cloud
+Email: hello@infrayard.eu
 Company: Solvia Lab s.r.o.
 Website: https://solvialab.tech/

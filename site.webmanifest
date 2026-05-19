@@ -1,12 +1,17 @@
 {
-  "name": "Infragate",
-  "short_name": "Infragate",
+  "name": "Infrayard",
+  "short_name": "Infrayard",
   "description": "OCI-native Internal Developer Platform for Oracle Kubernetes Engine.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0b1120",
   "theme_color": "#1b2b4b",
   "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
     {
       "src": "/favicon-192x192.png",
       "sizes": "192x192",

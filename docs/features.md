@@ -1,6 +1,6 @@
-# Infragate by Solvia Lab — Features
+# Infrayard by Solvia Lab — Features
 
-A complete overview of Infragate by Solvia Lab as an OCI-native Internal Developer Platform (IDP) for governed OKE lifecycle management: self-service provisioning, BYON networking, access delivery, approvals, Activity history, and FinOps visibility. Detailed deployment and integration runbooks are available during evaluation/POC.
+A complete overview of Infrayard by Solvia Lab as an OCI-native Internal Developer Platform (IDP) for governed OKE lifecycle management: self-service provisioning, BYON networking, access delivery, approvals, Activity history, and FinOps visibility. Detailed deployment and integration runbooks are available during evaluation/POC.
 
 ---
 
@@ -10,9 +10,9 @@ A complete overview of Infragate by Solvia Lab as an OCI-native Internal Develop
 - **Live Terraform streaming** — `terraform init`, `plan`, and `apply` output streams in real time to the browser during deploy, scale, upgrade, and destroy operations
 - **Template-based or custom** — choose from admin-defined cluster templates or configure everything manually
 - **Automatic resource creation** — each cluster gets its own compartment, VCN, subnet, internet gateway, route table, security list, and node pools
-- **VPN-first Kubernetes API access** — admins can enable public OKE API endpoints restricted to runner/VPN/corporate CIDRs. Infragate creates a dedicated public API endpoint subnet and TCP/6443 allowlist rules, avoiding DRG cost and LPG scaling limits while keeping access unavailable from the open internet.
-- **Bring your own infrastructure** — optionally supply existing VCN, compartment, or subnet OCIDs via the Advanced tab to skip resource creation and wire into existing networks. Supplied BYO resources are referenced read-only and never edited by Terraform; if only an existing VCN is supplied, Infragate may still create cluster subnets/security lists inside it. Existing subnet overrides require an existing VCN override and are validated against OCI before Terraform starts. Infragate-created VCN/subnet/security list resources are fully managed and manual OCI Console edits to them will be overwritten on the next apply. When using existing VCN/subnet overrides, route tables are not managed by Infragate, so equivalent private-subnet egress must already exist for OKE workers: route `0.0.0.0/0` to NAT Gateway (or equivalent corporate egress path) and route `all-<region>-services-in-oracle-services-network` to Service Gateway. This is routing, not an open ingress security rule.
-- **BYON scope behavior** - `Existing Compartment OCID` alone reuses only the compartment. Infragate does not auto-discover existing VCN/subnet objects inside that compartment; leave VCN/subnet blank only when you want Infragate to create a fresh network stack there.
+- **VPN-first Kubernetes API access** — admins can enable public OKE API endpoints restricted to runner/VPN/corporate CIDRs. Infrayard creates a dedicated public API endpoint subnet and TCP/6443 allowlist rules, avoiding DRG cost and LPG scaling limits while keeping access unavailable from the open internet.
+- **Bring your own infrastructure** — optionally supply existing VCN, compartment, or subnet OCIDs via the Advanced tab to skip resource creation and wire into existing networks. Supplied BYO resources are referenced read-only and never edited by Terraform; if only an existing VCN is supplied, Infrayard may still create cluster subnets/security lists inside it. Existing subnet overrides require an existing VCN override and are validated against OCI before Terraform starts. Infrayard-created VCN/subnet/security list resources are fully managed and manual OCI Console edits to them will be overwritten on the next apply. When using existing VCN/subnet overrides, route tables are not managed by Infrayard, so equivalent private-subnet egress must already exist for OKE workers: route `0.0.0.0/0` to NAT Gateway (or equivalent corporate egress path) and route `all-<region>-services-in-oracle-services-network` to Service Gateway. This is routing, not an open ingress security rule.
+- **BYON scope behavior** - `Existing Compartment OCID` alone reuses only the compartment. Infrayard does not auto-discover existing VCN/subnet objects inside that compartment; leave VCN/subnet blank only when you want Infrayard to create a fresh network stack there.
 - **Advanced override guardrails** - Advanced OCID fields validate resource-type prefixes and provide OCI-backed autocomplete for compartments, VCNs, and subnets to reduce typo/copy-paste errors before deploy.
 - **Shared compartment pattern** — for multiple clusters in one compartment, use a dedicated BYO compartment OCID in Advanced for every cluster in that shared domain; avoid reusing an auto-created per-cluster compartment as a shared target.
 - **Compartment subtree enforcement** — `Existing Compartment OCID` is validated against the install-time anchor compartment (set by the customer at install — can be the tenancy root, an existing org compartment, or a dedicated one) before Terraform runs. Descendants of the anchor at any depth are accepted; siblings, ancestors, or compartments in unrelated subtrees are rejected with a clear 400. This catches the misconfiguration upfront instead of letting it surface as a confusing mid-`terraform apply` IAM failure, since the runner's IAM `manage` policies are scoped to the anchor subtree. Customers who want a flat "anywhere goes" model anchor at the tenancy root; customers who want narrower blast radius pick a smaller anchor. Non-existent OCIDs return "compartment not found"; transient OCI API errors return 503 so the deploy can be retried.
@@ -35,7 +35,7 @@ A complete overview of Infragate by Solvia Lab as an OCI-native Internal Develop
 - **Deploy form pre-fill + lock** — selecting a template pre-fills and locks resource fields (pools, nodes, CPU, RAM, storage, pool names, and add/remove pool controls). Users can still set cluster name, CIDR, compartment, and advanced overrides. Select "Custom" to unlock all fields and configure manually with limit enforcement
 - **Template values can exceed user limits** — templates represent admin-pre-approved configurations, so template-defined values are not clamped to the user's personal limits. The lock prevents users from editing these values
 - **Requests workflow** — protected-cluster destroy approvals and per-user limit-increase requests share a dedicated admin Requests queue. Users submit a reason, admins approve/deny with an optional note, and outcomes are visible in Activity. When SMTP is configured, submit/approve/deny events also send info-only email pings to admins and users with requester, action, comments, and request parameters. Destroy approvals still require review of the Terraform destroy plan before force-destroy; limit approvals apply granted overrides to the user's account
-- **Time-to-live (TTL)** — optional expiry in hours, enforced at deploy time; when TTL is reached, Infragate automatically triggers destroy/cleanup. Also available on custom deploys without a template
+- **Time-to-live (TTL)** — optional expiry in hours, enforced at deploy time; when TTL is reached, Infrayard automatically triggers destroy/cleanup. Also available on custom deploys without a template
 - **Live cost preview** — add/edit modal shows estimated monthly and hourly cost that updates as you change pools, shape, or tier
 - **Template shape/K8s guardrail** — template modal uses the same shape-aware compatibility filtering as deploy; save/update re-validates selected shape+K8s and blocks incompatible combinations
 - **Role-based access** — restrict templates to users with a specific Keycloak realm role. This enables environment-tier gating across your organisation:
@@ -56,7 +56,7 @@ A complete overview of Infragate by Solvia Lab as an OCI-native Internal Develop
 
 ## Cost visibility (FinOps)
 
-Infragate provides live cost estimation across the entire platform using OCI Pay-As-You-Go rates as defaults, with optional admin overrides for custom contracts.
+Infrayard provides live cost estimation across the entire platform using OCI Pay-As-You-Go rates as defaults, with optional admin overrides for custom contracts.
 
 | Surface | What's shown |
 |---|---|
@@ -110,9 +110,9 @@ Infragate provides live cost estimation across the entire platform using OCI Pay
 - **TTL visibility** — dashboard cards show color-coded countdown badges (green >24h, orange <24h, red <4h) for clusters with TTL. Detail page shows full expiry timestamp and remaining time
 - **Destroy protection + approval queue** — protected clusters show a red "Protected" badge on dashboard cards, the admin All Clusters table, and the detail page. Non-admin users clicking "Destroy" open a "Request destroy" modal (optional reason) which creates a pending approval ticket. The admin nav shows a live-count "Requests (N)" badge, refreshed every 5s. On the admin Requests page, admins approve, review the destroy plan, then confirm force-destroy, or deny with a note — the user's cluster card then displays a "Destroy pending" (amber) or "Destroy denied" (red, note in tooltip) pill. At most one pending request per cluster. Every submit/approve/deny is audit-logged and can emit info-only request emails when SMTP is enabled. Admins can still force-destroy directly via `?force=true`.
 - **Activity inbox** — user nav includes a persistent Activity dropdown with unread counts, last events, and mark-read controls. Destroy-request approve/deny events, limit request submit/review events, TTL warnings, deploy/scale/upgrade/destroy lifecycle events, and admin-driven account limit changes emit inbox rows.
-- **Destroy with cleanup** — `terraform destroy` removes cluster-scoped OCI resources and returns CIDR to pool; Infragate-managed child compartments may be deleted, external compartment overrides are retained, and only the cluster `.tfstate` object is deleted while the user prefix remains
+- **Destroy with cleanup** — `terraform destroy` removes cluster-scoped OCI resources and returns CIDR to pool; Infrayard-managed child compartments may be deleted, external compartment overrides are retained, and only the cluster `.tfstate` object is deleted while the user prefix remains
 - **Error recovery** — failed deployments show troubleshooting tips and a "Clean up" button to remove partial resources
-- **Kubeconfig download** — universal kubeconfig with embedded per-user ServiceAccount token; no OCI CLI or local OCI config required. Infragate and the user must still reach the OKE API endpoint; the supported no-DRG/no-LPG path is the restricted public API endpoint allowlist. Explicit OCI-exec fallback remains available via `/kubeconfig-oci`.
+- **Kubeconfig download** — universal kubeconfig with embedded per-user ServiceAccount token; no OCI CLI or local OCI config required. Infrayard and the user must still reach the OKE API endpoint; the supported no-DRG/no-LPG path is the restricted public API endpoint allowlist. Explicit OCI-exec fallback remains available via `/kubeconfig-oci`.
 - **SSH key download** — Terraform-generated private key available on the detail page
 
 ---
@@ -120,7 +120,7 @@ Infragate provides live cost estimation across the entire platform using OCI Pay
 ## Identity and access
 
 - **Any OIDC provider** — works with Keycloak, Azure AD, Okta, Google Workspace, or any OIDC-compliant IdP
-- **No user directory** — Infragate auto-provisions users on first login from the JWT `sub` claim
+- **No user directory** — Infrayard auto-provisions users on first login from the JWT `sub` claim
 - **PKCE authentication** — Authorization Code + PKCE flow; no client secrets stored in the frontend
 - **Role-based access** — `admin` role (from IdP) grants access to the admin panel; custom realm roles can restrict cluster template visibility (e.g. `production`, `staging`); all other users are regular users
 - **Session management** — automatic token refresh, silent re-auth, secure logout via IdP end-session endpoint
@@ -176,7 +176,7 @@ Six dedicated admin pages accessible to users with the `admin` role:
 - **Review** action opens a modal: optional admin note, then **Approve** opens the destroy plan for a second confirmation, or **Deny** (note surfaces on user's cluster card as "Destroy denied")
 - Limit-request review lets admins grant requested or adjusted values for cluster count, pools, nodes, OCPU, RAM, and storage; approve/deny results notify the user in Activity
 - Optional request emails notify admins on submit and users on submit/approve/deny; email content includes requester, action, request id, comments, cluster details for destroy requests, and requested/granted values for limit requests
-- **Admin-action emails to cluster owner** — when an admin scales, upgrades, or force-destroys a cluster owned by another user, the owner is emailed at every lifecycle state (started, succeeded, failed) with the operation, the admin who initiated it, cluster details, and a link back to Infragate. Failure emails explicitly note that admins with OCI Console access can intervene/clean up directly. Owner-on-own actions stay silent
+- **Admin-action emails to cluster owner** — when an admin scales, upgrades, or force-destroys a cluster owned by another user, the owner is emailed at every lifecycle state (started, succeeded, failed) with the operation, the admin who initiated it, cluster details, and a link back to Infrayard. Failure emails explicitly note that admins with OCI Console access can intervene/clean up directly. Owner-on-own actions stay silent
 - Row-locked approval prevents double-approval when two admins click simultaneously
 - Every submit / approve / deny is audit-logged
 - Bypass path: admins can still force-destroy directly via `?force=true` for incident response

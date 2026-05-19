@@ -28,4 +28,4 @@ Allow: /
 User-agent: Google-Extended
 Allow: /
 
-Sitemap: https://infragate.cloud/sitemap.xml
+Sitemap: https://infrayard.eu/sitemap.xml

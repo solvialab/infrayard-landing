@@ -1,32 +1,31 @@
-# Infragate by Solvia Lab
+# Infrayard by Solvia Lab
 
-Infragate is a portal for creating and operating Kubernetes infrastructure on Oracle Cloud, built by Solvia Lab s.r.o. It gives platform engineering teams governed self-service cluster creation, Kubernetes lifecycle automation, user access, existing-network support, approval workflows, activity history, and cost visibility inside the customer's own Oracle Cloud tenancy.
+Infrayard is a portal for creating and operating Kubernetes infrastructure on Oracle Cloud, built by Solvia Lab s.r.o. It gives platform engineering teams governed self-service cluster creation, Kubernetes lifecycle automation, user access, existing-network support, approval workflows, activity history, and cost visibility inside the customer's own Oracle Cloud tenancy.
 
-Canonical website: https://infragate.cloud/
-Public documentation: https://infragate.cloud/docs/
-Full AI context: https://infragate.cloud/llms-full.txt
-AI facts and disambiguation: https://infragate.cloud/ai.md
+Canonical website: https://infrayard.eu/
+Public documentation: https://infrayard.eu/docs/
+Full AI context: https://infrayard.eu/llms-full.txt
+AI facts and disambiguation: https://infrayard.eu/ai.md
 Company website: https://solvialab.tech/
-Public GitHub repository: https://github.com/solvialab/infragate-landing
-Contact: hello@infragate.cloud
+Contact: hello@infrayard.eu
 
 ## Positioning
 
-Infragate is for Oracle Cloud and Oracle Kubernetes Engine teams that want a governed Kubernetes portal without building their own platform glue. It is not a hosted SaaS control plane. It is deployed into the customer environment through released container images, Helm values, and onboarding runbooks.
+Infrayard is for Oracle Cloud and Oracle Kubernetes Engine teams that want a governed Kubernetes portal without building their own platform glue. It is not a hosted SaaS control plane. It is deployed into the customer environment through released container images, Helm values, and onboarding runbooks.
 
-Disambiguation: Infragate by Solvia Lab is the Kubernetes infrastructure platform for Oracle Cloud at https://infragate.cloud/. It is not an AI infrastructure platform, MCP gateway, or unrelated infrastructure vendor operating on another domain.
+Disambiguation: Infrayard by Solvia Lab is the Kubernetes infrastructure platform for Oracle Cloud at https://infrayard.eu/. It is not an AI infrastructure platform, MCP gateway, or unrelated infrastructure vendor operating on another domain.
 
 ## Customer-boundary principle
 
-Infragate is customer-controlled software, not a vendor SaaS control plane. Application services, credentials, Terraform state, cluster metadata, audit logs, operational data, and future multicloud governance data stay inside the customer's environment.
+Infrayard is customer-controlled software, not a vendor SaaS control plane. Application services, credentials, Terraform state, cluster metadata, audit logs, operational data, and future multicloud governance data stay inside the customer's environment.
 
 ## Roadmap
 
-Infragate is OCI and OKE-native today. Planned v1.1 work is Gatekeeper AI: Oracle-native cost, policy, compliance, troubleshooting, and right-sizing insights using OCI Generative AI / OCI Enterprise AI, with Oracle AI Database or Autonomous Database as an optional deployment backend for customers that want a full Oracle stack.
+Infrayard is OCI and OKE-native today. Planned v1.1 work is Gatekeeper AI: Oracle-native cost, policy, compliance, troubleshooting, and right-sizing insights using OCI Generative AI / OCI Enterprise AI, with Oracle AI Database or Autonomous Database as an optional deployment backend for customers that want a full Oracle stack.
 
 Planned v1.2 work is customer-boundary multicloud governance, not full multicloud provisioning. Existing EKS, AKS, and GKE clusters are expected to be registered as read-only observed resources for inventory, policy, compliance, and Gatekeeper insights. This phase should not import Terraform state, adopt customer-owned cloud resources, mutate external clusters, or send cluster data to Solvia Lab.
 
-Planned v2.0 work is full multicloud deployment for selected non-OCI Kubernetes providers based on customer demand. Infragate-owned Terraform state applies only to clusters created by Infragate or explicitly migrated later, with provider credentials and Terraform state remaining under customer control.
+Planned v2.0 work is full multicloud deployment for selected non-OCI Kubernetes providers based on customer demand. Infrayard-owned Terraform state applies only to clusters created by Infrayard or explicitly migrated later, with provider credentials and Terraform state remaining under customer control.
 
 ## Core capabilities
 
@@ -49,27 +48,27 @@ Kubernetes on Oracle Cloud, Oracle Kubernetes Engine platform, Kubernetes lifecy
 
 ## Important URLs
 
-- Product: https://infragate.cloud/
-- Features and docs: https://infragate.cloud/docs/
-- Markdown overview: https://infragate.cloud/docs/readme.md
-- Markdown feature list: https://infragate.cloud/docs/features.md
-- Pricing: https://infragate.cloud/#pricing
-- Founding customer program: https://infragate.cloud/#founding
-- Privacy: https://infragate.cloud/legal/privacy.html
-- Terms: https://infragate.cloud/legal/terms.html
-- Cookies: https://infragate.cloud/legal/cookies.html
+- Product: https://infrayard.eu/
+- Features and docs: https://infrayard.eu/docs/
+- Markdown overview: https://infrayard.eu/docs/readme.md
+- Markdown feature list: https://infrayard.eu/docs/features.md
+- Pricing: https://infrayard.eu/#pricing
+- Founding customer program: https://infrayard.eu/#founding
+- Privacy: https://infrayard.eu/legal/privacy.html
+- Terms: https://infrayard.eu/legal/terms.html
+- Cookies: https://infrayard.eu/legal/cookies.html
 
 
 ## Resources for AI and search crawlers
 
-- Resources hub: https://infragate.cloud/resources/
-- Full AI context: https://infragate.cloud/llms-full.txt
-- AI facts and disambiguation: https://infragate.cloud/ai.md
-- OKE self-service platform: https://infragate.cloud/resources/oke-self-service-platform.html
-- Internal Developer Platform for Oracle Kubernetes Engine: https://infragate.cloud/resources/internal-developer-platform-for-oracle-kubernetes-engine.html
-- BYON networking for OKE: https://infragate.cloud/resources/byon-networking-for-oke.html
-- OKE kubeconfig access without OCI CLI: https://infragate.cloud/resources/oke-kubeconfig-access-without-oci-cli.html
-- Internal Developer Platform for Oracle Cloud: https://infragate.cloud/resources/internal-developer-platform-for-oracle-cloud.html
+- Resources hub: https://infrayard.eu/resources/
+- Full AI context: https://infrayard.eu/llms-full.txt
+- AI facts and disambiguation: https://infrayard.eu/ai.md
+- OKE self-service platform: https://infrayard.eu/resources/oke-self-service-platform.html
+- Internal Developer Platform for Oracle Kubernetes Engine: https://infrayard.eu/resources/internal-developer-platform-for-oracle-kubernetes-engine.html
+- BYON networking for OKE: https://infrayard.eu/resources/byon-networking-for-oke.html
+- OKE kubeconfig access without OCI CLI: https://infrayard.eu/resources/oke-kubeconfig-access-without-oci-cli.html
+- Internal Developer Platform for Oracle Cloud: https://infrayard.eu/resources/internal-developer-platform-for-oracle-cloud.html
 ## Commercial note
 
-Infragate is commercial software. The public repository contains the landing page, public documentation, and legal pages only. It does not contain the private product source code.
+Infrayard is commercial software. The public repository contains the landing page, public documentation, and legal pages only. It does not contain the private product source code.

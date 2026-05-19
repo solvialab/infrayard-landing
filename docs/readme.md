@@ -1,8 +1,8 @@
-# Infragate by Solvia Lab
+# Infrayard by Solvia Lab
 
 **A portal for creating and operating Kubernetes infrastructure on Oracle Cloud without making every engineer write Terraform or work directly in the Oracle Cloud Console.**
 
-Infragate lets platform teams define the approved ways to create Kubernetes clusters: templates, limits, networking rules, login roles, approvals, cost visibility, and audit history. Engineers request and operate clusters through the portal. Infragate runs the infrastructure workflow underneath, using Terraform and Oracle Cloud APIs inside the customer environment.
+Infrayard lets platform teams define the approved ways to create Kubernetes clusters: templates, limits, networking rules, login roles, approvals, cost visibility, and audit history. Engineers request and operate clusters through the portal. Infrayard runs the infrastructure workflow underneath, using Terraform and Oracle Cloud APIs inside the customer environment.
 
 In practical terms:
 
@@ -47,12 +47,12 @@ Pick the deployment path that matches your environment — both use the same Hel
 
 ### Existing OKE cluster (recommended)
 
-For teams that already have an OKE cluster — deploy Infragate via Helm in minutes:
+For teams that already have an OKE cluster — deploy Infrayard via Helm in minutes:
 
 ```bash
 helm upgrade --install infragate deploy/helm/ -n infragate \
   -f deploy/helm/values-oke.yaml \
-  --set global.domain=infragate.example.com \
+  --set global.domain=infrayard.example.com \
   --set postgresql.auth.password=YOUR_DB_PASSWORD \
   --set keycloak.admin.password=YOUR_KC_PASSWORD \
   --set api.oci.tenancyOcid=ocid1.tenancy... \
@@ -62,7 +62,7 @@ helm upgrade --install infragate deploy/helm/ -n infragate \
   --set api.oci.parentCompartmentOcid=ocid1.compartment...
 ```
 
-> Contact [hello@infragate.cloud](mailto:hello@infragate.cloud) for Helm chart access and onboarding support.
+> Contact [hello@infrayard.eu](mailto:hello@infrayard.eu) for Helm chart access and onboarding support.
 
 ### Single-node k3s
 
@@ -71,7 +71,7 @@ For dev/test, demos, or OCI Always Free tier VMs. Run this on an OCI VM in the s
 ```bash
 helm upgrade --install infragate deploy/helm/ -n infragate \
   -f deploy/helm/values-k3s.yaml \
-  --set global.domain=infragate.example.com \
+  --set global.domain=infrayard.example.com \
   --set postgresql.auth.password=YOUR_DB_PASSWORD \
   --set keycloak.admin.password=YOUR_KC_PASSWORD \
   --set api.oci.tenancyOcid=ocid1.tenancy... \
@@ -81,9 +81,9 @@ helm upgrade --install infragate deploy/helm/ -n infragate \
   --set api.oci.parentCompartmentOcid=ocid1.compartment...
 ```
 
-OCI credentials are still required — Infragate calls the OCI API to provision OKE clusters regardless of where Infragate itself runs. See customer onboarding runbooks (gated) for OCI service-account setup and state-backend provisioning steps.
+OCI credentials are still required — Infrayard calls the OCI API to provision OKE clusters regardless of where Infrayard itself runs. See customer onboarding runbooks (gated) for OCI service-account setup and state-backend provisioning steps.
 
-> Contact [hello@infragate.cloud](mailto:hello@infragate.cloud) for Helm chart access and onboarding support.
+> Contact [hello@infrayard.eu](mailto:hello@infrayard.eu) for Helm chart access and onboarding support.
 
 ### OCI Marketplace (planned)
 
@@ -97,7 +97,7 @@ Full deployment runbook is available during evaluation/POC.
 
 ### Signing in
 
-Infragate uses your organisation's existing identity provider (Keycloak, Azure AD, Okta, Google Workspace, or any OIDC-compliant IdP). Click **Log In** — you are redirected to your IdP's login page and returned to the portal after authentication. No separate Infragate account is needed.
+Infrayard uses your organisation's existing identity provider (Keycloak, Azure AD, Okta, Google Workspace, or any OIDC-compliant IdP). Click **Log In** — you are redirected to your IdP's login page and returned to the portal after authentication. No separate Infrayard account is needed.
 
 ### Deploying a cluster
 
@@ -111,7 +111,7 @@ Infragate uses your organisation's existing identity provider (Keycloak, Azure A
 8. Review the **Deployment Summary** — shows all resources that will be created, plus live estimated monthly and hourly cost
 9. Click **Deploy**
 
-Infragate runs `terraform apply` and streams the live output in the portal. The cluster appears in **My Clusters** once provisioning completes.
+Infrayard runs `terraform apply` and streams the live output in the portal. The cluster appears in **My Clusters** once provisioning completes.
 
 > The deploy form enforces your account's effective limits — maximum pools, nodes, OCPU, RAM, and storage. If a limit prevents you from deploying, submit a limit-increase request from the deploy or scale flow; admins can approve granted values into your per-user overrides.
 
@@ -128,7 +128,7 @@ Kubernetes version changes are handled via a separate **Upgrade** action.
 ### Destroying a cluster
 
 1. In **My Clusters**, click **Destroy**
-2. Infragate runs `terraform plan -destroy` and shows the exact resources that will be removed
+2. Infrayard runs `terraform plan -destroy` and shows the exact resources that will be removed
 3. Confirm — `terraform destroy` runs and cluster-scoped OCI resources are cleaned up
 4. The CIDR range is returned to the pool and available for reuse
 
@@ -136,7 +136,7 @@ Destroy is permanent and cannot be undone.
 
 > **Requests workflow:** The admin **Requests** area handles both protected-cluster destroy approvals and per-user limit-increase requests. Users submit a reason instead of destroying directly or when they need higher limits; admins approve, adjust, or deny with a note. Destroy approval still opens the Terraform destroy plan before force-destroy. Limit approval writes granted values into the user's per-user overrides. Results appear in the user's Activity inbox, and SMTP-enabled installs can also send info-only email pings with requester, action, comments, and request parameters.
 >
-> **Destroy behavior note:** Infragate-managed child compartments may be deleted with the cluster. External compartment overrides are retained for shared/multi-cluster setups. In Object Storage, only the destroyed cluster's `.tfstate` object is removed; the user-level prefix/folder is kept for other clusters.
+> **Destroy behavior note:** Infrayard-managed child compartments may be deleted with the cluster. External compartment overrides are retained for shared/multi-cluster setups. In Object Storage, only the destroyed cluster's `.tfstate` object is removed; the user-level prefix/folder is kept for other clusters.
 
 ### Activity
 
@@ -170,7 +170,7 @@ A full view of every cluster across all users — status, owner, CIDR, K8s versi
 
 ### Users & limits
 
-Lists every user who has signed into Infragate. For each user, admins can:
+Lists every user who has signed into Infrayard. For each user, admins can:
 
 - View current cluster count and active limit
 - View resolved effective limits (per-user override if set, otherwise global default)
@@ -202,9 +202,9 @@ Platform-wide settings manageable at runtime — no redeployment needed:
 >
 > Use the returned `shapes` and `sources` lists as the source of truth for VM shapes and node images.
 >
-> If **Sync from OCI** is unavailable, Infragate keeps existing shape config unchanged and you can continue with manual curation from the CLI output above. Sync uses the API pod OCI service account credentials/policies (not the browser/user profile).
+> If **Sync from OCI** is unavailable, Infrayard keeps existing shape config unchanged and you can continue with manual curation from the CLI output above. Sync uses the API pod OCI service account credentials/policies (not the browser/user profile).
 >
-> K8s version freshness: OCI can publish new OKE patch versions after Infragate is deployed. The platform now auto-syncs available OKE versions in the background (default daily) so admin config stays current without anyone clicking **Refresh from OCI**. Newly-fetched versions land disabled by default — admins still curate which versions users may deploy. **Refresh from OCI** remains available for on-demand pulls (e.g. before template reviews or upgrade waves). Upgrade recommendation pills use the latest enabled version, so stale enablement can hide available upgrades.
+> K8s version freshness: OCI can publish new OKE patch versions after Infrayard is deployed. The platform now auto-syncs available OKE versions in the background (default daily) so admin config stays current without anyone clicking **Refresh from OCI**. Newly-fetched versions land disabled by default — admins still curate which versions users may deploy. **Refresh from OCI** remains available for on-demand pulls (e.g. before template reviews or upgrade waves). Upgrade recommendation pills use the latest enabled version, so stale enablement can hide available upgrades.
 >
 > Once a cluster's K8s version falls behind the latest enabled, a separate sweeper (default hourly) emits one Activity entry plus one email to the cluster owner per (cluster, target version) pair, so the owner is told about new upgrade options even when not actively logged in. The notification is idempotent — it does not re-fire for the same target — and the marker auto-resets after the cluster is upgraded, ready to fire again on the next enabled-version bump.
 >
@@ -221,7 +221,7 @@ Dedicated admin page for creating and managing cluster templates — pre-configu
 | Node image | Pre-selected OCI compute image (optional — auto-selects latest OKE image if not set) |
 | Node pools | Pre-defined pool layout — name, node count, OCPU, RAM, storage per pool |
 | Tier default | Suggested cluster tier — Basic or Enhanced (suggestion only, not enforced) |
-| TTL | Optional time-to-live in hours — when reached, Infragate automatically starts cluster destroy/cleanup |
+| TTL | Optional time-to-live in hours — when reached, Infrayard automatically starts cluster destroy/cleanup |
 | Destroy protection | When enabled, the "Destroy" button on the user's cluster opens a "Request destroy" modal instead. Requests land in Admin → Requests (with a live count badge in the nav) where an admin approves, reviews the destroy plan, then confirms force-destroy, or denies with a note |
 | Required role | Keycloak realm role — only users with this role can see and use the template (leave empty for all users) |
 | Sort order | Controls display position in the deploy form (lower numbers appear first) |
@@ -311,7 +311,7 @@ The deploy form always reflects the user's current effective limits. If a user h
 
 Available on the cluster detail page once the cluster is running. The default download is a universal kubeconfig with an embedded per-user ServiceAccount token, so users only need `kubectl` — no OCI CLI, local OCI config, or plugins. The explicit `/kubeconfig-oci` endpoint remains available for power users who prefer OCI CLI exec auth.
 
-> **Network reachability still applies.** The universal kubeconfig solves authentication, not routing. The user's machine and the Infragate runner must be able to reach the OKE Kubernetes API on TCP/6443. The recommended no-DRG/no-LPG model is a public OKE API endpoint restricted to Infragate runner and company VPN/corporate CIDRs. A future in-cluster agent removes the direct endpoint requirement.
+> **Network reachability still applies.** The universal kubeconfig solves authentication, not routing. The user's machine and the Infrayard runner must be able to reach the OKE Kubernetes API on TCP/6443. The recommended no-DRG/no-LPG model is a public OKE API endpoint restricted to Infrayard runner and company VPN/corporate CIDRs. A future in-cluster agent removes the direct endpoint requirement.
 
 ```bash
 export KUBECONFIG=~/oke-myname-cluster-kubeconfig.yaml
@@ -338,7 +338,7 @@ Admins can download SSH keys for any cluster from **All Clusters → Details**.
 
 ### Default setup
 
-By default, Infragate creates a full network stack per cluster:
+By default, Infrayard creates a full network stack per cluster:
 
 - A **VCN** with a /16 range derived from the cluster's /24 CIDR
 - A **private worker subnet** (/24)
@@ -351,14 +351,14 @@ By default, Infragate creates a full network stack per cluster:
 
 Admin Configuration includes **Kubernetes API Access**:
 
-- **Private endpoint** keeps the OKE API on a private subnet. Infragate and kubectl clients need an existing private route, VPN, or bastion path.
-- **Public endpoint restricted by CIDR allowlist** creates a dedicated public API endpoint subnet and allows TCP/6443 only from configured CIDRs. Add both the Infragate runner egress IP/range and company VPN/corporate egress ranges. `0.0.0.0/0` is rejected.
+- **Private endpoint** keeps the OKE API on a private subnet. Infrayard and kubectl clients need an existing private route, VPN, or bastion path.
+- **Public endpoint restricted by CIDR allowlist** creates a dedicated public API endpoint subnet and allows TCP/6443 only from configured CIDRs. Add both the Infrayard runner egress IP/range and company VPN/corporate egress ranges. `0.0.0.0/0` is rejected.
 
 This is the supported path when DRG is too costly and LPG does not scale past the per-VCN peering limit. Users still need to be on the corporate/VPN network for `kubectl`.
 
 ### Bringing your own network
 
-Users can supply existing OCIDs via the **Advanced tab** in the deploy form. Infragate skips creating whichever resources are already provided:
+Users can supply existing OCIDs via the **Advanced tab** in the deploy form. Infrayard skips creating whichever resources are already provided:
 
 | Override | Effect |
 |---|---|
@@ -370,37 +370,37 @@ Supported private-endpoint combinations:
 
 | Combination | Behavior |
 |---|---|
-| No overrides | Infragate creates and manages the compartment, VCN, subnets, gateways, route tables, and security lists |
-| Existing Compartment OCID only | Infragate creates a new managed VCN/network stack inside that compartment |
-| Existing VCN OCID, with or without Existing Compartment OCID | Infragate reuses the VCN and creates cluster subnets/security lists inside it; existing VCN gateways and route tables are not managed |
-| Existing VCN OCID + Existing Subnet OCID, with or without Existing Compartment OCID | True BYON networking: Infragate creates OKE/node-pool resources and references the supplied network read-only |
+| No overrides | Infrayard creates and manages the compartment, VCN, subnets, gateways, route tables, and security lists |
+| Existing Compartment OCID only | Infrayard creates a new managed VCN/network stack inside that compartment |
+| Existing VCN OCID, with or without Existing Compartment OCID | Infrayard reuses the VCN and creates cluster subnets/security lists inside it; existing VCN gateways and route tables are not managed |
+| Existing VCN OCID + Existing Subnet OCID, with or without Existing Compartment OCID | True BYON networking: Infrayard creates OKE/node-pool resources and references the supplied network read-only |
 | Existing Subnet OCID without Existing VCN OCID | Unsupported and rejected before Terraform starts |
 
-**Compartment subtree rule.** `Existing Compartment OCID` must be a descendant (any depth) of the **anchor compartment** chosen at install time — the compartment Infragate uses as the parent for new cluster compartments. The anchor is whatever existing compartment you point us at; it does not have to be a dedicated Infragate-owned compartment. Direct children, grandchildren, and the anchor itself are all accepted. Siblings, ancestors, or compartments in unrelated subtrees are rejected with a 400 *before* Terraform starts — without this guard the deploy would fail mid-`terraform apply` with a confusing IAM error, because the runner's `manage` policies are scoped to the anchor subtree. Non-existent OCIDs return "compartment not found"; if OCI is briefly unreachable for the validation call, the API returns 503 so the deploy can simply be retried.
+**Compartment subtree rule.** `Existing Compartment OCID` must be a descendant (any depth) of the **anchor compartment** chosen at install time — the compartment Infrayard uses as the parent for new cluster compartments. The anchor is whatever existing compartment you point us at; it does not have to be a dedicated Infrayard-owned compartment. Direct children, grandchildren, and the anchor itself are all accepted. Siblings, ancestors, or compartments in unrelated subtrees are rejected with a 400 *before* Terraform starts — without this guard the deploy would fail mid-`terraform apply` with a confusing IAM error, because the runner's `manage` policies are scoped to the anchor subtree. Non-existent OCIDs return "compartment not found"; if OCI is briefly unreachable for the validation call, the API returns 503 so the deploy can simply be retried.
 
 The anchor is a knob, not a fixture. Pick the layout that matches your tenancy posture:
 
-- **Tenancy root anchor.** No new compartments, nothing to rearrange — the entire tenancy is BYON-eligible. Right for "we don't want Infragate adding any hierarchy on top of what we already have." Trade-off: the runner's IAM group needs `manage` permissions at tenancy scope (or scoped to the relevant resource families).
-- **Anchor at an existing org compartment.** Slot Infragate into a `platforms`, `production`, or `infra` compartment you already maintain. BYON works for anything under it, including peer compartments that already existed there. You don't have to create a new compartment to enable Infragate.
+- **Tenancy root anchor.** No new compartments, nothing to rearrange — the entire tenancy is BYON-eligible. Right for "we don't want Infrayard adding any hierarchy on top of what we already have." Trade-off: the runner's IAM group needs `manage` permissions at tenancy scope (or scoped to the relevant resource families).
+- **Anchor at an existing org compartment.** Slot Infrayard into a `platforms`, `production`, or `infra` compartment you already maintain. BYON works for anything under it, including peer compartments that already existed there. You don't have to create a new compartment to enable Infrayard.
 - **Dedicated anchor compartment.** Create one (e.g. `infragate`) for explicit blast-radius isolation. Functionally identical to the previous case, just a narrower IAM scope.
 
-The single-install pattern that's *not* supported today is "one Infragate spanning multiple unrelated subtrees of the same tenancy." That posture requires either tenancy-wide grants (use the tenancy-root anchor) or two installs.
+The single-install pattern that's *not* supported today is "one Infrayard spanning multiple unrelated subtrees of the same tenancy." That posture requires either tenancy-wide grants (use the tenancy-root anchor) or two installs.
 
-Restricted public API endpoint mode requires Infragate-managed networking when `Existing VCN OCID` or `Existing Subnet OCID` would otherwise make the network read-only.
+Restricted public API endpoint mode requires Infrayard-managed networking when `Existing VCN OCID` or `Existing Subnet OCID` would otherwise make the network read-only.
 
-Important behavior: `Existing Compartment OCID` does **not** auto-discover an existing VCN or subnet from that compartment. If VCN/subnet fields are left empty, Infragate creates a new VCN/subnets/network stack inside the provided compartment.
+Important behavior: `Existing Compartment OCID` does **not** auto-discover an existing VCN or subnet from that compartment. If VCN/subnet fields are left empty, Infrayard creates a new VCN/subnets/network stack inside the provided compartment.
 
 Advanced override UX guardrails: OCID fields validate type prefixes (`ocid1.vcn.`, `ocid1.compartment.`, `ocid1.subnet.`) and provide OCI-backed autocomplete lists for compartments, VCNs, and subnets.
 
 > Shared compartment guidance: if you want multiple clusters in one compartment, use a dedicated BYO compartment via `Existing Compartment OCID` for all those clusters. Do not reuse a compartment that was auto-created for another cluster as a shared target.
 
-> Note: If you deploy with existing VCN/subnet overrides, Infragate does not manage route tables for those existing resources. Your existing network must already provide equivalent private-subnet egress required for OKE worker node registration: route `0.0.0.0/0` to a NAT Gateway (or equivalent corporate egress path) and route `all-<region>-services-in-oracle-services-network` to a Service Gateway. This is a routing requirement, not an "open ingress" security rule.
+> Note: If you deploy with existing VCN/subnet overrides, Infrayard does not manage route tables for those existing resources. Your existing network must already provide equivalent private-subnet egress required for OKE worker node registration: route `0.0.0.0/0` to a NAT Gateway (or equivalent corporate egress path) and route `all-<region>-services-in-oracle-services-network` to a Service Gateway. This is a routing requirement, not an "open ingress" security rule.
 
-> ⚠️ **Drift behaviour.** Infragate-created VCN, subnet, IGW, route table, and security list resources are fully managed by the cluster's Terraform state — manual edits in the OCI Console will be overwritten on the next apply. Supplied BYO resources (existing VCN / subnet / compartment) are referenced read-only and never modified.
+> ⚠️ **Drift behaviour.** Infrayard-created VCN, subnet, IGW, route table, and security list resources are fully managed by the cluster's Terraform state — manual edits in the OCI Console will be overwritten on the next apply. Supplied BYO resources (existing VCN / subnet / compartment) are referenced read-only and never modified.
 
 ### Custom security rules
 
-Infragate's default security list covers the ports required by OKE. For custom ingress/egress rules — exposing specific node ports, restricting egress to corporate CIDRs, or integrating with existing NSGs — the recommended approach is to **bring your own subnet** via the Advanced tab with your security configuration already applied. Infragate uses your subnet and skips creating its own security list entirely, giving your network team full control without adding UI complexity.
+Infrayard's default security list covers the ports required by OKE. For custom ingress/egress rules — exposing specific node ports, restricting egress to corporate CIDRs, or integrating with existing NSGs — the recommended approach is to **bring your own subnet** via the Advanced tab with your security configuration already applied. Infrayard uses your subnet and skips creating its own security list entirely, giving your network team full control without adding UI complexity.
 
 ---
 
@@ -418,7 +418,7 @@ pytest tests/ -v --tb=short --cov=app --cov-report=term-missing
 
 ### CI pipeline (maintainer-owned)
 
-Infragate includes maintainer CI on GitHub and GitLab. GitHub Actions is the single release publisher for GHCR, GitLab Container Registry, and OCIR; GitLab CI is validation-only. Customer operators typically do not run these pipelines - they deploy versioned images from GHCR, OCIR, GitLab Container Registry, or an internal mirror.
+Infrayard includes maintainer CI on GitHub and GitLab. GitHub Actions is the single release publisher for GHCR, GitLab Container Registry, and OCIR; GitLab CI is validation-only. Customer operators typically do not run these pipelines - they deploy versioned images from GHCR, OCIR, GitLab Container Registry, or an internal mirror.
 
 **GitHub Actions** (`.github/workflows/ci.yml`):
 
@@ -459,22 +459,22 @@ The release publisher uses the same channel tags across all three registries: `d
 
 ## 10. License
 
-Infragate is licensed under the [Business Source License 1.1](./LICENSE).
+Infrayard is licensed under the [Business Source License 1.1](./LICENSE).
 
 | Parameter | Value |
 |---|---|
 | Licensor | Solvia Lab s.r.o. |
-| Licensed Work | Infragate |
+| Licensed Work | Infrayard |
 | Additional Use Grant | Production use permitted, except offering as a commercial managed service |
 | Change Date | 2030-03-19 |
 | Change License | Apache License, Version 2.0 |
 
 **What this means:**
 
-- You may use, modify, and redistribute Infragate freely for internal and non-production purposes
-- Production use is permitted, provided you do not offer Infragate as a hosted service to third parties
+- You may use, modify, and redistribute Infrayard freely for internal and non-production purposes
+- Production use is permitted, provided you do not offer Infrayard as a hosted service to third parties
 - On the Change Date (or 4 years after any given release), that version automatically converts to Apache 2.0
-- For commercial managed-service use or alternative licensing, contact [hello@infragate.cloud](mailto:hello@infragate.cloud)
+- For commercial managed-service use or alternative licensing, contact [hello@infrayard.eu](mailto:hello@infrayard.eu)
 
 ---
 

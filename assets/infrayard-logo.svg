@@ -1,0 +1,23 @@
+<svg width="212" height="48" viewBox="0 0 212 48" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">Infrayard logo</title>
+  <desc id="desc">Infrayard wordmark with a centered self-service yard monogram.</desc>
+  <defs>
+    <linearGradient id="yardPath" x1="15" y1="13.5" x2="33" y2="34.5" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#9AAEFF"/>
+      <stop offset="1" stop-color="#72D9A0"/>
+    </linearGradient>
+    <linearGradient id="plotFill" x1="15.75" y1="13.5" x2="32.25" y2="31.5" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F8FAFF"/>
+      <stop offset="1" stop-color="#E8EEF8"/>
+    </linearGradient>
+  </defs>
+  <g>
+    <rect width="48" height="48" rx="12" fill="#24334D"/>
+    <path d="M24 33.75V25.125M24 25.125L16.125 16.875M24 25.125L31.875 16.875" stroke="url(#yardPath)" stroke-width="5.25" stroke-linecap="round" stroke-linejoin="round"/>
+    <rect x="13.125" y="13.875" width="6" height="6" rx="1.8" fill="url(#plotFill)"/>
+    <rect x="28.875" y="13.875" width="6" height="6" rx="1.8" fill="url(#plotFill)"/>
+    <rect x="21" y="30.75" width="6" height="6" rx="1.8" fill="url(#plotFill)"/>
+    <circle cx="24" cy="25.125" r="1.65" fill="#24334D"/>
+  </g>
+  <text x="60" y="31" fill="#10182A" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="23" font-weight="720">Infrayard</text>
+</svg>

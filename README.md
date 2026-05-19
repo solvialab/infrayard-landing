@@ -1,17 +1,17 @@
-# Infragate by Solvia Lab - OCI-native Internal Developer Platform for Oracle Kubernetes Engine
+# Infrayard by Solvia Lab - OCI-native Internal Developer Platform for Oracle Kubernetes Engine
 
-**Infragate by Solvia Lab** is a commercial, OCI-native Internal Developer Platform (IDP) for **Oracle Kubernetes Engine (OKE)**. It helps platform engineering teams offer governed self-service Kubernetes lifecycle management inside their own Oracle Cloud tenancy.
+**Infrayard by Solvia Lab** is a commercial, OCI-native Internal Developer Platform (IDP) for **Oracle Kubernetes Engine (OKE)**. It helps platform engineering teams offer governed self-service Kubernetes lifecycle management inside their own Oracle Cloud tenancy.
 
-Website: [https://infragate.cloud](https://infragate.cloud)  
-Public docs: [https://infragate.cloud/docs/](https://infragate.cloud/docs/)  
-Resources hub: [https://infragate.cloud/resources/](https://infragate.cloud/resources/)  
-Contact: [hello@infragate.cloud](mailto:hello@infragate.cloud)
+Website: [https://infrayard.eu](https://infrayard.eu)  
+Public docs: [https://infrayard.eu/docs/](https://infrayard.eu/docs/)  
+Resources hub: [https://infrayard.eu/resources/](https://infrayard.eu/resources/)  
+Contact: [hello@infrayard.eu](mailto:hello@infrayard.eu)
 
-> This repository contains the public landing page, public documentation, and legal pages for Infragate. It does **not** contain the Infragate product source code. Infragate is commercial software delivered through private registry access, Helm values, and customer onboarding.
+> This repository contains the public landing page, public documentation, and legal pages for Infrayard. It does **not** contain the Infrayard product source code. Infrayard is commercial software delivered through private registry access, Helm values, and customer onboarding.
 
-## What Infragate Is
+## What Infrayard Is
 
-Infragate turns Oracle Kubernetes Engine into a governed internal platform. Engineers can deploy, scale, upgrade, access, and destroy OKE clusters through a web portal, while administrators keep control through templates, limits, approvals, audit history, cost visibility, and network ownership boundaries.
+Infrayard turns Oracle Kubernetes Engine into a governed internal platform. Engineers can deploy, scale, upgrade, access, and destroy OKE clusters through a web portal, while administrators keep control through templates, limits, approvals, audit history, cost visibility, and network ownership boundaries.
 
 It is built for organizations that want faster OKE delivery without giving every engineer direct OCI Console access, IAM administration rights, Terraform knowledge, or local OCI CLI setup.
 
@@ -34,7 +34,7 @@ It is built for organizations that want faster OKE delivery without giving every
 
 ## Built For
 
-Infragate is designed for:
+Infrayard is designed for:
 
 - platform engineering teams standardizing Oracle Cloud Kubernetes operations
 - enterprises using Oracle Kubernetes Engine as their managed Kubernetes platform
@@ -45,7 +45,7 @@ Infragate is designed for:
 
 ## Common Search Terms
 
-Infragate is relevant to teams searching for:
+Infrayard is relevant to teams searching for:
 
 - Oracle Kubernetes Engine Internal Developer Platform
 - OCI-native IDP
@@ -65,26 +65,26 @@ Infragate is relevant to teams searching for:
 
 ## Deployment Model
 
-Infragate is deployed into the customer environment, typically into an existing OKE cluster or a Kubernetes host used for platform services. The public product documentation describes the deployment paths at a high level; detailed onboarding, values files, operational runbooks, and validation procedures are provided during evaluation or commercial onboarding.
+Infrayard is deployed into the customer environment, typically into an existing OKE cluster or a Kubernetes host used for platform services. The public product documentation describes the deployment paths at a high level; detailed onboarding, values files, operational runbooks, and validation procedures are provided during evaluation or commercial onboarding.
 
-Infragate is intentionally not a SaaS control plane. OCI credentials, Terraform state, Kubernetes access, and operational control remain inside the customer's Oracle Cloud environment.
+Infrayard is intentionally not a SaaS control plane. OCI credentials, Terraform state, Kubernetes access, and operational control remain inside the customer's Oracle Cloud environment.
 
 ## Commercial Access
 
-Infragate is commercial software. Public pricing, evaluation options, and the founding customer program are described on the website:
+Infrayard is commercial software. Public pricing, evaluation options, and the founding customer program are described on the website:
 
-- [Pricing](https://infragate.cloud/#pricing)
-- [Founding Customer Program](https://infragate.cloud/#founding)
-- [Documentation](https://infragate.cloud/docs/)
-- [Privacy Policy](https://infragate.cloud/legal/privacy.html)
-- [Terms and Legal Notice](https://infragate.cloud/legal/terms.html)
-- [Cookie Policy](https://infragate.cloud/legal/cookies.html)
+- [Pricing](https://infrayard.eu/#pricing)
+- [Founding Customer Program](https://infrayard.eu/#founding)
+- [Documentation](https://infrayard.eu/docs/)
+- [Privacy Policy](https://infrayard.eu/legal/privacy.html)
+- [Terms and Legal Notice](https://infrayard.eu/legal/terms.html)
+- [Cookie Policy](https://infrayard.eu/legal/cookies.html)
 
-For evaluation, enterprise access, or partnership questions, contact [hello@infragate.cloud](mailto:hello@infragate.cloud).
+For evaluation, enterprise access, or partnership questions, contact [hello@infrayard.eu](mailto:hello@infrayard.eu).
 
 ## Roadmap Direction
 
-Infragate's current focus is reliable governed OKE lifecycle management, BYON validation, and production deployment into existing OKE environments.
+Infrayard's current focus is reliable governed OKE lifecycle management, BYON validation, and production deployment into existing OKE environments.
 
 Planned roadmap areas include an AI-assisted troubleshooting advisor, Gatekeeper policy and cost guardrails, drift detection, approval-gated remediation, and an in-cluster access agent for private-by-default environments. Roadmap items are directional and may change based on customer feedback and commercial agreements.
 
@@ -110,7 +110,7 @@ It does not include:
 
 ## Links
 
-- Website: [https://infragate.cloud](https://infragate.cloud)
-- Docs: [https://infragate.cloud/docs/](https://infragate.cloud/docs/)
-- Email: [hello@infragate.cloud](mailto:hello@infragate.cloud)
+- Website: [https://infrayard.eu](https://infrayard.eu)
+- Docs: [https://infrayard.eu/docs/](https://infrayard.eu/docs/)
+- Email: [hello@infrayard.eu](mailto:hello@infrayard.eu)
 - Company: [Solvia Lab](https://solvialab.tech)
