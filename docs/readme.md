@@ -50,7 +50,7 @@ Pick the deployment path that matches your environment — both use the same Hel
 For teams that already have an OKE cluster — deploy Infrayard via Helm in minutes:
 
 ```bash
-helm upgrade --install infragate deploy/helm/ -n infragate \
+helm upgrade --install infrayard deploy/helm/ -n infrayard \
   -f deploy/helm/values-oke.yaml \
   --set global.domain=infrayard.example.com \
   --set postgresql.auth.password=YOUR_DB_PASSWORD \
@@ -69,7 +69,7 @@ helm upgrade --install infragate deploy/helm/ -n infragate \
 For dev/test, demos, or OCI Always Free tier VMs. Run this on an OCI VM in the same region as your target tenancy for low-latency access to the OCI API:
 
 ```bash
-helm upgrade --install infragate deploy/helm/ -n infragate \
+helm upgrade --install infrayard deploy/helm/ -n infrayard \
   -f deploy/helm/values-k3s.yaml \
   --set global.domain=infrayard.example.com \
   --set postgresql.auth.password=YOUR_DB_PASSWORD \
@@ -382,7 +382,7 @@ The anchor is a knob, not a fixture. Pick the layout that matches your tenancy p
 
 - **Tenancy root anchor.** No new compartments, nothing to rearrange — the entire tenancy is BYON-eligible. Right for "we don't want Infrayard adding any hierarchy on top of what we already have." Trade-off: the runner's IAM group needs `manage` permissions at tenancy scope (or scoped to the relevant resource families).
 - **Anchor at an existing org compartment.** Slot Infrayard into a `platforms`, `production`, or `infra` compartment you already maintain. BYON works for anything under it, including peer compartments that already existed there. You don't have to create a new compartment to enable Infrayard.
-- **Dedicated anchor compartment.** Create one (e.g. `infragate`) for explicit blast-radius isolation. Functionally identical to the previous case, just a narrower IAM scope.
+- **Dedicated anchor compartment.** Create one (e.g. `infrayard`) for explicit blast-radius isolation. Functionally identical to the previous case, just a narrower IAM scope.
 
 The single-install pattern that's *not* supported today is "one Infrayard spanning multiple unrelated subtrees of the same tenancy." That posture requires either tenancy-wide grants (use the tenancy-root anchor) or two installs.
 
