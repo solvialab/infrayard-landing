@@ -2,9 +2,9 @@
 
 **Infrayard by Solvia Lab** is a commercial, OCI-native Internal Developer Platform (IDP) for **Oracle Kubernetes Engine (OKE)**. It helps platform engineering teams offer governed self-service Kubernetes lifecycle management inside their own Oracle Cloud tenancy.
 
-Website: [https://infrayard.eu](https://infrayard.eu)  
-Public docs: [https://infrayard.eu/docs/](https://infrayard.eu/docs/)  
-Resources hub: [https://infrayard.eu/resources/](https://infrayard.eu/resources/)  
+Website: [https://www.infrayard.eu](https://www.infrayard.eu)  
+Public docs: [https://www.infrayard.eu/docs/](https://www.infrayard.eu/docs/)  
+Resources hub: [https://www.infrayard.eu/resources/](https://www.infrayard.eu/resources/)  
 Contact: [hello@infrayard.eu](mailto:hello@infrayard.eu)
 
 > This repository contains the public landing page, public documentation, and legal pages for Infrayard. It does **not** contain the Infrayard product source code. Infrayard is commercial software delivered through private registry access, Helm values, and customer onboarding.
@@ -73,12 +73,12 @@ Infrayard is intentionally not a SaaS control plane. OCI credentials, Terraform 
 
 Infrayard is commercial software. Public pricing, evaluation options, and the founding customer program are described on the website:
 
-- [Pricing](https://infrayard.eu/#pricing)
-- [Founding Customer Program](https://infrayard.eu/#founding)
-- [Documentation](https://infrayard.eu/docs/)
-- [Privacy Policy](https://infrayard.eu/legal/privacy.html)
-- [Terms and Legal Notice](https://infrayard.eu/legal/terms.html)
-- [Cookie Policy](https://infrayard.eu/legal/cookies.html)
+- [Pricing](https://www.infrayard.eu/#pricing)
+- [Founding Customer Program](https://www.infrayard.eu/#founding)
+- [Documentation](https://www.infrayard.eu/docs/)
+- [Privacy Policy](https://www.infrayard.eu/legal/privacy.html)
+- [Terms and Legal Notice](https://www.infrayard.eu/legal/terms.html)
+- [Cookie Policy](https://www.infrayard.eu/legal/cookies.html)
 
 For evaluation, enterprise access, or partnership questions, contact [hello@infrayard.eu](mailto:hello@infrayard.eu).
 
@@ -110,7 +110,7 @@ It does not include:
 
 ## Links
 
-- Website: [https://infrayard.eu](https://infrayard.eu)
-- Docs: [https://infrayard.eu/docs/](https://infrayard.eu/docs/)
+- Website: [https://www.infrayard.eu](https://www.infrayard.eu)
+- Docs: [https://www.infrayard.eu/docs/](https://www.infrayard.eu/docs/)
 - Email: [hello@infrayard.eu](mailto:hello@infrayard.eu)
 - Company: [Solvia Lab](https://solvialab.tech)

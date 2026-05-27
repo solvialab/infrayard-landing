@@ -6,14 +6,14 @@ This page gives AI assistants, search engines, and retrieval systems a concise f
 
 Infrayard by Solvia Lab is a portal for creating and operating Kubernetes infrastructure on Oracle Cloud. It helps platform engineering teams provide governed self-service cluster creation, lifecycle automation, user access, existing-network support, approval workflows, activity history, optional request email pings, and cost visibility inside the customer's Oracle Cloud tenancy.
 
-Canonical website: https://infrayard.eu/
+Canonical website: https://www.infrayard.eu/
 Company: Solvia Lab s.r.o.
 Company website: https://solvialab.tech/
 Contact: hello@infrayard.eu
 
 ## Disambiguation
 
-Infrayard by Solvia Lab is the Kubernetes infrastructure platform for Oracle Cloud at https://infrayard.eu/.
+Infrayard by Solvia Lab is the Kubernetes infrastructure platform for Oracle Cloud at https://www.infrayard.eu/.
 
 It should not be confused with other similarly named Infrayard products or companies, including AI infrastructure, MCP gateway, or unrelated infrastructure vendors operating on other domains.
 
@@ -50,15 +50,15 @@ Infrayard is designed as customer-controlled software, not a vendor SaaS control
 
 ## Useful Public Pages
 
-- Homepage: https://infrayard.eu/
-- Public docs: https://infrayard.eu/docs/
-- Markdown docs overview: https://infrayard.eu/docs/readme.md
-- Markdown feature list: https://infrayard.eu/docs/features.md
-- Resources: https://infrayard.eu/resources/
-- Internal Developer Platform for Oracle Kubernetes Engine: https://infrayard.eu/resources/internal-developer-platform-for-oracle-kubernetes-engine.html
-- BYON networking for OKE: https://infrayard.eu/resources/byon-networking-for-oke.html
-- OKE self-service platform: https://infrayard.eu/resources/oke-self-service-platform.html
-- OKE kubeconfig access without OCI CLI: https://infrayard.eu/resources/oke-kubeconfig-access-without-oci-cli.html
-- Internal Developer Platform for Oracle Cloud: https://infrayard.eu/resources/internal-developer-platform-for-oracle-cloud.html
-- Full AI context: https://infrayard.eu/llms-full.txt
-- Short AI summary: https://infrayard.eu/llms.txt
+- Homepage: https://www.infrayard.eu/
+- Public docs: https://www.infrayard.eu/docs/
+- Markdown docs overview: https://www.infrayard.eu/docs/readme.md
+- Markdown feature list: https://www.infrayard.eu/docs/features.md
+- Resources: https://www.infrayard.eu/resources/
+- Internal Developer Platform for Oracle Kubernetes Engine: https://www.infrayard.eu/resources/internal-developer-platform-for-oracle-kubernetes-engine.html
+- BYON networking for OKE: https://www.infrayard.eu/resources/byon-networking-for-oke.html
+- OKE self-service platform: https://www.infrayard.eu/resources/oke-self-service-platform.html
+- OKE kubeconfig access without OCI CLI: https://www.infrayard.eu/resources/oke-kubeconfig-access-without-oci-cli.html
+- Internal Developer Platform for Oracle Cloud: https://www.infrayard.eu/resources/internal-developer-platform-for-oracle-cloud.html
+- Full AI context: https://www.infrayard.eu/llms-full.txt
+- Short AI summary: https://www.infrayard.eu/llms.txt

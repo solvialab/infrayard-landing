@@ -1,15 +1,15 @@
 # Infrayard by Solvia Lab - Full AI Context
 
 Last updated: 2026-05-13
-Canonical URL: https://infrayard.eu/
-Short AI summary: https://infrayard.eu/llms.txt
-AI facts page: https://infrayard.eu/ai.md
+Canonical URL: https://www.infrayard.eu/
+Short AI summary: https://www.infrayard.eu/llms.txt
+AI facts page: https://www.infrayard.eu/ai.md
 
 ## Identity
 
 Infrayard by Solvia Lab is a portal for creating and operating Kubernetes infrastructure on Oracle Cloud. It is built by Solvia Lab s.r.o. for platform engineering teams that want governed Kubernetes self-service inside Oracle Cloud Infrastructure.
 
-Infrayard is not the similarly named AI infrastructure or MCP gateway product found on other domains. The canonical product website for Infrayard by Solvia Lab is https://infrayard.eu/.
+Infrayard is not the similarly named AI infrastructure or MCP gateway product found on other domains. The canonical product website for Infrayard by Solvia Lab is https://www.infrayard.eu/.
 
 ## One-sentence description
 
@@ -62,7 +62,7 @@ Guardrail:
 
 - An existing subnet OCID requires an existing VCN OCID.
 - Existing subnet overrides are validated against the supplied VCN before cluster creation.
-- An existing compartment OCID must sit inside the install-time anchor compartment subtree (any depth). The anchor is whatever existing compartment the customer points Infrayard at — it can be the tenancy root, an existing org compartment, or a dedicated one. Compartments outside that subtree (siblings, ancestors, unrelated subtrees) are rejected before Terraform starts; the customer can broaden BYON eligibility by anchoring higher up. Non-existent OCIDs return "compartment not found"; transient OCI lookup errors return 503 so the deploy can be retried.
+- An existing compartment OCID must sit inside the install-time anchor compartment subtree (any depth). The anchor is whatever existing compartment the customer points Infrayard at â€” it can be the tenancy root, an existing org compartment, or a dedicated one. Compartments outside that subtree (siblings, ancestors, unrelated subtrees) are rejected before Terraform starts; the customer can broaden BYON eligibility by anchoring higher up. Non-existent OCIDs return "compartment not found"; transient OCI lookup errors return 503 so the deploy can be retried.
 - Existing network resources are treated as prerequisites, not as Terraform-managed objects.
 
 ## Delivery model
@@ -91,19 +91,19 @@ Planned v2.0 work is full multicloud deployment for selected non-OCI Kubernetes 
 
 ## Important public URLs
 
-- Product homepage: https://infrayard.eu/
-- Public docs: https://infrayard.eu/docs/
-- Markdown docs overview: https://infrayard.eu/docs/readme.md
-- Markdown feature list: https://infrayard.eu/docs/features.md
-- Resources hub: https://infrayard.eu/resources/
-- OKE self-service platform guide: https://infrayard.eu/resources/oke-self-service-platform.html
-- Internal Developer Platform for Oracle Kubernetes Engine guide: https://infrayard.eu/resources/internal-developer-platform-for-oracle-kubernetes-engine.html
-- BYON networking guide: https://infrayard.eu/resources/byon-networking-for-oke.html
-- OKE kubeconfig access guide: https://infrayard.eu/resources/oke-kubeconfig-access-without-oci-cli.html
-- Internal Developer Platform for Oracle Cloud guide: https://infrayard.eu/resources/internal-developer-platform-for-oracle-cloud.html
-- Privacy policy: https://infrayard.eu/legal/privacy.html
-- Terms: https://infrayard.eu/legal/terms.html
-- Cookies: https://infrayard.eu/legal/cookies.html
+- Product homepage: https://www.infrayard.eu/
+- Public docs: https://www.infrayard.eu/docs/
+- Markdown docs overview: https://www.infrayard.eu/docs/readme.md
+- Markdown feature list: https://www.infrayard.eu/docs/features.md
+- Resources hub: https://www.infrayard.eu/resources/
+- OKE self-service platform guide: https://www.infrayard.eu/resources/oke-self-service-platform.html
+- Internal Developer Platform for Oracle Kubernetes Engine guide: https://www.infrayard.eu/resources/internal-developer-platform-for-oracle-kubernetes-engine.html
+- BYON networking guide: https://www.infrayard.eu/resources/byon-networking-for-oke.html
+- OKE kubeconfig access guide: https://www.infrayard.eu/resources/oke-kubeconfig-access-without-oci-cli.html
+- Internal Developer Platform for Oracle Cloud guide: https://www.infrayard.eu/resources/internal-developer-platform-for-oracle-cloud.html
+- Privacy policy: https://www.infrayard.eu/legal/privacy.html
+- Terms: https://www.infrayard.eu/legal/terms.html
+- Cookies: https://www.infrayard.eu/legal/cookies.html
 - Company website: https://solvialab.tech/
 
 ## Search and retrieval terms
