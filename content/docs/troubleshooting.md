@@ -20,7 +20,9 @@ Note the time and the exact error before you retry, and check what actually exis
 | Symptom | Cause and fix |
 | --- | --- |
 | `infrayard-api` pod stays in `Init` or `ContainerCreating`; events mention `infrayard-oci-key` | The OCI key secret is missing or in another namespace. Create it as in [step 3](/docs/install-kubernetes/#3-create-the-namespace-and-secrets) |
-| `ImagePullBackOff` or `docker compose pull` fails with `unauthorized` | Registry login or `regcred` secret is missing or the token has expired. Check `global.imagePullSecrets` and the image addresses; ask support for a new token |
+| `ImagePullBackOff`, `docker compose pull` or `helm show chart` fails with `401`, `403`, `unauthorized` or `denied` | The registry login or the `regcred` secret is missing, has a typo, or the token has expired. Check `global.imagePullSecrets` and the image addresses. If the login succeeds but pulling still fails, the token lacks read access to the registry; ask support for a new token |
+| API log or `oci` CLI shows `401 NotAuthenticated` right after the OCI user or API key was created | OCI needs a few minutes to activate a new user and key in every service. Wait five minutes and retry. If it persists, compare the fingerprint, user OCID and tenancy OCID with the API key page |
+| API log shows `404 NotAuthorizedOrNotFound` for OCI calls | A policy statement is missing or names the wrong group or compartment. Compare with [Prepare OCI](/docs/oci-setup/#3-add-the-policies) |
 | `helm install` fails with `... is required` | A required value is missing, for example `postgresql.auth.password` or `keycloak.admin.password`. Add it to `secrets.yaml` |
 | Certificate stays `READY False` | DNS does not point to the ingress yet, or port 80 is not reachable from the internet. Check `kubectl describe certificate -n infrayard infrayard-tls` and `kubectl get challenges -A` |
 | VM: browser shows a certificate error | Caddy could not get a certificate. Check `docker compose logs caddy`; DNS and ports 80/443 must reach the VM |

@@ -44,7 +44,7 @@ helm install cert-manager jetstack/cert-manager -n cert-manager --create-namespa
   --set crds.enabled=true
 ```
 
-Then create a Let's Encrypt issuer. Use an e-mail address that receives expiry notices:
+Then create a Let's Encrypt issuer. It needs no e-mail address; Let's Encrypt no longer sends expiry e-mails, and cert-manager renews the certificate on its own:
 
 ```bash
 kubectl apply -f - <<'EOF'
@@ -55,7 +55,6 @@ metadata:
 spec:
   acme:
     server: https://acme-v02.api.letsencrypt.org/directory
-    email: platform@example.com
     privateKeySecretRef:
       name: letsencrypt
     solvers:
@@ -76,11 +75,15 @@ helm registry login registry.gitlab.com -u <registry-user>
 # Password: your registry token
 ```
 
+In scripts, pass the token on standard input instead: `printf '%s' "$TOKEN" | helm registry login registry.gitlab.com -u <registry-user> --password-stdin`.
+
 Check that you can read the chart:
 
 ```bash
 helm show chart oci://registry.gitlab.com/solvialab/infrayard/charts/infrayard --version <version>
 ```
+
+The output starts with `Pulled: …` and ends with `name: infrayard` and `version: <version>`. An error with `401`, `403` or `denied` means the login is missing or the token cannot read the registry; see [troubleshooting](/docs/troubleshooting/#installation).
 
 ## 3. Create the namespace and secrets
 
@@ -150,7 +153,7 @@ ingress:
     secretName: infrayard-tls
 ```
 
-`secrets.yaml` (generate each password with `openssl rand -base64 24`):
+`secrets.yaml`. Generate each of the three passwords with `openssl rand -hex 24`; hex passwords contain no characters that need escaping:
 
 ```yaml
 postgresql:
@@ -178,6 +181,7 @@ Notes:
 - **ingress-nginx:** set `className: nginx` and add the annotations `nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"` and `nginx.ingress.kubernetes.io/proxy-buffering: "off"`, so that live Terraform logs are not cut off.
 - **Your own Keycloak** instead of the bundled one: see [Use your own Keycloak](/docs/keycloak/) before installing.
 - **E-mail notifications** (optional): set `api.email.enabled: true`, `api.email.adminEmails` and the `api.email.smtp` block, with the SMTP password in `secrets.yaml`.
+- **Test or demo installation:** `frontend.robots.noindex: true` asks search engines not to index the portal.
 - **Single-node clusters:** the chart tolerates the control-plane taint by default, so all pods can run on one k3s node.
 
 ## 5. Install
@@ -189,7 +193,7 @@ helm install infrayard oci://registry.gitlab.com/solvialab/infrayard/charts/infr
 
 The chart version selects the matching image version automatically; do not set an image tag.
 
-Watch the pods until all four are `Running` and ready. Keycloak needs about a minute on the first start:
+Watch the pods until all four are `Running` and ready, usually within two minutes. Keycloak is the last one, because it imports the realm on the first start:
 
 ```bash
 kubectl get pods -n infrayard -w
@@ -212,7 +216,11 @@ kubectl get svc -n traefik traefik        # OKE with Traefik from step 1
 kubectl get svc -n kube-system traefik    # k3s
 ```
 
-Create an `A` record from `infrayard.example.com` to the `EXTERNAL-IP`. Once DNS resolves, cert-manager obtains the certificate, usually within two minutes:
+Create an `A` record from `infrayard.example.com` to the `EXTERNAL-IP`.
+
+**k3s on a cloud VM** (for example OCI Compute): k3s publishes Traefik on the node's own address, so `EXTERNAL-IP` shows the VM's **private** IP, such as `10.0.0.12`. Point DNS to the VM's **public** IP instead, and allow TCP 80 and 443 in the VM's security list or network security group and in the host firewall. For a VPN-only portal, use the private IP; see [private access](/docs/private-access/).
+
+Once DNS resolves, cert-manager obtains the certificate, usually within two minutes:
 
 ```bash
 kubectl get certificate -n infrayard

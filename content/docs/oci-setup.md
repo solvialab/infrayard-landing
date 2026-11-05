@@ -1,6 +1,8 @@
 # Prepare OCI
 
-Infrayard creates OKE clusters with Terraform under one OCI user. This page creates that user, its permissions, an API key, the Terraform state bucket and the S3 key for the bucket. Every installation path needs these steps. Plan about 20 minutes in the OCI Console.
+Infrayard creates OKE clusters with Terraform under one OCI user. This page creates that user, its permissions, an API key, the Terraform state bucket and the S3 key for the bucket. Every installation path needs these steps. Plan about 20 minutes in the OCI Console, or use the [OCI CLI variant](#the-same-steps-with-the-oci-cli) below.
+
+You need a user with administrator rights in the tenancy for these steps; Infrayard itself never gets them.
 
 At the end you have the values from the [checklist](#values-checklist).
 
@@ -51,7 +53,7 @@ What each part is for:
 | `object-family` | Read and write Terraform state in the bucket from step 5 |
 | `read all-resources`, `read tenancies`, `inspect compartments` | List regions, shapes, Kubernetes versions, images and existing networks |
 | `use tag-namespaces` | Required when your tenancy applies tag defaults to new resources. Infrayard itself sets free-form tags |
-| `Allow service OKE …` | Lets the OKE service itself work in the tenancy. Add it once per tenancy; skip it if it already exists |
+| `Allow service OKE …` | Lets the OKE service itself work in the tenancy. Keep it in this policy even if another policy already has it; a duplicate statement does no harm |
 
 If the group lives in a domain other than **Default**, write it as `group 'MyDomain'/'InfrayardServiceGroup'`.
 
@@ -81,17 +83,79 @@ Terraform reaches the bucket through the S3-compatible API, which needs its own 
 2. Copy the **secret key** right away. OCI shows it only once.
 3. Copy the **access key** from the list.
 
-## Check the setup (optional)
+## The same steps with the OCI CLI
 
-With the OCI CLI configured for the new user (`~/.oci/config` with the key from step 4), these commands must succeed:
+Instead of the Console you can run steps 1–6 with the OCI CLI, signed in as a tenancy administrator. The commands were tested in this order; they keep the generated values in shell variables and write the key files to the current directory. Run them in an empty directory that only you can read (`mkdir -m 700 infrayard-oci && cd infrayard-oci`).
 
 ```bash
-oci iam compartment get --compartment-id <anchor-compartment-ocid>
-oci ce cluster-options get --cluster-option-id all --query 'data."kubernetes-versions"'
-oci os object list --bucket-name infrayard-tfstate
+# Your tenancy OCID, as in ~/.oci/config of the administrator
+T=ocid1.tenancy.oc1..aaaa…
+
+# 1. Anchor compartment (skip and set C=<ocid> to use an existing one)
+C=$(oci iam compartment create -c $T --name infrayard \
+      --description "Infrayard anchor compartment" \
+      --wait-for-state ACTIVE --query data.id --raw-output)
+
+# 2. Group and user, user in the group
+G=$(oci iam group create -c $T --name InfrayardServiceGroup \
+      --description "Infrayard service user" --query data.id --raw-output)
+U=$(oci iam user create -c $T --name infrayard-svc \
+      --description "Infrayard service user" --email platform-team@example.com \
+      --query data.id --raw-output)
+oci iam group add-user --group-id $G --user-id $U
+
+# 3. Policy: save the ten statements from step 3 as a JSON list in policy.json,
+#    one string per statement: ["Allow group …", "Allow group …", …]
+oci iam policy create -c $T --name infrayard-service \
+  --description "Infrayard service user" --statements file://policy.json
+
+# 4. API key: generate it locally and upload the public part
+umask 077
+openssl genrsa -out oci_api_key.pem 2048
+openssl rsa -pubout -in oci_api_key.pem -out oci_api_key_public.pem
+FP=$(oci iam user api-key upload --user-id $U \
+       --key-file oci_api_key_public.pem --query data.fingerprint --raw-output)
+
+# 5. State bucket with versioning, and the namespace
+oci os bucket create -c $C --name infrayard-tfstate --versioning Enabled
+NS=$(oci os ns get --query data --raw-output)
+
+# 6. S3 key: "id" is the access key, "key" the secret key (shown only once)
+oci iam customer-secret-key create --user-id $U --display-name infrayard-tfstate \
+  --query 'data.{access_key:id,secret_key:key}' --output json > s3-key.json
+
+echo "tenancy=$T user=$U fingerprint=$FP compartment=$C namespace=$NS"
 ```
 
-Infrayard runs the same kind of calls when an administrator opens **Admin → Configuration** and syncs shapes and versions.
+The last line prints the values for the [checklist](#values-checklist); the S3 key pair is in `s3-key.json`. Store `oci_api_key.pem` and `s3-key.json` in your secret manager and delete the local copies after the installation.
+
+## Check the setup
+
+A new user and API key take **a few minutes** to work in every OCI service. During that time some calls fail with `401 NotAuthenticated` even though everything is set up correctly; in our tests Identity accepted the key first, Container Engine and Object Storage about two minutes later. Wait five minutes before you start the installation or before you look for a mistake.
+
+To check the new user from your workstation, write a CLI configuration file for it (values from the [checklist](#values-checklist)):
+
+```ini
+# infrayard-oci-config
+[DEFAULT]
+user=ocid1.user.oc1..aaaa…
+fingerprint=12:34:56:…
+tenancy=ocid1.tenancy.oc1..aaaa…
+region=eu-frankfurt-1
+key_file=/full/path/to/oci_api_key.pem
+```
+
+These three commands must succeed. They print the compartment name, a list of Kubernetes versions, and an empty list for the new bucket:
+
+```bash
+oci --config-file infrayard-oci-config iam compartment get \
+  --compartment-id <anchor-compartment-ocid> --query data.name --raw-output
+oci --config-file infrayard-oci-config ce cluster-options get \
+  --cluster-option-id all --query 'data."kubernetes-versions"'
+oci --config-file infrayard-oci-config os object list --bucket-name infrayard-tfstate
+```
+
+`NotAuthorizedOrNotFound` (404) instead means a policy is missing or names the wrong group or compartment. Infrayard runs the same kind of calls when an administrator syncs shapes and versions in **Admin → Configuration**.
 
 ## Values checklist
 

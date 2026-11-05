@@ -49,7 +49,8 @@
 <p class="docs-nav-group">Operate</p><a class="docs-nav-link" href="/docs/operations/">Operations, upgrades and recovery</a>
 <a class="docs-nav-link" href="/docs/troubleshooting/">Troubleshooting and support</a>
 <p class="docs-nav-group">Reference</p><a class="docs-nav-link" href="/docs/subscription/">Subscription, billing and licensing</a>
-<a class="docs-nav-link" href="/docs/releases/">Releases and roadmap</a></nav></aside><main class="docs-main" id="main"><div class="docs-layout"><div><nav class="docs-breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><a href="/docs/">Documentation</a><span aria-hidden="true">/</span><span aria-current="page">Prepare OCI</span></nav><article class="docs-article"><h1>Prepare OCI</h1><p class="docs-summary">Create the OCI user, policies, API key, Terraform state bucket and S3 key.</p><p class="docs-maintained">Maintained by Solvia Lab s.r.o. · Updated <time datetime="2026-11-05">2026-11-05</time></p><details class="docs-mobile-toc"><summary>On this page</summary><nav aria-label="Page contents"><a href="#1-choose-the-anchor-compartment">1. Choose the anchor compartment</a><a href="#2-create-the-user-and-group">2. Create the user and group</a><a href="#3-add-the-policies">3. Add the policies</a><a href="#4-create-the-api-key">4. Create the API key</a><a href="#5-create-the-terraform-state-bucket">5. Create the Terraform state bucket</a><a href="#6-create-the-s3-key-for-the-bucket">6. Create the S3 key for the bucket</a><a href="#check-the-setup-optional">Check the setup (optional)</a><a href="#values-checklist">Values checklist</a></nav></details><div class="docs-content"><p>Infrayard creates OKE clusters with Terraform under one OCI user. This page creates that user, its permissions, an API key, the Terraform state bucket and the S3 key for the bucket. Every installation path needs these steps. Plan about 20 minutes in the OCI Console.</p>
+<a class="docs-nav-link" href="/docs/releases/">Releases and roadmap</a></nav></aside><main class="docs-main" id="main"><div class="docs-layout"><div><nav class="docs-breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><a href="/docs/">Documentation</a><span aria-hidden="true">/</span><span aria-current="page">Prepare OCI</span></nav><article class="docs-article"><h1>Prepare OCI</h1><p class="docs-summary">Create the OCI user, policies, API key, Terraform state bucket and S3 key.</p><p class="docs-maintained">Maintained by Solvia Lab s.r.o. · Updated <time datetime="2026-11-05">2026-11-05</time></p><details class="docs-mobile-toc"><summary>On this page</summary><nav aria-label="Page contents"><a href="#1-choose-the-anchor-compartment">1. Choose the anchor compartment</a><a href="#2-create-the-user-and-group">2. Create the user and group</a><a href="#3-add-the-policies">3. Add the policies</a><a href="#4-create-the-api-key">4. Create the API key</a><a href="#5-create-the-terraform-state-bucket">5. Create the Terraform state bucket</a><a href="#6-create-the-s3-key-for-the-bucket">6. Create the S3 key for the bucket</a><a href="#the-same-steps-with-the-oci-cli">The same steps with the OCI CLI</a><a href="#check-the-setup">Check the setup</a><a href="#values-checklist">Values checklist</a></nav></details><div class="docs-content"><p>Infrayard creates OKE clusters with Terraform under one OCI user. This page creates that user, its permissions, an API key, the Terraform state bucket and the S3 key for the bucket. Every installation path needs these steps. Plan about 20 minutes in the OCI Console, or use the <a href="#the-same-steps-with-the-oci-cli">OCI CLI variant</a> below.</p>
+<p>You need a user with administrator rights in the tenancy for these steps; Infrayard itself never gets them.</p>
 <p>At the end you have the values from the <a href="#values-checklist">checklist</a>.</p>
 <h2 id="1-choose-the-anchor-compartment">1. Choose the anchor compartment<a class="heading-link" href="#1-choose-the-anchor-compartment" aria-label="Link to 1. Choose the anchor compartment">#</a></h2>
 <p>Infrayard creates everything it manages <strong>under one compartment</strong>, the anchor. By default each cluster gets its own child compartment with its network and node pools; a cluster can also use an existing compartment inside the anchor.</p>
@@ -111,7 +112,7 @@ Allow service OKE to manage all-resources in tenancy
 </tr>
 <tr>
 <td><code>Allow service OKE …</code></td>
-<td>Lets the OKE service itself work in the tenancy. Add it once per tenancy; skip it if it already exists</td>
+<td>Lets the OKE service itself work in the tenancy. Keep it in this policy even if another policy already has it; a duplicate statement does no harm</td>
 </tr>
 </tbody></table></div>
 <p>If the group lives in a domain other than <strong>Default</strong>, write it as <code>group &#39;MyDomain&#39;/&#39;InfrayardServiceGroup&#39;</code>.</p>
@@ -137,13 +138,66 @@ Allow service OKE to manage all-resources in tenancy
 <li>Copy the <strong>secret key</strong> right away. OCI shows it only once.</li>
 <li>Copy the <strong>access key</strong> from the list.</li>
 </ol>
-<h2 id="check-the-setup-optional">Check the setup (optional)<a class="heading-link" href="#check-the-setup-optional" aria-label="Link to Check the setup (optional)">#</a></h2>
-<p>With the OCI CLI configured for the new user (<code>~/.oci/config</code> with the key from step 4), these commands must succeed:</p>
-<pre><code class="language-bash">oci iam compartment get --compartment-id &lt;anchor-compartment-ocid&gt;
-oci ce cluster-options get --cluster-option-id all --query &#39;data.&quot;kubernetes-versions&quot;&#39;
-oci os object list --bucket-name infrayard-tfstate
+<h2 id="the-same-steps-with-the-oci-cli">The same steps with the OCI CLI<a class="heading-link" href="#the-same-steps-with-the-oci-cli" aria-label="Link to The same steps with the OCI CLI">#</a></h2>
+<p>Instead of the Console you can run steps 1–6 with the OCI CLI, signed in as a tenancy administrator. The commands were tested in this order; they keep the generated values in shell variables and write the key files to the current directory. Run them in an empty directory that only you can read (<code>mkdir -m 700 infrayard-oci &amp;&amp; cd infrayard-oci</code>).</p>
+<pre><code class="language-bash"># Your tenancy OCID, as in ~/.oci/config of the administrator
+T=ocid1.tenancy.oc1..aaaa…
+
+# 1. Anchor compartment (skip and set C=&lt;ocid&gt; to use an existing one)
+C=$(oci iam compartment create -c $T --name infrayard \
+      --description &quot;Infrayard anchor compartment&quot; \
+      --wait-for-state ACTIVE --query data.id --raw-output)
+
+# 2. Group and user, user in the group
+G=$(oci iam group create -c $T --name InfrayardServiceGroup \
+      --description &quot;Infrayard service user&quot; --query data.id --raw-output)
+U=$(oci iam user create -c $T --name infrayard-svc \
+      --description &quot;Infrayard service user&quot; --email platform-team@example.com \
+      --query data.id --raw-output)
+oci iam group add-user --group-id $G --user-id $U
+
+# 3. Policy: save the ten statements from step 3 as a JSON list in policy.json,
+#    one string per statement: [&quot;Allow group …&quot;, &quot;Allow group …&quot;, …]
+oci iam policy create -c $T --name infrayard-service \
+  --description &quot;Infrayard service user&quot; --statements file://policy.json
+
+# 4. API key: generate it locally and upload the public part
+umask 077
+openssl genrsa -out oci_api_key.pem 2048
+openssl rsa -pubout -in oci_api_key.pem -out oci_api_key_public.pem
+FP=$(oci iam user api-key upload --user-id $U \
+       --key-file oci_api_key_public.pem --query data.fingerprint --raw-output)
+
+# 5. State bucket with versioning, and the namespace
+oci os bucket create -c $C --name infrayard-tfstate --versioning Enabled
+NS=$(oci os ns get --query data --raw-output)
+
+# 6. S3 key: &quot;id&quot; is the access key, &quot;key&quot; the secret key (shown only once)
+oci iam customer-secret-key create --user-id $U --display-name infrayard-tfstate \
+  --query &#39;data.{access_key:id,secret_key:key}&#39; --output json &gt; s3-key.json
+
+echo &quot;tenancy=$T user=$U fingerprint=$FP compartment=$C namespace=$NS&quot;
 </code></pre>
-<p>Infrayard runs the same kind of calls when an administrator opens <strong>Admin → Configuration</strong> and syncs shapes and versions.</p>
+<p>The last line prints the values for the <a href="#values-checklist">checklist</a>; the S3 key pair is in <code>s3-key.json</code>. Store <code>oci_api_key.pem</code> and <code>s3-key.json</code> in your secret manager and delete the local copies after the installation.</p>
+<h2 id="check-the-setup">Check the setup<a class="heading-link" href="#check-the-setup" aria-label="Link to Check the setup">#</a></h2>
+<p>A new user and API key take <strong>a few minutes</strong> to work in every OCI service. During that time some calls fail with <code>401 NotAuthenticated</code> even though everything is set up correctly; in our tests Identity accepted the key first, Container Engine and Object Storage about two minutes later. Wait five minutes before you start the installation or before you look for a mistake.</p>
+<p>To check the new user from your workstation, write a CLI configuration file for it (values from the <a href="#values-checklist">checklist</a>):</p>
+<pre><code class="language-ini"># infrayard-oci-config
+[DEFAULT]
+user=ocid1.user.oc1..aaaa…
+fingerprint=12:34:56:…
+tenancy=ocid1.tenancy.oc1..aaaa…
+region=eu-frankfurt-1
+key_file=/full/path/to/oci_api_key.pem
+</code></pre>
+<p>These three commands must succeed. They print the compartment name, a list of Kubernetes versions, and an empty list for the new bucket:</p>
+<pre><code class="language-bash">oci --config-file infrayard-oci-config iam compartment get \
+  --compartment-id &lt;anchor-compartment-ocid&gt; --query data.name --raw-output
+oci --config-file infrayard-oci-config ce cluster-options get \
+  --cluster-option-id all --query &#39;data.&quot;kubernetes-versions&quot;&#39;
+oci --config-file infrayard-oci-config os object list --bucket-name infrayard-tfstate
+</code></pre>
+<p><code>NotAuthorizedOrNotFound</code> (404) instead means a policy is missing or names the wrong group or compartment. Infrayard runs the same kind of calls when an administrator syncs shapes and versions in <strong>Admin → Configuration</strong>.</p>
 <h2 id="values-checklist">Values checklist<a class="heading-link" href="#values-checklist" aria-label="Link to Values checklist">#</a></h2>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Scrollable reference table"><table>
 <thead>
@@ -200,4 +254,4 @@ oci os object list --bucket-name infrayard-tfstate
 </tr>
 </tbody></table></div>
 <p>Continue with your installation path: <a href="/docs/install-kubernetes/">Kubernetes</a> or <a href="/docs/install-vm/">single VM</a>.</p>
-</div></article><nav class="docs-page-nav" aria-label="Documentation pages"><div><a href="/docs/installation/"><small>Previous</small>← Installation</a></div><div><a href="/docs/install-kubernetes/"><small>Next</small>Install on Kubernetes →</a></div></nav><p class="docs-footer">Infrayard by Solvia Lab · <a href="/">Product</a> · <a href="/docs/subscription/">Plans and licensing</a> · <a href="mailto:support@infrayard.eu">Support</a> · <a href="/legal/privacy.html">Privacy</a></p></div><aside class="docs-toc" aria-label="On this page"><h2>On this page</h2><a href="#1-choose-the-anchor-compartment">1. Choose the anchor compartment</a><a href="#2-create-the-user-and-group">2. Create the user and group</a><a href="#3-add-the-policies">3. Add the policies</a><a href="#4-create-the-api-key">4. Create the API key</a><a href="#5-create-the-terraform-state-bucket">5. Create the Terraform state bucket</a><a href="#6-create-the-s3-key-for-the-bucket">6. Create the S3 key for the bucket</a><a href="#check-the-setup-optional">Check the setup (optional)</a><a href="#values-checklist">Values checklist</a></aside></div></main></div></body></html>
+</div></article><nav class="docs-page-nav" aria-label="Documentation pages"><div><a href="/docs/installation/"><small>Previous</small>← Installation</a></div><div><a href="/docs/install-kubernetes/"><small>Next</small>Install on Kubernetes →</a></div></nav><p class="docs-footer">Infrayard by Solvia Lab · <a href="/">Product</a> · <a href="/docs/subscription/">Plans and licensing</a> · <a href="mailto:support@infrayard.eu">Support</a> · <a href="/legal/privacy.html">Privacy</a></p></div><aside class="docs-toc" aria-label="On this page"><h2>On this page</h2><a href="#1-choose-the-anchor-compartment">1. Choose the anchor compartment</a><a href="#2-create-the-user-and-group">2. Create the user and group</a><a href="#3-add-the-policies">3. Add the policies</a><a href="#4-create-the-api-key">4. Create the API key</a><a href="#5-create-the-terraform-state-bucket">5. Create the Terraform state bucket</a><a href="#6-create-the-s3-key-for-the-bucket">6. Create the S3 key for the bucket</a><a href="#the-same-steps-with-the-oci-cli">The same steps with the OCI CLI</a><a href="#check-the-setup">Check the setup</a><a href="#values-checklist">Values checklist</a></aside></div></main></div></body></html>

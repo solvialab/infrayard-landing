@@ -73,8 +73,16 @@ docker compose logs --tail=200 infrayard-api
 <td>The OCI key secret is missing or in another namespace. Create it as in <a href="/docs/install-kubernetes/#3-create-the-namespace-and-secrets">step 3</a></td>
 </tr>
 <tr>
-<td><code>ImagePullBackOff</code> or <code>docker compose pull</code> fails with <code>unauthorized</code></td>
-<td>Registry login or <code>regcred</code> secret is missing or the token has expired. Check <code>global.imagePullSecrets</code> and the image addresses; ask support for a new token</td>
+<td><code>ImagePullBackOff</code>, <code>docker compose pull</code> or <code>helm show chart</code> fails with <code>401</code>, <code>403</code>, <code>unauthorized</code> or <code>denied</code></td>
+<td>The registry login or the <code>regcred</code> secret is missing, has a typo, or the token has expired. Check <code>global.imagePullSecrets</code> and the image addresses. If the login succeeds but pulling still fails, the token lacks read access to the registry; ask support for a new token</td>
+</tr>
+<tr>
+<td>API log or <code>oci</code> CLI shows <code>401 NotAuthenticated</code> right after the OCI user or API key was created</td>
+<td>OCI needs a few minutes to activate a new user and key in every service. Wait five minutes and retry. If it persists, compare the fingerprint, user OCID and tenancy OCID with the API key page</td>
+</tr>
+<tr>
+<td>API log shows <code>404 NotAuthorizedOrNotFound</code> for OCI calls</td>
+<td>A policy statement is missing or names the wrong group or compartment. Compare with <a href="/docs/oci-setup/#3-add-the-policies">Prepare OCI</a></td>
 </tr>
 <tr>
 <td><code>helm install</code> fails with <code>... is required</code></td>

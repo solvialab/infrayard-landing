@@ -80,7 +80,7 @@ helm install traefik traefik/traefik -n traefik --create-namespace \
 helm install cert-manager jetstack/cert-manager -n cert-manager --create-namespace \
   --set crds.enabled=true
 </code></pre>
-<p>Then create a Let&#39;s Encrypt issuer. Use an e-mail address that receives expiry notices:</p>
+<p>Then create a Let&#39;s Encrypt issuer. It needs no e-mail address; Let&#39;s Encrypt no longer sends expiry e-mails, and cert-manager renews the certificate on its own:</p>
 <pre><code class="language-bash">kubectl apply -f - &lt;&lt;&#39;EOF&#39;
 apiVersion: cert-manager.io/v1
 kind: ClusterIssuer
@@ -89,7 +89,6 @@ metadata:
 spec:
   acme:
     server: https://acme-v02.api.letsencrypt.org/directory
-    email: platform@example.com
     privateKeySecretRef:
       name: letsencrypt
     solvers:
@@ -104,9 +103,11 @@ EOF
 <pre><code class="language-bash">helm registry login registry.gitlab.com -u &lt;registry-user&gt;
 # Password: your registry token
 </code></pre>
+<p>In scripts, pass the token on standard input instead: <code>printf &#39;%s&#39; &quot;$TOKEN&quot; | helm registry login registry.gitlab.com -u &lt;registry-user&gt; --password-stdin</code>.</p>
 <p>Check that you can read the chart:</p>
 <pre><code class="language-bash">helm show chart oci://registry.gitlab.com/solvialab/infrayard/charts/infrayard --version &lt;version&gt;
 </code></pre>
+<p>The output starts with <code>Pulled: …</code> and ends with <code>name: infrayard</code> and <code>version: &lt;version&gt;</code>. An error with <code>401</code>, <code>403</code> or <code>denied</code> means the login is missing or the token cannot read the registry; see <a href="/docs/troubleshooting/#installation">troubleshooting</a>.</p>
 <h2 id="3-create-the-namespace-and-secrets">3. Create the namespace and secrets<a class="heading-link" href="#3-create-the-namespace-and-secrets" aria-label="Link to 3. Create the namespace and secrets">#</a></h2>
 <p>Two secrets are created by hand so that they never appear in Helm values. Run the commands from a directory that contains <code>oci_api_key.pem</code>:</p>
 <pre><code class="language-bash">kubectl create namespace infrayard
@@ -165,7 +166,7 @@ ingress:
     enabled: true
     secretName: infrayard-tls
 </code></pre>
-<p><code>secrets.yaml</code> (generate each password with <code>openssl rand -base64 24</code>):</p>
+<p><code>secrets.yaml</code>. Generate each of the three passwords with <code>openssl rand -hex 24</code>; hex passwords contain no characters that need escaping:</p>
 <pre><code class="language-yaml">postgresql:
   auth:
     password: &quot;&lt;database password&gt;&quot;
@@ -188,6 +189,7 @@ api:
 <li><strong>ingress-nginx:</strong> set <code>className: nginx</code> and add the annotations <code>nginx.ingress.kubernetes.io/proxy-read-timeout: &quot;3600&quot;</code> and <code>nginx.ingress.kubernetes.io/proxy-buffering: &quot;off&quot;</code>, so that live Terraform logs are not cut off.</li>
 <li><strong>Your own Keycloak</strong> instead of the bundled one: see <a href="/docs/keycloak/">Use your own Keycloak</a> before installing.</li>
 <li><strong>E-mail notifications</strong> (optional): set <code>api.email.enabled: true</code>, <code>api.email.adminEmails</code> and the <code>api.email.smtp</code> block, with the SMTP password in <code>secrets.yaml</code>.</li>
+<li><strong>Test or demo installation:</strong> <code>frontend.robots.noindex: true</code> asks search engines not to index the portal.</li>
 <li><strong>Single-node clusters:</strong> the chart tolerates the control-plane taint by default, so all pods can run on one k3s node.</li>
 </ul>
 <h2 id="5-install">5. Install<a class="heading-link" href="#5-install" aria-label="Link to 5. Install">#</a></h2>
@@ -195,7 +197,7 @@ api:
   --version &lt;version&gt; -n infrayard -f values.yaml -f secrets.yaml
 </code></pre>
 <p>The chart version selects the matching image version automatically; do not set an image tag.</p>
-<p>Watch the pods until all four are <code>Running</code> and ready. Keycloak needs about a minute on the first start:</p>
+<p>Watch the pods until all four are <code>Running</code> and ready, usually within two minutes. Keycloak is the last one, because it imports the realm on the first start:</p>
 <pre><code class="language-bash">kubectl get pods -n infrayard -w
 </code></pre>
 <pre><code class="language-text">NAME                                  READY   STATUS    RESTARTS   AGE
@@ -209,7 +211,9 @@ infrayard-postgresql-0                1/1     Running   0          2m
 <pre><code class="language-bash">kubectl get svc -n traefik traefik        # OKE with Traefik from step 1
 kubectl get svc -n kube-system traefik    # k3s
 </code></pre>
-<p>Create an <code>A</code> record from <code>infrayard.example.com</code> to the <code>EXTERNAL-IP</code>. Once DNS resolves, cert-manager obtains the certificate, usually within two minutes:</p>
+<p>Create an <code>A</code> record from <code>infrayard.example.com</code> to the <code>EXTERNAL-IP</code>.</p>
+<p><strong>k3s on a cloud VM</strong> (for example OCI Compute): k3s publishes Traefik on the node&#39;s own address, so <code>EXTERNAL-IP</code> shows the VM&#39;s <strong>private</strong> IP, such as <code>10.0.0.12</code>. Point DNS to the VM&#39;s <strong>public</strong> IP instead, and allow TCP 80 and 443 in the VM&#39;s security list or network security group and in the host firewall. For a VPN-only portal, use the private IP; see <a href="/docs/private-access/">private access</a>.</p>
+<p>Once DNS resolves, cert-manager obtains the certificate, usually within two minutes:</p>
 <pre><code class="language-bash">kubectl get certificate -n infrayard
 # NAME            READY   SECRET          AGE
 # infrayard-tls   True    infrayard-tls   2m
