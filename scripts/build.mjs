@@ -3,7 +3,7 @@ import { resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Marked } from '../assets/vendor/marked.mjs';
 import { site, pricing, faqs, docs, money } from '../content/site.mjs';
-import { escapeHtml as e, jsonScript, header, docsHeader, footer, contactDialog } from './templates.mjs';
+import { escapeHtml as e, jsonScript, header, docsHeader, docsSidebarLinks, docsFooter, footer, contactDialog } from './templates.mjs';
 import { demo, docsTitles, docsDescriptions, resourceTitles, robotsRules, indexNowKey } from '../content/seo.mjs';
 import { head, graph, breadcrumb, videoCredit, absolute, organization } from './seo.mjs';
 
@@ -68,7 +68,7 @@ Annual payment saves ${money(pricing.business.monthly * 12 - pricing.business.an
 
 ## What you receive
 
-When the order is accepted and the first invoice is paid, your technical contact receives the onboarding e-mail: the registry user and token, the chart and image addresses, the version to install and the support address. [Installation](/docs/installation/#what-you-receive) lists its contents. With it, your team installs Infrayard on its own with the public guides; they plan about an hour, including the OCI preparation.
+When the order is accepted and the first invoice is paid, your technical contact receives an onboarding e-mail with the registry credentials, chart and image addresses, version to install and support address. Your team can install Infrayard using the public guides. The installation guide lists what you receive and how long setup takes. [Installation](/docs/installation/)
 
 | | Business | Enterprise | Guided evaluation |
 | --- | --- | --- | --- |
@@ -171,18 +171,51 @@ for (let pageIndex = 0; pageIndex < docs.length; pageIndex++) {
   }).join('\n');
   const tocLinks = toc.map(item => `<a href="#${item.id}">${e(item.text)}</a>`).join('');
   const prev = docs[pageIndex - 1], next = docs[pageIndex + 1];
-  const pageNav = `<nav class="docs-page-nav" aria-label="Documentation pages"><div>${prev ? `<a href="${route(prev)}"><small>Previous</small>← ${e(prev.title)}</a>` : ''}</div><div>${next ? `<a href="${route(next)}"><small>Next</small>${e(next.title)} →</a>` : ''}</div></nav>`;
+  const pageNavLinks = [[prev, 'prev', 'Previous', '←'], [next, 'next', 'Next', '→']]
+    .filter(([item]) => item)
+    .map(([item, rel, label, arrow]) => `<a class="docs-page-nav-link" href="${route(item)}" rel="${rel}">
+      <span class="docs-page-arrow" aria-hidden="true">${arrow}</span>
+      <span><small>${label}</small><strong>${e(item.title)}</strong></span>
+    </a>`).join('');
+  const pageNav = `<nav class="docs-page-nav" aria-label="Previous and next documentation pages">${pageNavLinks}</nav>`;
   const crumbs = [['Home', '/'], ['Documentation', '/docs/'], ...(page.slug ? [[page.title, url]] : [])];
   const title = docsTitles[page.slug] || `${page.title} | Infrayard Docs`;
   const description = docsDescriptions[page.slug] || page.description;
   const articleData = graph({ path: url, title, description, crumbs, article: { type: 'TechArticle', headline: page.slug ? page.title : 'Infrayard documentation' } });
   pageRecords.push({ path: url, modified: site.updated });
   const output = `${generated}<!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">${head({ path: url, title, description, type: 'article', data: articleData })}<script src="/assets/theme.js"></script><link rel="stylesheet" href="/assets/site.css"><link rel="stylesheet" href="/assets/docs.css"><script type="module" src="/assets/site.js"></script><script defer src="/assets/docs.js"></script>${page.slug === '' ? '<script defer src="/assets/docs-legacy.js"></script>' : ''}</head>
-<body><a class="skip-link" href="#main">Skip to content</a>${docsHeader}<div class="docs-shell"><aside class="docs-sidebar" id="docs-navigation" aria-label="Documentation navigation"><div class="docs-search"><label for="docs-search">Search documentation</label><input id="docs-search" type="search" placeholder="Try: networking, billing…" autocomplete="off" aria-controls="search-results"></div><section class="search-results" id="search-results" role="region" aria-label="Documentation search results" aria-live="polite" hidden></section><nav aria-label="Documentation pages">${navigation}</nav></aside><main class="docs-main" id="main"><div class="docs-layout"><div><nav class="docs-breadcrumb" aria-label="Breadcrumb"><a href="/docs/">Docs</a><span aria-hidden="true">/</span><span>${e(page.title)}</span></nav><article class="docs-article"><h1>${e(page.slug ? page.title : 'Infrayard documentation')}</h1><p class="docs-summary">${e(page.description)}</p>${toc.length ? `<details class="docs-mobile-toc"><summary>On this page</summary><nav aria-label="Page contents">${tocLinks}</nav></details>` : ''}<div class="docs-content">${html}</div></article>${pageNav}<p class="docs-footer">Infrayard by Solvia Lab · <a href="/">Product</a> · <a href="/docs/subscription/">Plans and licensing</a> · <a href="mailto:${site.supportEmail}">Support</a> · <a href="/legal/privacy.html">Privacy</a></p></div>${toc.length ? `<aside class="docs-toc" aria-label="On this page"><h2>On this page</h2>${tocLinks}</aside>` : ''}</div></main></div></body></html>`;
-  await write(`docs/${page.slug ? page.slug + '/' : ''}index.html`, output
-    .replace(/<nav class="docs-breadcrumb"[\s\S]*?<\/nav>/, breadcrumb(crumbs))
-    .replace(`<p class="docs-summary">${e(page.description)}</p>`, `<p class="docs-summary">${e(page.description)}</p><p class="docs-maintained">Maintained by ${e(site.company)} · Updated <time datetime="${site.updated}">${site.updated}</time></p>`));
+<html lang="en" class="docs-root"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">${head({ path: url, title, description, type: 'article', data: articleData })}<script src="/assets/theme.js"></script><link rel="stylesheet" href="/assets/site.css"><link rel="stylesheet" href="/assets/docs.css"><script type="module" src="/assets/site.js"></script><script defer src="/assets/docs.js"></script>${page.slug === '' ? '<script defer src="/assets/docs-legacy.js"></script>' : ''}</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+  ${docsHeader}
+  <div class="docs-shell">
+    <aside class="docs-sidebar" id="docs-navigation" aria-label="Documentation navigation" tabindex="-1">
+      <div class="docs-search"><label for="docs-search">Search documentation</label><input id="docs-search" type="search" placeholder="Try: networking, billing…" autocomplete="off" aria-controls="search-results"></div>
+      <section class="search-results" id="search-results" role="region" aria-label="Documentation search results" aria-live="polite" hidden></section>
+      <nav aria-label="Documentation pages">${navigation}</nav>
+      ${docsSidebarLinks}
+    </aside>
+    <button class="docs-backdrop" id="docs-backdrop" type="button" aria-label="Close documentation navigation" tabindex="-1" hidden></button>
+    <main class="docs-main" id="main" tabindex="-1">
+      <div class="docs-layout">
+        <div class="docs-reading">
+          ${breadcrumb(crumbs)}
+          <article class="docs-article">
+            <h1>${e(page.slug ? page.title : 'Infrayard documentation')}</h1>
+            <p class="docs-summary">${e(page.description)}</p>
+            <p class="docs-maintained">Maintained by ${e(site.company)} · Updated <time datetime="${site.updated}">${site.updated}</time></p>
+            ${toc.length ? `<details class="docs-mobile-toc"><summary>On this page</summary><nav aria-label="Page contents">${tocLinks}</nav></details>` : ''}
+            <div class="docs-content">${html}</div>
+          </article>
+          ${pageNav}
+          ${docsFooter}
+        </div>
+        ${toc.length ? `<aside class="docs-toc" aria-label="On this page"><h2>On this page</h2>${tocLinks}</aside>` : ''}
+      </div>
+    </main>
+  </div>
+</body></html>`;
+  await write(`docs/${page.slug ? page.slug + '/' : ''}index.html`, output);
 }
 await write('docs/search-index.json', JSON.stringify(searchRecords));
 

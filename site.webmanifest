@@ -1,7 +1,7 @@
 {
   "name": "Infrayard",
   "short_name": "Infrayard",
-  "description": "Provision and operate Oracle Kubernetes Engine clusters through a self-service portal. Control templates, access and resource limits inside your OCI tenancy.",
+  "description": "Run a self-service portal for Oracle Kubernetes Engine in your own OCI tenancy. Keep OCI credentials, Terraform state and audit records in your environment.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#0b1120",

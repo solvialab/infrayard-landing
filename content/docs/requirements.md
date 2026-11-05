@@ -18,6 +18,15 @@ At rest Infrayard uses about 0.9 GB memory and almost no CPU; Keycloak takes mos
 
 Infrayard is tested on OKE 1.36 and k3s 1.36, both with Traefik and cert-manager. The images are built for x86 (`amd64`) and Arm (`arm64`).
 
+## Compare deployment models
+
+When evaluating a platform for sensitive infrastructure, check who runs the control plane, where it stores operational records and how much of the OKE workflow your team needs to assemble.
+
+- **Infrayard** is a commercial subscription for a ready-to-install OKE portal. Your team runs the portal and API on its own Kubernetes cluster, stores operational records in its PostgreSQL database and keeps Terraform state in its OCI Object Storage. The chart includes OKE provisioning and lifecycle workflows. [Infrayard architecture](/docs/architecture/)
+- **Quali Torque** orchestrates infrastructure environments from blueprints. Its SaaS model uses an agent that connects the customer's infrastructure to Torque SaaS. Quali also describes a self-hosted control plane for sovereign environments. [Torque Agent](https://docs.qtorque.io/torque-agent/Torque-Agent-Intro) · [Quali's self-hosted control plane](https://www.quali.com/resource/qualis-torque-platform-delivers-the-operational-foundation-enterprises-need-to-achieve-sovereign-ai/)
+- **Rafay** offers a Rafay-managed SaaS controller and a self-hosted controller that customers can install on Kubernetes. Review the requirements for the controller model you plan to run. [Rafay SaaS controller](https://docs.rafay.co/security/whitelist/) · [Rafay self-hosted controller](https://docs.rafay.co/selfhosted/installation_helm/)
+- **Backstage** is a framework for building and deploying an internal developer portal. Its Kubernetes plugin gives service owners visibility into running workloads. Teams choose the integrations and workflows that go into their portal. [Backstage production deployment](https://backstage.io/docs/next/golden-path/deployment/) · [Backstage Kubernetes plugin](https://backstage.io/docs/next/features/kubernetes/)
+
 ## OCI
 
 - A tenancy and a region where you create OKE clusters.

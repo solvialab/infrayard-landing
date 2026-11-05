@@ -1,6 +1,6 @@
 # Security and access
 
-Infrayard runs entirely in your environment. OCI credentials, Terraform state, the database and logs stay with you; there is no Solvia Lab cloud service in the path, and Infrayard sends no data to Solvia Lab.
+Infrayard's portal and API run in your environment. OCI credentials stay in your Kubernetes Secrets, Terraform state stays in your OCI Object Storage bucket and operational records and audit logs stay in your PostgreSQL database. Infrayard sends no operational data to Solvia Lab. Commercial onboarding and support run separately from your deployment.
 
 ## Identity and roles
 

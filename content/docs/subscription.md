@@ -13,7 +13,7 @@ Annual payment saves €6,000 compared with twelve monthly payments. Oracle Clou
 
 ## What you receive
 
-When the order is accepted and the first invoice is paid, your technical contact receives the onboarding e-mail: the registry user and token, the chart and image addresses, the version to install and the support address. [Installation](/docs/installation/#what-you-receive) lists its contents. With it, your team installs Infrayard on its own with the public guides; they plan about an hour, including the OCI preparation.
+When the order is accepted and the first invoice is paid, your technical contact receives an onboarding e-mail with the registry credentials, chart and image addresses, version to install and support address. Your team can install Infrayard using the public guides. The installation guide lists what you receive and how long setup takes. [Installation](/docs/installation/)
 
 | | Business | Enterprise | Guided evaluation |
 | --- | --- | --- | --- |

@@ -7,7 +7,7 @@ export const site = {
   supportEmail: 'support@infrayard.eu',
   updated: '2026-11-05',
   title: 'Infrayard | OKE Self-service Platform for Oracle Cloud',
-  description: 'Provision and operate Oracle Kubernetes Engine clusters through a self-service portal. Control templates, access and resource limits inside your OCI tenancy.',
+  description: 'Run a self-service portal for Oracle Kubernetes Engine in your own OCI tenancy. Keep OCI credentials, Terraform state and audit records in your environment.',
 };
 
 export const pricing = {

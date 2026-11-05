@@ -8,7 +8,24 @@ const menuIcon = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" str
 
 export const header = `<header class="site-header"><div class="container header-inner">${brand}<nav class="nav-links" id="main-navigation" aria-label="Main navigation"><a href="#product">Product</a><a href="#how-it-works">How it works</a><a href="#pricing">Pricing</a><a href="/docs/">Docs</a></nav><div class="header-actions">${themeToggle}<button class="button compact" data-contact="demo">Request a demo</button><button class="icon-button menu-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false" aria-controls="main-navigation">${menuIcon}</button></div></div></header>`;
 
-export const docsHeader = `<header class="site-header docs-header"><div class="container header-inner"><div style="display:flex;align-items:center;gap:12px">${brand}<span class="docs-brand-label">Documentation</span></div><div class="header-actions"><a href="/" class="small">Product</a>${themeToggle}<a class="button compact" href="/?enquiry=demo#demo">Request a demo</a><button class="icon-button docs-menu-toggle" id="docs-menu-toggle" type="button" aria-label="Toggle documentation navigation" aria-expanded="false" aria-controls="docs-navigation">${menuIcon}</button></div></div></header>`;
+const docsProductLinks = `<a class="small" href="/">Product</a><a class="button compact" href="/?enquiry=demo#demo">Request a demo</a>`;
+
+export const docsHeader = `<header class="site-header docs-header"><div class="container header-inner">
+  <div class="docs-brand">${brand}<a class="docs-brand-label" href="/docs/">Documentation</a></div>
+  <div class="header-actions"><div class="docs-header-links">${docsProductLinks}</div>${themeToggle}<button class="icon-button docs-menu-toggle" id="docs-menu-toggle" type="button" aria-label="Toggle documentation navigation" aria-expanded="false" aria-controls="docs-navigation">${menuIcon}<span>Docs</span></button></div>
+</div></header>`;
+
+export const docsSidebarLinks = `<nav class="docs-sidebar-links" aria-label="Product links">${docsProductLinks}</nav>`;
+
+export const docsFooter = `<footer class="docs-footer">
+  <p>Infrayard by Solvia Lab</p>
+  <nav aria-label="Documentation footer"><ul>
+    <li><a href="/">Product</a></li>
+    <li><a href="/docs/subscription/">Plans and licensing</a></li>
+    <li><a href="mailto:${site.supportEmail}">Support</a></li>
+    <li><a href="/legal/privacy.html">Privacy</a></li>
+  </ul></nav>
+</footer>`;
 
 export const footer = `<footer class="site-footer"><div class="container"><div class="footer-top"><div>${brand}<p class="footer-description">Self-service OKE provisioning and lifecycle workflows inside your OCI tenancy.</p></div><nav class="footer-links" aria-label="Footer navigation"><a href="/docs/">Documentation</a><a href="/resources/">Resources</a><button type="button" class="text-link footer-support" data-contact="support" style="padding:0;border:0;background:none;color:var(--muted);font:inherit">Support</button><a href="https://solvialab.tech/">Solvia Lab</a><a href="mailto:${site.email}">Contact</a></nav></div><div class="footer-bottom"><span>© 2026 Solvia Lab s.r.o.</span><nav class="footer-legal" aria-label="Legal links"><a href="/legal/privacy.html">Privacy</a><a href="/legal/terms.html">Terms</a><a href="/legal/cookies.html">Cookies</a></nav></div></div></footer>`;
 

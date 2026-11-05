@@ -1,16 +1,30 @@
 (() => {
   const sidebar = document.getElementById('docs-navigation');
   const toggle = document.getElementById('docs-menu-toggle');
-  toggle?.addEventListener('click', () => {
-    const open = toggle.getAttribute('aria-expanded') !== 'true';
+  const backdrop = document.getElementById('docs-backdrop');
+  const main = document.getElementById('main');
+  const narrowScreen = matchMedia('(max-width: 780px)');
+  const menuIsOpen = () => toggle?.getAttribute('aria-expanded') === 'true';
+  const setMenuOpen = (open, restoreFocus = true) => {
     toggle.setAttribute('aria-expanded', String(open));
-    sidebar?.classList.toggle('is-open', open);
+    sidebar.classList.toggle('is-open', open);
+    if (backdrop) backdrop.hidden = !open;
+    main.inert = open;
+    if (open) sidebar.focus({ preventScroll: true });
+    else if (restoreFocus) toggle.focus({ preventScroll: true });
+  };
+  toggle?.addEventListener('click', () => {
+    setMenuOpen(!menuIsOpen());
+  });
+  backdrop?.addEventListener('click', () => setMenuOpen(false));
+  sidebar?.addEventListener('click', event => {
+    if (menuIsOpen() && event.target.closest('a[href]')) setMenuOpen(false);
   });
   document.addEventListener('keydown', event => {
-    if (event.key === 'Escape') {
-      sidebar?.classList.remove('is-open');
-      toggle?.setAttribute('aria-expanded', 'false');
-    }
+    if (event.key === 'Escape' && menuIsOpen()) setMenuOpen(false);
+  });
+  narrowScreen.addEventListener('change', event => {
+    if (!event.matches && menuIsOpen()) setMenuOpen(false, false);
   });
   document.querySelectorAll('.docs-content pre').forEach(pre => {
     const button = document.createElement('button');

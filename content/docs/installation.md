@@ -1,6 +1,8 @@
 # Installation
 
-Infrayard runs on a Kubernetes cluster in your environment: an OKE cluster for production, or k3s on a single VM for an evaluation. Both use the same Helm chart, images and values. Installation takes about an hour, including the OCI preparation.
+Infrayard runs on Kubernetes in your environment. Use an existing OKE cluster for production or k3s on a single VM for an evaluation. Both use the same Helm chart, images and values.
+
+Once you have registry access and OCI permissions, plan 45–90 minutes to first sign-in if you know OCI and Helm and have a Kubernetes host ready. For a first-time evaluation that includes preparing a k3s VM, allow 2–4 hours. These estimates include OCI preparation and portal setup. Provisioning a cluster through the portal is a separate OCI operation.
 
 ## Choose your deployment path
 

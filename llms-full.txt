@@ -190,6 +190,15 @@ At rest Infrayard uses about 0.9 GB memory and almost no CPU; Keycloak takes mos
 
 Infrayard is tested on OKE 1.36 and k3s 1.36, both with Traefik and cert-manager. The images are built for x86 (`amd64`) and Arm (`arm64`).
 
+### Compare deployment models
+
+When evaluating a platform for sensitive infrastructure, check who runs the control plane, where it stores operational records and how much of the OKE workflow your team needs to assemble.
+
+- **Infrayard** is a commercial subscription for a ready-to-install OKE portal. Your team runs the portal and API on its own Kubernetes cluster, stores operational records in its PostgreSQL database and keeps Terraform state in its OCI Object Storage. The chart includes OKE provisioning and lifecycle workflows. [Infrayard architecture](https://www.infrayard.eu/docs/architecture/)
+- **Quali Torque** orchestrates infrastructure environments from blueprints. Its SaaS model uses an agent that connects the customer's infrastructure to Torque SaaS. Quali also describes a self-hosted control plane for sovereign environments. [Torque Agent](https://docs.qtorque.io/torque-agent/Torque-Agent-Intro) · [Quali's self-hosted control plane](https://www.quali.com/resource/qualis-torque-platform-delivers-the-operational-foundation-enterprises-need-to-achieve-sovereign-ai/)
+- **Rafay** offers a Rafay-managed SaaS controller and a self-hosted controller that customers can install on Kubernetes. Review the requirements for the controller model you plan to run. [Rafay SaaS controller](https://docs.rafay.co/security/whitelist/) · [Rafay self-hosted controller](https://docs.rafay.co/selfhosted/installation_helm/)
+- **Backstage** is a framework for building and deploying an internal developer portal. Its Kubernetes plugin gives service owners visibility into running workloads. Teams choose the integrations and workflows that go into their portal. [Backstage production deployment](https://backstage.io/docs/next/golden-path/deployment/) · [Backstage Kubernetes plugin](https://backstage.io/docs/next/features/kubernetes/)
+
 ### OCI
 
 - A tenancy and a region where you create OKE clusters.
@@ -256,7 +265,7 @@ Infrayard provisions and manages OKE clusters: create, access, scale, upgrade an
 
 Canonical page: https://www.infrayard.eu/docs/security/
 
-Infrayard runs entirely in your environment. OCI credentials, Terraform state, the database and logs stay with you; there is no Solvia Lab cloud service in the path, and Infrayard sends no data to Solvia Lab.
+Infrayard's portal and API run in your environment. OCI credentials stay in your Kubernetes Secrets, Terraform state stays in your OCI Object Storage bucket and operational records and audit logs stay in your PostgreSQL database. Infrayard sends no operational data to Solvia Lab. Commercial onboarding and support run separately from your deployment.
 
 ### Identity and roles
 
@@ -431,7 +440,9 @@ To make the portal reachable only from your VPN, see [private access](https://ww
 
 Canonical page: https://www.infrayard.eu/docs/installation/
 
-Infrayard runs on a Kubernetes cluster in your environment: an OKE cluster for production, or k3s on a single VM for an evaluation. Both use the same Helm chart, images and values. Installation takes about an hour, including the OCI preparation.
+Infrayard runs on Kubernetes in your environment. Use an existing OKE cluster for production or k3s on a single VM for an evaluation. Both use the same Helm chart, images and values.
+
+Once you have registry access and OCI permissions, plan 45–90 minutes to first sign-in if you know OCI and Helm and have a Kubernetes host ready. For a first-time evaluation that includes preparing a k3s VM, allow 2–4 hours. These estimates include OCI preparation and portal setup. Provisioning a cluster through the portal is a separate OCI operation.
 
 ### Choose your deployment path
 
@@ -1772,7 +1783,7 @@ Annual payment saves €6,000 compared with twelve monthly payments. Oracle Clou
 
 ### What you receive
 
-When the order is accepted and the first invoice is paid, your technical contact receives the onboarding e-mail: the registry user and token, the chart and image addresses, the version to install and the support address. [Installation](https://www.infrayard.eu/docs/installation/#what-you-receive) lists its contents. With it, your team installs Infrayard on its own with the public guides; they plan about an hour, including the OCI preparation.
+When the order is accepted and the first invoice is paid, your technical contact receives an onboarding e-mail with the registry credentials, chart and image addresses, version to install and support address. Your team can install Infrayard using the public guides. The installation guide lists what you receive and how long setup takes. [Installation](https://www.infrayard.eu/docs/installation/)
 
 | | Business | Enterprise | Guided evaluation |
 | --- | --- | --- | --- |

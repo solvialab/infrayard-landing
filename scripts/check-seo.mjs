@@ -21,7 +21,7 @@ export async function checkSEO(htmlByPath, root) {
     if (titles.has(title)) errors.push(`${file}: duplicate search title`);
     if (descriptions.has(description)) errors.push(`${file}: duplicate search description`);
     titles.add(title); descriptions.add(description);
-    if (!/<html lang="en">/.test(html)) errors.push(`${file}: missing document language`);
+    if (!/<html\b[^>]*\slang="en"[^>]*>/.test(html)) errors.push(`${file}: missing document language`);
     if (!description || description.length < 50 || description.length > 170) errors.push(`${file}: search description must be 50-170 characters (now ${description?.length ?? 0})`);
     if (!html.includes(`<link rel="canonical" href="${canonical}">`)) errors.push(`${file}: canonical must match the public route ${route}`);
     if (metadata.get('og:url') !== canonical || metadata.get('og:title') !== title || metadata.get('twitter:title') !== title) errors.push(`${file}: inconsistent canonical/social title`);
