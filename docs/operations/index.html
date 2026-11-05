@@ -111,19 +111,28 @@
 <p>Database and state belong together: a restored database must match the clusters that actually exist in OCI. Treat backups as sensitive; they contain SSH private keys and, with the bundled Keycloak, password hashes.</p>
 <h2 id="backups">Backups<a class="heading-link" href="#backups" aria-label="Link to Backups">#</a></h2>
 <p>The database backup is one file that contains both Infrayard and the bundled Keycloak.</p>
-<pre><code class="language-bash">kubectl exec -n infrayard infrayard-postgresql-0 -c postgresql -- \
+<pre><code class="language-bash">umask 077
+kubectl exec -n infrayard infrayard-postgresql-0 -c postgresql -- \
   pg_dump -U infrayard -Fc infrayard &gt; infrayard-$(date +%F).dump
 </code></pre>
 <p>Copy the files off the host, for example to an Object Storage bucket with <code>oci os object put</code>, and delete old ones according to your retention policy.</p>
 <p>If you use an external PostgreSQL (<code>postgresql.enabled: false</code>), back it up with your database tooling instead.</p>
 <h2 id="restore">Restore<a class="heading-link" href="#restore" aria-label="Link to Restore">#</a></h2>
 <p>Restore into the same Infrayard version that created the backup, then upgrade if needed. Stop the services that write to the database first.</p>
-<pre><code class="language-bash">kubectl scale deploy -n infrayard infrayard-api infrayard-keycloak --replicas=0
+<pre><code class="language-bash">BACKUP=infrayard-2026-01-31.dump  # Replace with the dump to restore.
+test -s &quot;$BACKUP&quot; &amp;&amp;
+kubectl scale deploy -n infrayard infrayard-api infrayard-keycloak --replicas=0 &amp;&amp;
+kubectl wait --for=delete pod -n infrayard \
+  -l &#39;app.kubernetes.io/instance=infrayard,app.kubernetes.io/component in (api,keycloak)&#39; \
+  --timeout=120s &amp;&amp;
 kubectl exec -i -n infrayard infrayard-postgresql-0 -c postgresql -- \
-  pg_restore -U infrayard -d infrayard --clean --if-exists --no-owner &lt; infrayard-2026-01-31.dump
-kubectl scale deploy -n infrayard infrayard-api infrayard-keycloak --replicas=1
+  pg_restore -U infrayard -d infrayard --clean --if-exists --no-owner \
+    --single-transaction &lt; &quot;$BACKUP&quot; &amp;&amp;
+kubectl scale deploy -n infrayard infrayard-api infrayard-keycloak --replicas=1 &amp;&amp;
+kubectl rollout status -n infrayard deploy/infrayard-keycloak --timeout=180s &amp;&amp;
+kubectl rollout status -n infrayard deploy/infrayard-api --timeout=180s
 </code></pre>
-<p>Without the bundled Keycloak, leave <code>infrayard-keycloak</code> out of the commands.</p>
+<p>Wait for the old pods to disappear before restoring so their database connections have closed. If the restore fails, PostgreSQL rolls back the transaction and the writers stay stopped. Without the bundled Keycloak, omit it from both scale commands and skip its rollout check.</p>
 <p><strong>On a new host</strong>, start only the database first, so that nothing writes to it before the restore: install with your values and <code>--set api.replicaCount=0 --set keycloak.replicaCount=0</code>, restore, then run <code>helm upgrade</code> with the same command without these two options.</p>
 <p>After a restore, compare the cluster list in the portal with what exists in OCI before you start new operations. A cluster created or destroyed after the backup appears in the wrong state; its Terraform state in the bucket is still correct.</p>
 <h2 id="upgrade-infrayard">Upgrade Infrayard<a class="heading-link" href="#upgrade-infrayard" aria-label="Link to Upgrade Infrayard">#</a></h2>

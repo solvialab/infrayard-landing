@@ -444,7 +444,7 @@ Infrayard runs on a Kubernetes cluster in your environment: an OKE cluster for p
 | Keycloak | Bundled or your own | Bundled or your own |
 | Guide | [Install on Kubernetes](https://www.infrayard.eu/docs/install-kubernetes/) | [Install on Kubernetes](https://www.infrayard.eu/docs/install-kubernetes/) |
 
-**For an evaluation**, one VM with k3s is enough: install k3s with its [quick start](https://docs.k3s.io/quick-start), then follow the Kubernetes guide. We recommend 2 OCPUs and 8 GB memory. Measured on our k3s demo VM at rest, the whole VM (Oracle Linux, k3s, Traefik, cert-manager and Infrayard) uses about 3.5 GB, of which Infrayard about 0.9 GB. The images run on x86 and Arm (Ampere A1) shapes.
+**For an evaluation**, one VM with k3s is enough. We recommend 2 OCPUs and 8 GB RAM. At idle, the full stack used about 2.7 GiB on the Arm test VM and about 3.5 GB on an earlier demo VM. The four Infrayard pods on the Arm VM used about 0.85 GiB. The images run on x86 and Arm shapes. [Prepare a k3s VM](#prepare-a-k3s-vm)
 
 Both paths run one replica of each service, and Kubernetes restarts a service that fails. Neither is a high-availability setup for the portal itself. Your OKE clusters keep running if Infrayard is down.
 
@@ -458,7 +458,7 @@ When your order is accepted and the first invoice is paid, or when your evaluati
 | Registry | `registry.gitlab.com` |
 | Helm chart | `oci://registry.gitlab.com/solvialab/infrayard/charts/infrayard` |
 | Images | `registry.gitlab.com/solvialab/infrayard/api` and `registry.gitlab.com/solvialab/infrayard/frontend` |
-| Version to install | A number such as `1.4.0`; chart and images share it |
+| Version to install | A number such as `1.0.0`; chart and images share it |
 | Support | [support@infrayard.eu](mailto:support@infrayard.eu) |
 
 The guides on this site are written so that your team can install Infrayard with these values on its own. Nothing is downloaded from a public website: the chart and the images come only from this registry.
@@ -468,7 +468,7 @@ The token reads the registry and nothing else, for the term of your subscription
 ### From the e-mail to the first cluster
 
 1. **[Prepare OCI](https://www.infrayard.eu/docs/oci-setup/)**, about 20 minutes: the service user, policies, API key, state bucket and S3 key. Needed for every path.
-2. **Prepare the host:** an OKE cluster you already run, or a VM with k3s from the [k3s quick start](https://docs.k3s.io/quick-start).
+2. **Prepare the host.** Use an existing OKE cluster or [prepare a k3s VM](#prepare-a-k3s-vm).
 3. **[Install with Helm](https://www.infrayard.eu/docs/install-kubernetes/)**, about 30 minutes, including DNS and the certificate.
 4. **Configure and test:** sign in, set up **Admin → Configuration** and create a test cluster, as in [step 7 of the guide](https://www.infrayard.eu/docs/install-kubernetes/#7-sign-in). The test cluster proves the OCI policies, the state bucket and the network path to the cluster API.
 5. **Give people access:** [add users](https://www.infrayard.eu/docs/install-kubernetes/#add-users) in the bundled Keycloak, or connect [your own Keycloak](https://www.infrayard.eu/docs/keycloak/).
@@ -489,6 +489,114 @@ If a step fails, look it up in [troubleshooting](https://www.infrayard.eu/docs/t
 | Network paths | Users → portal (443); Infrayard → OCI APIs, registry, cluster APIs (6443) |
 
 Details for each item are in [requirements](https://www.infrayard.eu/docs/requirements/).
+
+### Prepare a k3s VM
+
+This evaluation setup uses one public Oracle Linux 9 VM with 2 OCPUs and 8 GB RAM. The steps below were tested on Ampere Arm (`VM.Standard.A1.Flex`) with the bundled k3s Traefik. Use the tenancy and anchor compartment from the OCI setup and an OCI CLI profile with permission to create Compute and network resources. [Prepare OCI](https://www.infrayard.eu/docs/oci-setup/)
+
+#### Create the VM and its network in OCI
+
+Run these commands in Bash with the OCI CLI and `jq`. Set `T` and `C` to your tenancy and compartment OCIDs, and replace the example SSH source with the public IPv4 address of your workstation or VPN.
+
+```bash
+export OCI_CLI_REGION=eu-frankfurt-1
+T=ocid1.tenancy.oc1..aaaa...
+C=ocid1.compartment.oc1..aaaa...
+SSH_CIDR=203.0.113.10/32
+NAME=infrayard-k3s
+
+umask 077
+mkdir -m 700 infrayard-host
+cd infrayard-host
+ssh-keygen -t ed25519 -f ssh_ed25519
+
+VCN=$(oci network vcn create -c "$C" --display-name "$NAME-vcn" \
+  --cidr-block 10.180.0.0/16 --wait-for-state AVAILABLE --query data.id --raw-output)
+IGW=$(oci network internet-gateway create -c "$C" --vcn-id "$VCN" \
+  --display-name "$NAME-igw" --is-enabled true \
+  --wait-for-state AVAILABLE --query data.id --raw-output)
+ROUTES=$(jq -nc --arg gateway "$IGW" \
+  '[{destination:"0.0.0.0/0",destinationType:"CIDR_BLOCK",networkEntityId:$gateway}]')
+RT=$(oci network route-table create -c "$C" --vcn-id "$VCN" \
+  --display-name "$NAME-rt" --route-rules "$ROUTES" \
+  --wait-for-state AVAILABLE --query data.id --raw-output)
+INGRESS=$(jq -nc --arg ssh "$SSH_CIDR" '[
+  {source:$ssh,protocol:"6",tcpOptions:{destinationPortRange:{min:22,max:22}}},
+  {source:"0.0.0.0/0",protocol:"6",tcpOptions:{destinationPortRange:{min:80,max:80}}},
+  {source:"0.0.0.0/0",protocol:"6",tcpOptions:{destinationPortRange:{min:443,max:443}}}
+]')
+SL=$(oci network security-list create -c "$C" --vcn-id "$VCN" \
+  --display-name "$NAME-sl" --ingress-security-rules "$INGRESS" \
+  --egress-security-rules '[{"destination":"0.0.0.0/0","protocol":"all"}]' \
+  --wait-for-state AVAILABLE --query data.id --raw-output)
+SUBNET=$(oci network subnet create -c "$C" --vcn-id "$VCN" \
+  --display-name "$NAME-subnet" --cidr-block 10.180.1.0/24 \
+  --route-table-id "$RT" --security-list-ids "$(jq -nc --arg sl "$SL" '[$sl]')" \
+  --prohibit-public-ip-on-vnic false --wait-for-state AVAILABLE --query data.id --raw-output)
+
+oci iam availability-domain list -c "$T" --query 'data[].name'
+```
+
+Choose an availability domain from that list. If OCI reports `Out of host capacity`, try another domain with the same subnet. You can also select `VM.Standard.E5.Flex` and repeat the image lookup to select the x86 image.
+
+```bash
+AD='your availability domain name'
+SHAPE=VM.Standard.A1.Flex
+IMAGE=$(oci compute image list -c "$T" --shape "$SHAPE" \
+  --operating-system "Oracle Linux" --operating-system-version 9 \
+  --sort-by TIMECREATED --sort-order DESC --limit 1 --query 'data[0].id' --raw-output)
+VM=$(oci compute instance launch -c "$C" --availability-domain "$AD" \
+  --shape "$SHAPE" --shape-config '{"ocpus":2,"memoryInGBs":8}' --image-id "$IMAGE" \
+  --subnet-id "$SUBNET" --assign-public-ip true --display-name "$NAME-vm" \
+  --ssh-authorized-keys-file ssh_ed25519.pub --query data.id --raw-output)
+oci compute instance get --instance-id "$VM" --query 'data."lifecycle-state"' --raw-output
+```
+
+Once the instance is `RUNNING`, retrieve its public IP and sign in.
+
+```bash
+VM_IP=$(oci compute instance list-vnics --instance-id "$VM" \
+  --query 'data[0]."public-ip"' --raw-output)
+ssh -i ssh_ed25519 "opc@$VM_IP"
+```
+
+#### Configure firewalld and install k3s
+
+Run these commands on the VM. Keep TCP 6443 closed in the OCI security list. Local tools will reach the API through an SSH tunnel. The trusted sources below are the default pod and service CIDRs. [K3s firewall requirements](https://docs.k3s.io/installation/requirements#firewalld) · [K3s quick start](https://docs.k3s.io/quick-start)
+
+```bash
+sudo firewall-cmd --state
+sudo firewall-cmd --permanent --add-service=http
+sudo firewall-cmd --permanent --add-service=https
+sudo firewall-cmd --permanent --add-port=6443/tcp
+sudo firewall-cmd --permanent --zone=trusted --add-source=10.42.0.0/16
+sudo firewall-cmd --permanent --zone=trusted --add-source=10.43.0.0/16
+sudo firewall-cmd --reload
+
+curl -sfL https://get.k3s.io | sudo sh -
+sudo /usr/local/bin/k3s kubectl wait --for=condition=Ready node --all --timeout=180s
+sudo /usr/local/bin/k3s kubectl wait --for=create deployment/traefik -n kube-system --timeout=180s
+sudo /usr/local/bin/k3s kubectl rollout status deployment/traefik -n kube-system --timeout=180s
+```
+
+#### Connect kubectl and Helm from your workstation
+
+Install kubectl and Helm on your workstation. On macOS with Homebrew, use `brew install kubectl helm`. [Install kubectl](https://kubernetes.io/docs/tasks/tools/) · [Install Helm](https://helm.sh/docs/intro/install/)
+
+Return to the workstation shell in `infrayard-host`. The copied kubeconfig grants cluster-admin access. Keep it private and leave the server address at `https://127.0.0.1:6443` for this tunnel.
+
+```bash
+umask 077
+ssh -i ssh_ed25519 "opc@$VM_IP" 'sudo cat /etc/rancher/k3s/k3s.yaml' > kubeconfig
+chmod 600 kubeconfig
+ssh -i ssh_ed25519 -fN -o ExitOnForwardFailure=yes \
+  -L 127.0.0.1:6443:127.0.0.1:6443 "opc@$VM_IP"
+export KUBECONFIG="$PWD/kubeconfig"
+kubectl get nodes
+helm version --short
+```
+
+Keep the tunnel running and return to the directory containing your OCI API key, such as `infrayard-oci`. Continue with the Kubernetes installation using storage class `local-path`. For a public portal, use the VM's public IP for DNS. A temporary evaluation can use a name such as `203-0-113-10.sslip.io` with the octets of the VM's public IP. Verify that the name resolves before you request the certificate. [Install on Kubernetes](https://www.infrayard.eu/docs/install-kubernetes/)
 
 
 ## Prepare OCI
@@ -690,15 +798,15 @@ Time needed: about 30 minutes, after [Prepare OCI](https://www.infrayard.eu/docs
 - Outbound internet access from the pods. Each cluster deployment downloads the Terraform providers from `registry.terraform.io`, `releases.hashicorp.com` and GitHub releases. On OKE with private worker nodes, this traffic goes through the VCN's NAT gateway; a service gateway alone is not enough.
 - A DNS name for the portal, for example `infrayard.example.com`. Keycloak is served on the same name under `/auth`, so one name is enough.
 - The values from the [OCI checklist](https://www.infrayard.eu/docs/oci-setup/#values-checklist).
-- Your registry access from the onboarding e-mail: user, token, registry address and the Infrayard version (for example `1.4.0`; use it wherever `<version>` appears below).
+- The registry user, token, address and Infrayard version from your onboarding e-mail. Step 2 uses `1.0.0` as an example.
 
 The examples use the namespace `infrayard`, the release name `infrayard` and the registry `registry.gitlab.com/solvialab/infrayard`. Use the registry address and version from your onboarding e-mail.
 
 ### 1. Ingress controller and certificates
 
-Skip this step if your cluster already has an ingress controller and cert-manager.
+Reuse your ingress controller and cert-manager if they are already installed. For automatic TLS, configure or reuse a ClusterIssuer and use its name in step 4.
 
-**OKE: install Traefik.** It creates an OCI flexible load balancer with a public IP:
+**OKE:** Install Traefik if you need an ingress controller. The chart creates an OCI flexible load balancer with a public IP.
 
 ```bash
 helm repo add traefik https://traefik.github.io/charts
@@ -716,7 +824,7 @@ For a portal reachable only from your VPN, use an internal load balancer instead
 
 **k3s:** Traefik is already running in `kube-system`.
 
-**cert-manager** (both):
+Install cert-manager on OKE or k3s if it is missing from your cluster.
 
 ```bash
 helm repo add jetstack https://charts.jetstack.io
@@ -742,41 +850,46 @@ spec:
           ingress:
             ingressClassName: traefik
 EOF
+kubectl wait --for=condition=Ready clusterissuer/letsencrypt --timeout=120s
 ```
 
 Let's Encrypt must reach the portal on port 80 from the internet. If it cannot, use your own certificate (step 4).
 
 ### 2. Log in to the registry
 
-The chart and the images are in the same private registry. Log in once with the token from your onboarding e-mail:
+The chart and the images are in the same private registry. Use the same Bash shell for the remaining steps so they can read the variables you set here. When prompted, enter the registry credentials from your onboarding e-mail.
 
 ```bash
-helm registry login registry.gitlab.com -u <registry-user>
-# Password: your registry token
+VERSION=1.0.0  # Replace with the version from your onboarding e-mail.
+read -r -p 'Registry user: ' REGISTRY_USER
+read -rs -p 'Registry token: ' REGISTRY_TOKEN
+printf '\n'
+printf '%s' "$REGISTRY_TOKEN" |
+  helm registry login registry.gitlab.com -u "$REGISTRY_USER" --password-stdin
 ```
 
-In scripts, pass the token on standard input instead: `printf '%s' "$TOKEN" | helm registry login registry.gitlab.com -u <registry-user> --password-stdin`.
-
-Check that you can read the chart:
+Check that you can read the chart.
 
 ```bash
-helm show chart oci://registry.gitlab.com/solvialab/infrayard/charts/infrayard --version <version>
+helm show chart oci://registry.gitlab.com/solvialab/infrayard/charts/infrayard --version "$VERSION"
 ```
 
-The output starts with `Pulled: …` and ends with `name: infrayard` and `version: <version>`. An error with `401`, `403` or `denied` means the login is missing or the token cannot read the registry; see [troubleshooting](https://www.infrayard.eu/docs/troubleshooting/#installation).
+Check that both `version` and `appVersion` match `VERSION`. If you get `401`, `403` or `denied`, check your login and the token's registry access. [Troubleshooting](https://www.infrayard.eu/docs/troubleshooting/#installation)
 
 ### 3. Create the namespace and secrets
 
-Two secrets are created by hand so that they never appear in Helm values. Run the commands from a directory that contains `oci_api_key.pem`:
+Create two Kubernetes Secrets outside Helm. This block uses `jq` and the registry credentials from step 2. Run it from the directory containing `oci_api_key.pem`.
 
 ```bash
 kubectl create namespace infrayard
 
 # Lets Kubernetes pull the images
-kubectl create secret docker-registry regcred -n infrayard \
-  --docker-server=registry.gitlab.com \
-  --docker-username=<registry-user> \
-  --docker-password=<registry-token>
+printf '%s' "$REGISTRY_TOKEN" |
+  jq -cRs --arg user "$REGISTRY_USER" \
+    '{auths:{"registry.gitlab.com":{auth:(($user + ":" + .)|@base64)}}}' |
+  kubectl create secret generic regcred -n infrayard \
+    --type=kubernetes.io/dockerconfigjson --from-file=.dockerconfigjson=/dev/stdin
+unset REGISTRY_TOKEN
 
 # OCI API private key of the infrayard-svc user
 kubectl create secret generic infrayard-oci-key -n infrayard \
@@ -868,7 +981,7 @@ Notes:
 
 ```bash
 helm install infrayard oci://registry.gitlab.com/solvialab/infrayard/charts/infrayard \
-  --version <version> -n infrayard -f values.yaml -f secrets.yaml
+  --version "$VERSION" -n infrayard -f values.yaml -f secrets.yaml
 ```
 
 The chart version selects the matching image version automatically; do not set an image tag.
@@ -896,9 +1009,11 @@ kubectl get svc -n traefik traefik        # OKE with Traefik from step 1
 kubectl get svc -n kube-system traefik    # k3s
 ```
 
-Create an `A` record from `infrayard.example.com` to the `EXTERNAL-IP`.
+If you use your own domain on OKE, point its A record to the `EXTERNAL-IP`.
 
 **k3s on a cloud VM** (for example OCI Compute): k3s publishes Traefik on the node's own address, so `EXTERNAL-IP` shows the VM's **private** IP, such as `10.0.0.12`. Point DNS to the VM's **public** IP instead, and allow TCP 80 and 443 in the VM's security list or network security group and in the host firewall. For a VPN-only portal, use the private IP; see [private access](https://www.infrayard.eu/docs/private-access/).
+
+For a temporary k3s evaluation using `sslip.io`, use the same name as `global.domain` in step 4. That name supplies its own A record. Run `dig +short "$PORTAL_DOMAIN" A` with `PORTAL_DOMAIN` set to the name and check that it returns the VM's public IP.
 
 Once DNS resolves, cert-manager obtains the certificate, usually within two minutes:
 
@@ -915,7 +1030,7 @@ Open `https://infrayard.example.com` and sign in with the first admin's user nam
 Then, in **Admin → Configuration**:
 
 1. Check the region and the anchor compartment.
-2. **Sync** shapes and Kubernetes versions from OCI and enable the ones your users may choose. New versions start disabled.
+2. In **Available Node Shapes**, click **Sync from OCI**. In **Available K8s Versions**, click **Refresh from OCI**. Enable the shapes and versions your users may choose. New versions start disabled.
 3. Set **Kubernetes API Access** under **OCI Settings**. Infrayard calls the API of every new cluster on port 6443 to issue kubeconfigs, so it needs a network path to it. With the box off (the default), clusters get a private endpoint. Infrayard creates a new VCN for each cluster unless you supply one, so it reaches a private endpoint only if its own network is routed into that VCN; without such a route the cluster still deploys, but the kubeconfig download fails. To use a public endpoint instead, turn on **Public endpoint restricted by CIDR allowlist**, enter your VPN or office ranges and Infrayard's own outbound address in **Allowed API CIDRs**, and click **Save OCI settings**. On OKE with private worker nodes, that address is the public IP of the NAT gateway in the VCN of the cluster that runs Infrayard:
 
    ```bash
@@ -935,9 +1050,9 @@ With the bundled Keycloak, users are managed in the Keycloak admin console, whic
 kubectl port-forward -n infrayard svc/infrayard-keycloak 8080:8080
 ```
 
-Go to `http://localhost:8080/auth/admin`, sign in as `admin` with the Keycloak master admin password and switch to the realm **infrayard**.
+Go to `http://localhost:8080/auth/admin` and sign in as `admin` with the Keycloak master admin password from step 4. Open **Manage realms** and select **infrayard**.
 
-- **Users → Add user**, then **Credentials → Set password** with **Temporary** on.
+- In **Users → Add user**, fill in the user details and click **Create**. Open **Credentials → Set password**, keep **Temporary** on, click **Save**, and confirm with **Save password**. The user sets a new password at first sign-in.
 - For an administrator: **Role mapping → Assign role → admin**.
 
 Users without the `admin` role can sign in, deploy clusters within their limits and see the templates allowed for their roles. To connect Infrayard to your company Keycloak instead, see [Use your own Keycloak](https://www.infrayard.eu/docs/keycloak/).
@@ -945,7 +1060,7 @@ Users without the `admin` role can sign in, deploy clusters within their limits 
 ### Reference: all settings
 
 ```bash
-helm show values oci://registry.gitlab.com/solvialab/infrayard/charts/infrayard --version <version>
+helm show values oci://registry.gitlab.com/solvialab/infrayard/charts/infrayard --version "$VERSION"
 ```
 
 Every value is documented in that output. After the installation, `helm status infrayard -n infrayard` prints the portal URL and the sign-in summary again.
@@ -1430,6 +1545,7 @@ Database and state belong together: a restored database must match the clusters 
 The database backup is one file that contains both Infrayard and the bundled Keycloak.
 
 ```bash
+umask 077
 kubectl exec -n infrayard infrayard-postgresql-0 -c postgresql -- \
   pg_dump -U infrayard -Fc infrayard > infrayard-$(date +%F).dump
 ```
@@ -1443,13 +1559,21 @@ If you use an external PostgreSQL (`postgresql.enabled: false`), back it up with
 Restore into the same Infrayard version that created the backup, then upgrade if needed. Stop the services that write to the database first.
 
 ```bash
-kubectl scale deploy -n infrayard infrayard-api infrayard-keycloak --replicas=0
+BACKUP=infrayard-2026-01-31.dump  # Replace with the dump to restore.
+test -s "$BACKUP" &&
+kubectl scale deploy -n infrayard infrayard-api infrayard-keycloak --replicas=0 &&
+kubectl wait --for=delete pod -n infrayard \
+  -l 'app.kubernetes.io/instance=infrayard,app.kubernetes.io/component in (api,keycloak)' \
+  --timeout=120s &&
 kubectl exec -i -n infrayard infrayard-postgresql-0 -c postgresql -- \
-  pg_restore -U infrayard -d infrayard --clean --if-exists --no-owner < infrayard-2026-01-31.dump
-kubectl scale deploy -n infrayard infrayard-api infrayard-keycloak --replicas=1
+  pg_restore -U infrayard -d infrayard --clean --if-exists --no-owner \
+    --single-transaction < "$BACKUP" &&
+kubectl scale deploy -n infrayard infrayard-api infrayard-keycloak --replicas=1 &&
+kubectl rollout status -n infrayard deploy/infrayard-keycloak --timeout=180s &&
+kubectl rollout status -n infrayard deploy/infrayard-api --timeout=180s
 ```
 
-Without the bundled Keycloak, leave `infrayard-keycloak` out of the commands.
+Wait for the old pods to disappear before restoring so their database connections have closed. If the restore fails, PostgreSQL rolls back the transaction and the writers stay stopped. Without the bundled Keycloak, omit it from both scale commands and skip its rollout check.
 
 **On a new host**, start only the database first, so that nothing writes to it before the restore: install with your values and `--set api.replicaCount=0 --set keycloak.replicaCount=0`, restore, then run `helm upgrade` with the same command without these two options.
 

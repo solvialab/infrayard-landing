@@ -28,6 +28,7 @@ Database and state belong together: a restored database must match the clusters 
 The database backup is one file that contains both Infrayard and the bundled Keycloak.
 
 ```bash
+umask 077
 kubectl exec -n infrayard infrayard-postgresql-0 -c postgresql -- \
   pg_dump -U infrayard -Fc infrayard > infrayard-$(date +%F).dump
 ```
@@ -41,13 +42,21 @@ If you use an external PostgreSQL (`postgresql.enabled: false`), back it up with
 Restore into the same Infrayard version that created the backup, then upgrade if needed. Stop the services that write to the database first.
 
 ```bash
-kubectl scale deploy -n infrayard infrayard-api infrayard-keycloak --replicas=0
+BACKUP=infrayard-2026-01-31.dump  # Replace with the dump to restore.
+test -s "$BACKUP" &&
+kubectl scale deploy -n infrayard infrayard-api infrayard-keycloak --replicas=0 &&
+kubectl wait --for=delete pod -n infrayard \
+  -l 'app.kubernetes.io/instance=infrayard,app.kubernetes.io/component in (api,keycloak)' \
+  --timeout=120s &&
 kubectl exec -i -n infrayard infrayard-postgresql-0 -c postgresql -- \
-  pg_restore -U infrayard -d infrayard --clean --if-exists --no-owner < infrayard-2026-01-31.dump
-kubectl scale deploy -n infrayard infrayard-api infrayard-keycloak --replicas=1
+  pg_restore -U infrayard -d infrayard --clean --if-exists --no-owner \
+    --single-transaction < "$BACKUP" &&
+kubectl scale deploy -n infrayard infrayard-api infrayard-keycloak --replicas=1 &&
+kubectl rollout status -n infrayard deploy/infrayard-keycloak --timeout=180s &&
+kubectl rollout status -n infrayard deploy/infrayard-api --timeout=180s
 ```
 
-Without the bundled Keycloak, leave `infrayard-keycloak` out of the commands.
+Wait for the old pods to disappear before restoring so their database connections have closed. If the restore fails, PostgreSQL rolls back the transaction and the writers stay stopped. Without the bundled Keycloak, omit it from both scale commands and skip its rollout check.
 
 **On a new host**, start only the database first, so that nothing writes to it before the restore: install with your values and `--set api.replicaCount=0 --set keycloak.replicaCount=0`, restore, then run `helm upgrade` with the same command without these two options.
 

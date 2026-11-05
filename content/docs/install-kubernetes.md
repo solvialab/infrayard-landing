@@ -15,15 +15,15 @@ Time needed: about 30 minutes, after [Prepare OCI](/docs/oci-setup/).
 - Outbound internet access from the pods. Each cluster deployment downloads the Terraform providers from `registry.terraform.io`, `releases.hashicorp.com` and GitHub releases. On OKE with private worker nodes, this traffic goes through the VCN's NAT gateway; a service gateway alone is not enough.
 - A DNS name for the portal, for example `infrayard.example.com`. Keycloak is served on the same name under `/auth`, so one name is enough.
 - The values from the [OCI checklist](/docs/oci-setup/#values-checklist).
-- Your registry access from the onboarding e-mail: user, token, registry address and the Infrayard version (for example `1.4.0`; use it wherever `<version>` appears below).
+- The registry user, token, address and Infrayard version from your onboarding e-mail. Step 2 uses `1.0.0` as an example.
 
 The examples use the namespace `infrayard`, the release name `infrayard` and the registry `registry.gitlab.com/solvialab/infrayard`. Use the registry address and version from your onboarding e-mail.
 
 ## 1. Ingress controller and certificates
 
-Skip this step if your cluster already has an ingress controller and cert-manager.
+Reuse your ingress controller and cert-manager if they are already installed. For automatic TLS, configure or reuse a ClusterIssuer and use its name in step 4.
 
-**OKE: install Traefik.** It creates an OCI flexible load balancer with a public IP:
+**OKE:** Install Traefik if you need an ingress controller. The chart creates an OCI flexible load balancer with a public IP.
 
 ```bash
 helm repo add traefik https://traefik.github.io/charts
@@ -41,7 +41,7 @@ For a portal reachable only from your VPN, use an internal load balancer instead
 
 **k3s:** Traefik is already running in `kube-system`.
 
-**cert-manager** (both):
+Install cert-manager on OKE or k3s if it is missing from your cluster.
 
 ```bash
 helm repo add jetstack https://charts.jetstack.io
@@ -67,41 +67,46 @@ spec:
           ingress:
             ingressClassName: traefik
 EOF
+kubectl wait --for=condition=Ready clusterissuer/letsencrypt --timeout=120s
 ```
 
 Let's Encrypt must reach the portal on port 80 from the internet. If it cannot, use your own certificate (step 4).
 
 ## 2. Log in to the registry
 
-The chart and the images are in the same private registry. Log in once with the token from your onboarding e-mail:
+The chart and the images are in the same private registry. Use the same Bash shell for the remaining steps so they can read the variables you set here. When prompted, enter the registry credentials from your onboarding e-mail.
 
 ```bash
-helm registry login registry.gitlab.com -u <registry-user>
-# Password: your registry token
+VERSION=1.0.0  # Replace with the version from your onboarding e-mail.
+read -r -p 'Registry user: ' REGISTRY_USER
+read -rs -p 'Registry token: ' REGISTRY_TOKEN
+printf '\n'
+printf '%s' "$REGISTRY_TOKEN" |
+  helm registry login registry.gitlab.com -u "$REGISTRY_USER" --password-stdin
 ```
 
-In scripts, pass the token on standard input instead: `printf '%s' "$TOKEN" | helm registry login registry.gitlab.com -u <registry-user> --password-stdin`.
-
-Check that you can read the chart:
+Check that you can read the chart.
 
 ```bash
-helm show chart oci://registry.gitlab.com/solvialab/infrayard/charts/infrayard --version <version>
+helm show chart oci://registry.gitlab.com/solvialab/infrayard/charts/infrayard --version "$VERSION"
 ```
 
-The output starts with `Pulled: …` and ends with `name: infrayard` and `version: <version>`. An error with `401`, `403` or `denied` means the login is missing or the token cannot read the registry; see [troubleshooting](/docs/troubleshooting/#installation).
+Check that both `version` and `appVersion` match `VERSION`. If you get `401`, `403` or `denied`, check your login and the token's registry access. [Troubleshooting](/docs/troubleshooting/#installation)
 
 ## 3. Create the namespace and secrets
 
-Two secrets are created by hand so that they never appear in Helm values. Run the commands from a directory that contains `oci_api_key.pem`:
+Create two Kubernetes Secrets outside Helm. This block uses `jq` and the registry credentials from step 2. Run it from the directory containing `oci_api_key.pem`.
 
 ```bash
 kubectl create namespace infrayard
 
 # Lets Kubernetes pull the images
-kubectl create secret docker-registry regcred -n infrayard \
-  --docker-server=registry.gitlab.com \
-  --docker-username=<registry-user> \
-  --docker-password=<registry-token>
+printf '%s' "$REGISTRY_TOKEN" |
+  jq -cRs --arg user "$REGISTRY_USER" \
+    '{auths:{"registry.gitlab.com":{auth:(($user + ":" + .)|@base64)}}}' |
+  kubectl create secret generic regcred -n infrayard \
+    --type=kubernetes.io/dockerconfigjson --from-file=.dockerconfigjson=/dev/stdin
+unset REGISTRY_TOKEN
 
 # OCI API private key of the infrayard-svc user
 kubectl create secret generic infrayard-oci-key -n infrayard \
@@ -193,7 +198,7 @@ Notes:
 
 ```bash
 helm install infrayard oci://registry.gitlab.com/solvialab/infrayard/charts/infrayard \
-  --version <version> -n infrayard -f values.yaml -f secrets.yaml
+  --version "$VERSION" -n infrayard -f values.yaml -f secrets.yaml
 ```
 
 The chart version selects the matching image version automatically; do not set an image tag.
@@ -221,9 +226,11 @@ kubectl get svc -n traefik traefik        # OKE with Traefik from step 1
 kubectl get svc -n kube-system traefik    # k3s
 ```
 
-Create an `A` record from `infrayard.example.com` to the `EXTERNAL-IP`.
+If you use your own domain on OKE, point its A record to the `EXTERNAL-IP`.
 
 **k3s on a cloud VM** (for example OCI Compute): k3s publishes Traefik on the node's own address, so `EXTERNAL-IP` shows the VM's **private** IP, such as `10.0.0.12`. Point DNS to the VM's **public** IP instead, and allow TCP 80 and 443 in the VM's security list or network security group and in the host firewall. For a VPN-only portal, use the private IP; see [private access](/docs/private-access/).
+
+For a temporary k3s evaluation using `sslip.io`, use the same name as `global.domain` in step 4. That name supplies its own A record. Run `dig +short "$PORTAL_DOMAIN" A` with `PORTAL_DOMAIN` set to the name and check that it returns the VM's public IP.
 
 Once DNS resolves, cert-manager obtains the certificate, usually within two minutes:
 
@@ -240,7 +247,7 @@ Open `https://infrayard.example.com` and sign in with the first admin's user nam
 Then, in **Admin → Configuration**:
 
 1. Check the region and the anchor compartment.
-2. **Sync** shapes and Kubernetes versions from OCI and enable the ones your users may choose. New versions start disabled.
+2. In **Available Node Shapes**, click **Sync from OCI**. In **Available K8s Versions**, click **Refresh from OCI**. Enable the shapes and versions your users may choose. New versions start disabled.
 3. Set **Kubernetes API Access** under **OCI Settings**. Infrayard calls the API of every new cluster on port 6443 to issue kubeconfigs, so it needs a network path to it. With the box off (the default), clusters get a private endpoint. Infrayard creates a new VCN for each cluster unless you supply one, so it reaches a private endpoint only if its own network is routed into that VCN; without such a route the cluster still deploys, but the kubeconfig download fails. To use a public endpoint instead, turn on **Public endpoint restricted by CIDR allowlist**, enter your VPN or office ranges and Infrayard's own outbound address in **Allowed API CIDRs**, and click **Save OCI settings**. On OKE with private worker nodes, that address is the public IP of the NAT gateway in the VCN of the cluster that runs Infrayard:
 
    ```bash
@@ -260,9 +267,9 @@ With the bundled Keycloak, users are managed in the Keycloak admin console, whic
 kubectl port-forward -n infrayard svc/infrayard-keycloak 8080:8080
 ```
 
-Go to `http://localhost:8080/auth/admin`, sign in as `admin` with the Keycloak master admin password and switch to the realm **infrayard**.
+Go to `http://localhost:8080/auth/admin` and sign in as `admin` with the Keycloak master admin password from step 4. Open **Manage realms** and select **infrayard**.
 
-- **Users → Add user**, then **Credentials → Set password** with **Temporary** on.
+- In **Users → Add user**, fill in the user details and click **Create**. Open **Credentials → Set password**, keep **Temporary** on, click **Save**, and confirm with **Save password**. The user sets a new password at first sign-in.
 - For an administrator: **Role mapping → Assign role → admin**.
 
 Users without the `admin` role can sign in, deploy clusters within their limits and see the templates allowed for their roles. To connect Infrayard to your company Keycloak instead, see [Use your own Keycloak](/docs/keycloak/).
@@ -270,7 +277,7 @@ Users without the `admin` role can sign in, deploy clusters within their limits 
 ## Reference: all settings
 
 ```bash
-helm show values oci://registry.gitlab.com/solvialab/infrayard/charts/infrayard --version <version>
+helm show values oci://registry.gitlab.com/solvialab/infrayard/charts/infrayard --version "$VERSION"
 ```
 
 Every value is documented in that output. After the installation, `helm status infrayard -n infrayard` prints the portal URL and the sign-in summary again.

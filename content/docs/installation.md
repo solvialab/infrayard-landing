@@ -13,7 +13,7 @@ Infrayard runs on a Kubernetes cluster in your environment: an OKE cluster for p
 | Keycloak | Bundled or your own | Bundled or your own |
 | Guide | [Install on Kubernetes](/docs/install-kubernetes/) | [Install on Kubernetes](/docs/install-kubernetes/) |
 
-**For an evaluation**, one VM with k3s is enough: install k3s with its [quick start](https://docs.k3s.io/quick-start), then follow the Kubernetes guide. We recommend 2 OCPUs and 8 GB memory. Measured on our k3s demo VM at rest, the whole VM (Oracle Linux, k3s, Traefik, cert-manager and Infrayard) uses about 3.5 GB, of which Infrayard about 0.9 GB. The images run on x86 and Arm (Ampere A1) shapes.
+**For an evaluation**, one VM with k3s is enough. We recommend 2 OCPUs and 8 GB RAM. At idle, the full stack used about 2.7 GiB on the Arm test VM and about 3.5 GB on an earlier demo VM. The four Infrayard pods on the Arm VM used about 0.85 GiB. The images run on x86 and Arm shapes. [Prepare a k3s VM](#prepare-a-k3s-vm)
 
 Both paths run one replica of each service, and Kubernetes restarts a service that fails. Neither is a high-availability setup for the portal itself. Your OKE clusters keep running if Infrayard is down.
 
@@ -27,7 +27,7 @@ When your order is accepted and the first invoice is paid, or when your evaluati
 | Registry | `registry.gitlab.com` |
 | Helm chart | `oci://registry.gitlab.com/solvialab/infrayard/charts/infrayard` |
 | Images | `registry.gitlab.com/solvialab/infrayard/api` and `registry.gitlab.com/solvialab/infrayard/frontend` |
-| Version to install | A number such as `1.4.0`; chart and images share it |
+| Version to install | A number such as `1.0.0`; chart and images share it |
 | Support | [support@infrayard.eu](mailto:support@infrayard.eu) |
 
 The guides on this site are written so that your team can install Infrayard with these values on its own. Nothing is downloaded from a public website: the chart and the images come only from this registry.
@@ -37,7 +37,7 @@ The token reads the registry and nothing else, for the term of your subscription
 ## From the e-mail to the first cluster
 
 1. **[Prepare OCI](/docs/oci-setup/)**, about 20 minutes: the service user, policies, API key, state bucket and S3 key. Needed for every path.
-2. **Prepare the host:** an OKE cluster you already run, or a VM with k3s from the [k3s quick start](https://docs.k3s.io/quick-start).
+2. **Prepare the host.** Use an existing OKE cluster or [prepare a k3s VM](#prepare-a-k3s-vm).
 3. **[Install with Helm](/docs/install-kubernetes/)**, about 30 minutes, including DNS and the certificate.
 4. **Configure and test:** sign in, set up **Admin → Configuration** and create a test cluster, as in [step 7 of the guide](/docs/install-kubernetes/#7-sign-in). The test cluster proves the OCI policies, the state bucket and the network path to the cluster API.
 5. **Give people access:** [add users](/docs/install-kubernetes/#add-users) in the bundled Keycloak, or connect [your own Keycloak](/docs/keycloak/).
@@ -58,3 +58,111 @@ If a step fails, look it up in [troubleshooting](/docs/troubleshooting/#installa
 | Network paths | Users → portal (443); Infrayard → OCI APIs, registry, cluster APIs (6443) |
 
 Details for each item are in [requirements](/docs/requirements/).
+
+## Prepare a k3s VM
+
+This evaluation setup uses one public Oracle Linux 9 VM with 2 OCPUs and 8 GB RAM. The steps below were tested on Ampere Arm (`VM.Standard.A1.Flex`) with the bundled k3s Traefik. Use the tenancy and anchor compartment from the OCI setup and an OCI CLI profile with permission to create Compute and network resources. [Prepare OCI](/docs/oci-setup/)
+
+### Create the VM and its network in OCI
+
+Run these commands in Bash with the OCI CLI and `jq`. Set `T` and `C` to your tenancy and compartment OCIDs, and replace the example SSH source with the public IPv4 address of your workstation or VPN.
+
+```bash
+export OCI_CLI_REGION=eu-frankfurt-1
+T=ocid1.tenancy.oc1..aaaa...
+C=ocid1.compartment.oc1..aaaa...
+SSH_CIDR=203.0.113.10/32
+NAME=infrayard-k3s
+
+umask 077
+mkdir -m 700 infrayard-host
+cd infrayard-host
+ssh-keygen -t ed25519 -f ssh_ed25519
+
+VCN=$(oci network vcn create -c "$C" --display-name "$NAME-vcn" \
+  --cidr-block 10.180.0.0/16 --wait-for-state AVAILABLE --query data.id --raw-output)
+IGW=$(oci network internet-gateway create -c "$C" --vcn-id "$VCN" \
+  --display-name "$NAME-igw" --is-enabled true \
+  --wait-for-state AVAILABLE --query data.id --raw-output)
+ROUTES=$(jq -nc --arg gateway "$IGW" \
+  '[{destination:"0.0.0.0/0",destinationType:"CIDR_BLOCK",networkEntityId:$gateway}]')
+RT=$(oci network route-table create -c "$C" --vcn-id "$VCN" \
+  --display-name "$NAME-rt" --route-rules "$ROUTES" \
+  --wait-for-state AVAILABLE --query data.id --raw-output)
+INGRESS=$(jq -nc --arg ssh "$SSH_CIDR" '[
+  {source:$ssh,protocol:"6",tcpOptions:{destinationPortRange:{min:22,max:22}}},
+  {source:"0.0.0.0/0",protocol:"6",tcpOptions:{destinationPortRange:{min:80,max:80}}},
+  {source:"0.0.0.0/0",protocol:"6",tcpOptions:{destinationPortRange:{min:443,max:443}}}
+]')
+SL=$(oci network security-list create -c "$C" --vcn-id "$VCN" \
+  --display-name "$NAME-sl" --ingress-security-rules "$INGRESS" \
+  --egress-security-rules '[{"destination":"0.0.0.0/0","protocol":"all"}]' \
+  --wait-for-state AVAILABLE --query data.id --raw-output)
+SUBNET=$(oci network subnet create -c "$C" --vcn-id "$VCN" \
+  --display-name "$NAME-subnet" --cidr-block 10.180.1.0/24 \
+  --route-table-id "$RT" --security-list-ids "$(jq -nc --arg sl "$SL" '[$sl]')" \
+  --prohibit-public-ip-on-vnic false --wait-for-state AVAILABLE --query data.id --raw-output)
+
+oci iam availability-domain list -c "$T" --query 'data[].name'
+```
+
+Choose an availability domain from that list. If OCI reports `Out of host capacity`, try another domain with the same subnet. You can also select `VM.Standard.E5.Flex` and repeat the image lookup to select the x86 image.
+
+```bash
+AD='your availability domain name'
+SHAPE=VM.Standard.A1.Flex
+IMAGE=$(oci compute image list -c "$T" --shape "$SHAPE" \
+  --operating-system "Oracle Linux" --operating-system-version 9 \
+  --sort-by TIMECREATED --sort-order DESC --limit 1 --query 'data[0].id' --raw-output)
+VM=$(oci compute instance launch -c "$C" --availability-domain "$AD" \
+  --shape "$SHAPE" --shape-config '{"ocpus":2,"memoryInGBs":8}' --image-id "$IMAGE" \
+  --subnet-id "$SUBNET" --assign-public-ip true --display-name "$NAME-vm" \
+  --ssh-authorized-keys-file ssh_ed25519.pub --query data.id --raw-output)
+oci compute instance get --instance-id "$VM" --query 'data."lifecycle-state"' --raw-output
+```
+
+Once the instance is `RUNNING`, retrieve its public IP and sign in.
+
+```bash
+VM_IP=$(oci compute instance list-vnics --instance-id "$VM" \
+  --query 'data[0]."public-ip"' --raw-output)
+ssh -i ssh_ed25519 "opc@$VM_IP"
+```
+
+### Configure firewalld and install k3s
+
+Run these commands on the VM. Keep TCP 6443 closed in the OCI security list. Local tools will reach the API through an SSH tunnel. The trusted sources below are the default pod and service CIDRs. [K3s firewall requirements](https://docs.k3s.io/installation/requirements#firewalld) · [K3s quick start](https://docs.k3s.io/quick-start)
+
+```bash
+sudo firewall-cmd --state
+sudo firewall-cmd --permanent --add-service=http
+sudo firewall-cmd --permanent --add-service=https
+sudo firewall-cmd --permanent --add-port=6443/tcp
+sudo firewall-cmd --permanent --zone=trusted --add-source=10.42.0.0/16
+sudo firewall-cmd --permanent --zone=trusted --add-source=10.43.0.0/16
+sudo firewall-cmd --reload
+
+curl -sfL https://get.k3s.io | sudo sh -
+sudo /usr/local/bin/k3s kubectl wait --for=condition=Ready node --all --timeout=180s
+sudo /usr/local/bin/k3s kubectl wait --for=create deployment/traefik -n kube-system --timeout=180s
+sudo /usr/local/bin/k3s kubectl rollout status deployment/traefik -n kube-system --timeout=180s
+```
+
+### Connect kubectl and Helm from your workstation
+
+Install kubectl and Helm on your workstation. On macOS with Homebrew, use `brew install kubectl helm`. [Install kubectl](https://kubernetes.io/docs/tasks/tools/) · [Install Helm](https://helm.sh/docs/intro/install/)
+
+Return to the workstation shell in `infrayard-host`. The copied kubeconfig grants cluster-admin access. Keep it private and leave the server address at `https://127.0.0.1:6443` for this tunnel.
+
+```bash
+umask 077
+ssh -i ssh_ed25519 "opc@$VM_IP" 'sudo cat /etc/rancher/k3s/k3s.yaml' > kubeconfig
+chmod 600 kubeconfig
+ssh -i ssh_ed25519 -fN -o ExitOnForwardFailure=yes \
+  -L 127.0.0.1:6443:127.0.0.1:6443 "opc@$VM_IP"
+export KUBECONFIG="$PWD/kubeconfig"
+kubectl get nodes
+helm version --short
+```
+
+Keep the tunnel running and return to the directory containing your OCI API key, such as `infrayard-oci`. Continue with the Kubernetes installation using storage class `local-path`. For a public portal, use the VM's public IP for DNS. A temporary evaluation can use a name such as `203-0-113-10.sslip.io` with the octets of the VM's public IP. Verify that the name resolves before you request the certificate. [Install on Kubernetes](/docs/install-kubernetes/)
