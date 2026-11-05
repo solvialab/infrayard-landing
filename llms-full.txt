@@ -19,7 +19,7 @@ Infrayard is self-hosted. It is installed with a Helm chart on a Kubernetes clus
 
 ## Commercial access
 
-Business: EUR 3000 per month, billed monthly with a monthly commitment, or EUR 30000 annually paid upfront (EUR 2500/month equivalent). Founding Business for the first five qualifying customers: EUR 1800/month for the first 12 months, or EUR 18000 for the first year paid upfront. Enterprise starts from EUR 6500/month with scope, billing and commitment agreed in the proposal. Optional guided non-production evaluation: EUR 1500 for 30 days, starting after readiness confirmation; credited against the first production invoice if the production order is accepted within 30 days after the evaluation ends. Oracle usage is separate.
+Business (one production and one test installation): EUR 3000 per month, billed monthly with a monthly commitment, or EUR 30000 annually paid upfront (EUR 2500/month equivalent). Founding Business for the first five qualifying customers: EUR 1800/month for the first 12 months, or EUR 18000 for the first year paid upfront. Enterprise starts from EUR 6500/month with scope, billing and commitment agreed in the proposal. Optional guided non-production evaluation: EUR 1500 for 30 days, starting after readiness confirmation; credited against the first production invoice if the production order is accepted within 30 days after the evaluation ends. Oracle usage is separate.
 
 Subscriptions are arranged directly with Solvia Lab. Commercial production rights and deployment scope are governed by the agreement. Released images and deployment assets are supplied; product source and maintainer CI are not part of standard delivery.
 
@@ -1652,7 +1652,7 @@ When the order is accepted and the first invoice is paid, your technical contact
 
 | | Business | Enterprise | Guided evaluation |
 | --- | --- | --- | --- |
-| Use | Production, for the agreed installation scope | Agreed in the proposal | Non-production, 30 days |
+| Use | One production and one test installation | Agreed in the proposal | Non-production, 30 days |
 | Registry access to the Helm chart and images | For the subscription term | For the agreed term | For the evaluation period |
 | New releases | Included | Included | Included during the evaluation |
 | Product features | All available features | All available features | All available features |
@@ -1662,9 +1662,9 @@ When the order is accepted and the first invoice is paid, your technical contact
 
 ### What your subscription covers
 
-Business includes the commercial production subscription for the agreed installation scope, released images and deployment assets, core OKE lifecycle workflows, templates, role-based access, resource limits, protected requests, cost estimates, execution logs and activity history. It includes an onboarding workshop and email support.
+Business includes the commercial production subscription for one production installation and one non-production test installation, released images and deployment assets, core OKE lifecycle workflows, templates, role-based access, resource limits, protected requests, cost estimates, execution logs and activity history. It includes an onboarding workshop and email support.
 
-Business support has a 48-hour response SLA during the business hours defined in the agreement. Response is not a guaranteed incident resolution time. Your order identifies the covered installation and tenancy scope, support calendar and authorised contacts; this website does not imply unlimited installations, tenancies or managed-service resale.
+Business support has a 48-hour response SLA during the business hours defined in the agreement. Response is not a guaranteed incident resolution time. Your order identifies the covered installations and tenancy, support calendar and authorised contacts. More installations or tenancies are arranged through Enterprise; this website does not imply unlimited installations, tenancies or managed-service resale.
 
 The customer operates the installation, OCI resources and workloads unless additional assistance is agreed. See [operations and responsibilities](https://www.infrayard.eu/docs/operations/).
 

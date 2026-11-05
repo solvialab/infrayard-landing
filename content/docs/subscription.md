@@ -17,7 +17,7 @@ When the order is accepted and the first invoice is paid, your technical contact
 
 | | Business | Enterprise | Guided evaluation |
 | --- | --- | --- | --- |
-| Use | Production, for the agreed installation scope | Agreed in the proposal | Non-production, 30 days |
+| Use | One production and one test installation | Agreed in the proposal | Non-production, 30 days |
 | Registry access to the Helm chart and images | For the subscription term | For the agreed term | For the evaluation period |
 | New releases | Included | Included | Included during the evaluation |
 | Product features | All available features | All available features | All available features |
@@ -27,9 +27,9 @@ When the order is accepted and the first invoice is paid, your technical contact
 
 ## What your subscription covers
 
-Business includes the commercial production subscription for the agreed installation scope, released images and deployment assets, core OKE lifecycle workflows, templates, role-based access, resource limits, protected requests, cost estimates, execution logs and activity history. It includes an onboarding workshop and email support.
+Business includes the commercial production subscription for one production installation and one non-production test installation, released images and deployment assets, core OKE lifecycle workflows, templates, role-based access, resource limits, protected requests, cost estimates, execution logs and activity history. It includes an onboarding workshop and email support.
 
-Business support has a 48-hour response SLA during the business hours defined in the agreement. Response is not a guaranteed incident resolution time. Your order identifies the covered installation and tenancy scope, support calendar and authorised contacts; this website does not imply unlimited installations, tenancies or managed-service resale.
+Business support has a 48-hour response SLA during the business hours defined in the agreement. Response is not a guaranteed incident resolution time. Your order identifies the covered installations and tenancy, support calendar and authorised contacts. More installations or tenancies are arranged through Enterprise; this website does not imply unlimited installations, tenancies or managed-service resale.
 
 The customer operates the installation, OCI resources and workloads unless additional assistance is agreed. See [operations and responsibilities](/docs/operations/).
 

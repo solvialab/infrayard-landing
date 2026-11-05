@@ -19,7 +19,7 @@ Infrayard is self-hosted. It is installed with a Helm chart on a Kubernetes clus
 
 ## Commercial access
 
-Business: EUR 3000 per month, billed monthly with a monthly commitment, or EUR 30000 annually paid upfront (EUR 2500/month equivalent). Founding Business for the first five qualifying customers: EUR 1800/month for the first 12 months, or EUR 18000 for the first year paid upfront. Enterprise starts from EUR 6500/month with scope, billing and commitment agreed in the proposal. Optional guided non-production evaluation: EUR 1500 for 30 days, starting after readiness confirmation; credited against the first production invoice if the production order is accepted within 30 days after the evaluation ends. Oracle usage is separate.
+Business (one production and one test installation): EUR 3000 per month, billed monthly with a monthly commitment, or EUR 30000 annually paid upfront (EUR 2500/month equivalent). Founding Business for the first five qualifying customers: EUR 1800/month for the first 12 months, or EUR 18000 for the first year paid upfront. Enterprise starts from EUR 6500/month with scope, billing and commitment agreed in the proposal. Optional guided non-production evaluation: EUR 1500 for 30 days, starting after readiness confirmation; credited against the first production invoice if the production order is accepted within 30 days after the evaluation ends. Oracle usage is separate.
 
 Subscriptions are arranged directly with Solvia Lab. Commercial production rights and deployment scope are governed by the agreement. Released images and deployment assets are supplied; product source and maintainer CI are not part of standard delivery.
 
