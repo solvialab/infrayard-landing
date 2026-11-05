@@ -4,17 +4,19 @@ Use this page to check whether Infrayard fits your environment before you instal
 
 ## Deployment options
 
-| | Existing OKE cluster | Other Kubernetes (k3s, …) | Single VM |
-| --- | --- | --- | --- |
-| Intended use | Production | Production or evaluation | Evaluation, demos, small teams |
-| Tooling | `kubectl`, Helm 3.8+ | `kubectl`, Helm 3.8+ | Docker with Compose v2 |
-| Ingress | An ingress controller you install, e.g. Traefik with an OCI load balancer | Your ingress controller; k3s ships Traefik | Caddy, included |
-| TLS | cert-manager or your own certificate | cert-manager or your own certificate | Automatic Let's Encrypt or your own certificate |
-| Storage | 50 GB block volume, `oci-bv` (the OCI minimum; the chart requests 10 GiB) | 10 GiB volume from your StorageClass | Docker volume, 30 GB disk |
-| Capacity | About 1 CPU and 2 GiB free (limits up to 4.7 CPU, 3.2 GiB) | Same | 2 CPUs, 4 GB memory minimum, 8 GB recommended |
-| Keycloak | Bundled or your own | Bundled or your own | Bundled |
+| | Existing OKE cluster | Other Kubernetes (k3s, …) |
+| --- | --- | --- |
+| Intended use | Production | Evaluation on a single VM, or production |
+| Tooling | `kubectl`, Helm 3.8+ | `kubectl`, Helm 3.8+ |
+| Ingress | An ingress controller you install, e.g. Traefik with an OCI load balancer | Your ingress controller; k3s ships Traefik |
+| TLS | cert-manager or your own certificate | cert-manager or your own certificate |
+| Storage | 50 GB block volume, `oci-bv` (the OCI minimum; the chart requests 10 GiB) | 10 GiB volume from your StorageClass |
+| Capacity | About 1 CPU and 2 GiB free (requests 0.9 CPU and 1.6 GiB, limits 3.7 CPU and 3.2 GiB) | Same; a k3s VM: 2 OCPUs and 8 GB memory |
+| Keycloak | Bundled or your own | Bundled or your own |
 
-Infrayard is tested on OKE 1.36 and k3s 1.36, both with Traefik and cert-manager, and with the Docker Compose bundle. The images are built for x86 (`amd64`) and Arm (`arm64`).
+At rest Infrayard uses about 0.9 GB memory and almost no CPU; Keycloak takes most of it. On a k3s VM, k3s with Traefik and cert-manager adds about 1.8 GB. Terraform jobs run inside the API, whose limit is 1 GiB.
+
+Infrayard is tested on OKE 1.36 and k3s 1.36, both with Traefik and cert-manager. The images are built for x86 (`amd64`) and Arm (`arm64`).
 
 ## OCI
 
@@ -45,7 +47,7 @@ Sign-in uses Keycloak: either the Keycloak bundled with Infrayard (realm, client
 
 ## Costs outside the subscription
 
-The subscription covers the Infrayard software. Your Oracle Cloud bill covers the OKE clusters and their nodes, load balancers and storage, and the host that runs Infrayard: a VM, or capacity and one block volume in your cluster (50 GB on OKE, the OCI minimum), plus a load balancer for the ingress.
+The subscription covers the Infrayard software. Your Oracle Cloud bill covers the OKE clusters and their nodes, load balancers and storage, and the host that runs Infrayard: capacity and one block volume in your cluster (50 GB on OKE, the OCI minimum) plus a load balancer for the ingress, or the VM for k3s.
 
 ## OKE versions, shapes and images
 

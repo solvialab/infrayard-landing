@@ -41,7 +41,6 @@
 <p class="docs-nav-group">Install</p><a class="docs-nav-link" href="/docs/installation/">Installation</a>
 <a class="docs-nav-link" href="/docs/oci-setup/">Prepare OCI</a>
 <a class="docs-nav-link" href="/docs/install-kubernetes/">Install on Kubernetes</a>
-<a class="docs-nav-link" href="/docs/install-vm/">Install on a single VM</a>
 <a class="docs-nav-link" href="/docs/keycloak/">Use your own Keycloak</a>
 <a class="docs-nav-link" href="/docs/private-access/" aria-current="page">Private access (VPN only)</a>
 <p class="docs-nav-group">Use</p><a class="docs-nav-link" href="/docs/cluster-lifecycle/">Cluster lifecycle</a>
@@ -68,7 +67,7 @@
 </code></pre>
 <p>Annotations must be strings; with <code>--set</code>, Helm reads <code>true</code> and the numbers as other types and the install fails.</p>
 <p><strong>Other Kubernetes distributions:</strong> use your platform&#39;s internal load balancer, or expose the ingress controller only on the nodes&#39; private addresses.</p>
-<p><strong>Single VM:</strong> create the VM in a private subnet without a public IP. Give the subnet a NAT gateway for outbound traffic.</p>
+<p><strong>k3s on a single VM:</strong> create the VM in a private subnet without a public IP. Give the subnet a NAT gateway for outbound traffic.</p>
 <h2 id="option-b-public-address-with-an-allowlist">Option B: public address with an allowlist<a class="heading-link" href="#option-b-public-address-with-an-allowlist" aria-label="Link to Option B: public address with an allowlist">#</a></h2>
 <p>The portal keeps its public IP, but only your VPN&#39;s egress addresses may connect. In OCI, add an ingress rule for TCP 443 (and 80) from your VPN CIDR ranges only, in the network security group or security list of the load balancer or the VM, and remove any rule that allows <code>0.0.0.0/0</code>.</p>
 <p>This is quicker to set up but depends on the VPN&#39;s public addresses staying the same.</p>
@@ -78,19 +77,16 @@
 <thead>
 <tr>
 <th>Certificate</th>
-<th>Kubernetes</th>
-<th>Single VM</th>
+<th>How</th>
 </tr>
 </thead>
 <tbody><tr>
 <td>From your company CA</td>
 <td><code>kubectl create secret tls infrayard-tls -n infrayard --cert=fullchain.pem --key=privkey.pem</code> and remove the <code>cert-manager.io/cluster-issuer</code> annotation from the values</td>
-<td>Use the <code>tls</code> line in the <code>Caddyfile</code>, see <a href="/docs/install-vm/#variants">own TLS certificate</a></td>
 </tr>
 <tr>
 <td>Let&#39;s Encrypt with a DNS check (DNS-01)</td>
 <td>A cert-manager <code>ClusterIssuer</code> with a <a href="https://cert-manager.io/docs/configuration/acme/dns01/">DNS-01 solver</a> for your DNS provider</td>
-<td>Use a Caddy build with your DNS provider&#39;s module, or a company CA</td>
 </tr>
 </tbody></table></div>
 <p>A company CA certificate must be trusted on users&#39; devices; for a public DNS-01 certificate nothing extra is needed. Renew company CA certificates before they expire: Infrayard does not do that for you.</p>

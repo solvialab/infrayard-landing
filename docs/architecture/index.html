@@ -41,7 +41,6 @@
 <p class="docs-nav-group">Install</p><a class="docs-nav-link" href="/docs/installation/">Installation</a>
 <a class="docs-nav-link" href="/docs/oci-setup/">Prepare OCI</a>
 <a class="docs-nav-link" href="/docs/install-kubernetes/">Install on Kubernetes</a>
-<a class="docs-nav-link" href="/docs/install-vm/">Install on a single VM</a>
 <a class="docs-nav-link" href="/docs/keycloak/">Use your own Keycloak</a>
 <a class="docs-nav-link" href="/docs/private-access/">Private access (VPN only)</a>
 <p class="docs-nav-group">Use</p><a class="docs-nav-link" href="/docs/cluster-lifecycle/">Cluster lifecycle</a>
@@ -49,7 +48,7 @@
 <p class="docs-nav-group">Operate</p><a class="docs-nav-link" href="/docs/operations/">Operations, upgrades and recovery</a>
 <a class="docs-nav-link" href="/docs/troubleshooting/">Troubleshooting and support</a>
 <p class="docs-nav-group">Reference</p><a class="docs-nav-link" href="/docs/subscription/">Subscription, billing and licensing</a>
-<a class="docs-nav-link" href="/docs/releases/">Releases and roadmap</a></nav></aside><main class="docs-main" id="main"><div class="docs-layout"><div><nav class="docs-breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><a href="/docs/">Documentation</a><span aria-hidden="true">/</span><span aria-current="page">Architecture</span></nav><article class="docs-article"><h1>Architecture</h1><p class="docs-summary">Components, the request flow, state storage and network connections.</p><p class="docs-maintained">Maintained by Solvia Lab s.r.o. · Updated <time datetime="2026-11-05">2026-11-05</time></p><details class="docs-mobile-toc"><summary>On this page</summary><nav aria-label="Page contents"><a href="#components">Components</a><a href="#what-happens-when-a-user-creates-a-cluster">What happens when a user creates a cluster</a><a href="#state-and-ownership">State and ownership</a><a href="#connections">Connections</a><a href="#operating-responsibility">Operating responsibility</a></nav></details><div class="docs-content"><p>Infrayard runs in an environment you control: a Kubernetes cluster or a single VM. There is no Solvia Lab cloud service in between. Infrayard works in your OCI tenancy with its own OCI user and keeps its data in your database and your Object Storage bucket.</p>
+<a class="docs-nav-link" href="/docs/releases/">Releases and roadmap</a></nav></aside><main class="docs-main" id="main"><div class="docs-layout"><div><nav class="docs-breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><a href="/docs/">Documentation</a><span aria-hidden="true">/</span><span aria-current="page">Architecture</span></nav><article class="docs-article"><h1>Architecture</h1><p class="docs-summary">Components, the request flow, state storage and network connections.</p><p class="docs-maintained">Maintained by Solvia Lab s.r.o. · Updated <time datetime="2026-11-05">2026-11-05</time></p><details class="docs-mobile-toc"><summary>On this page</summary><nav aria-label="Page contents"><a href="#components">Components</a><a href="#what-happens-when-a-user-creates-a-cluster">What happens when a user creates a cluster</a><a href="#state-and-ownership">State and ownership</a><a href="#connections">Connections</a><a href="#operating-responsibility">Operating responsibility</a></nav></details><div class="docs-content"><p>Infrayard runs in an environment you control: an OKE cluster, or k3s on a single VM. There is no Solvia Lab cloud service in between. Infrayard works in your OCI tenancy with its own OCI user and keeps its data in your database and your Object Storage bucket.</p>
 <h2 id="components">Components<a class="heading-link" href="#components" aria-label="Link to Components">#</a></h2>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Scrollable reference table"><table>
 <thead>
@@ -95,7 +94,7 @@
 <td>Your OCI tenancy</td>
 </tr>
 </tbody></table></div>
-<p>On Kubernetes the services are installed by the Helm chart; on a single VM by Docker Compose, with Caddy in front for HTTPS. Both use the same images.</p>
+<p>The Helm chart installs these services. An ingress controller in your cluster, such as Traefik, terminates HTTPS in front of the portal.</p>
 <p>The portal and the bundled Keycloak share one address: the portal at <code>https://infrayard.example.com</code>, Keycloak at <code>https://infrayard.example.com/auth</code>. The portal forwards <code>/api</code> to the API and <code>/auth</code> to Keycloak; the Keycloak admin console is not reachable this way.</p>
 <h2 id="what-happens-when-a-user-creates-a-cluster">What happens when a user creates a cluster<a class="heading-link" href="#what-happens-when-a-user-creates-a-cluster" aria-label="Link to What happens when a user creates a cluster">#</a></h2>
 <ol>

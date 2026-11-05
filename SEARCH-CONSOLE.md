@@ -35,7 +35,7 @@ Pripravené 17. októbra 2026, doplnené 5. novembra 2026. Search Console vidí 
 ## Doplnené 5. novembra 2026
 
 - Každá stránka dokumentácie má vlastný popis pre výsledky vyhľadávania (110–160 znakov) v `content/seo.mjs` → `docsDescriptions`. Kratší popis v `content/site.mjs` zostáva ako text v navigácii a pod nadpisom. `npm run check` odmietne popis kratší ako 50 alebo dlhší ako 170 znakov.
-- `ai.md` a `llms.txt` majú sekciu **Deployment**: self-hosted, Helm alebo Docker Compose, Keycloak, privátna registry, OCI používateľ a VPN-only prístup.
+- `ai.md` a `llms.txt` majú sekciu **Deployment**: self-hosted, Helm (OKE alebo k3s), Keycloak, privátna registry, OCI používateľ a VPN-only prístup.
 - `404.html`: vlastná stránka „Page not found“ s odkazmi, `noindex`, mimo sitemap. Vercel ju vráti so stavom 404.
 - `/.well-known/security.txt` (RFC 9116): kontakt `support@infrayard.eu`, platnosť rok od `site.updated`. Kontrola zlyhá, keď platnosť vyprší; stačí aktualizovať `site.updated` a znovu zostaviť.
 - **IndexNow** (Bing a ďalšie vyhľadávače; z Bingu čerpajú aj ChatGPT search a Copilot): kľúč v `content/seo.mjs` → `indexNowKey`, súbor `/<kľúč>.txt` vytvára build. Po každom nasadení s podstatnou zmenou spusti `npm run indexnow` (všetky URL zo sitemap) alebo `npm run indexnow -- /docs/` (iba časť). Google IndexNow nepoužíva, číta sitemap.

@@ -1,6 +1,6 @@
 # Architecture
 
-Infrayard runs in an environment you control: a Kubernetes cluster or a single VM. There is no Solvia Lab cloud service in between. Infrayard works in your OCI tenancy with its own OCI user and keeps its data in your database and your Object Storage bucket.
+Infrayard runs in an environment you control: an OKE cluster, or k3s on a single VM. There is no Solvia Lab cloud service in between. Infrayard works in your OCI tenancy with its own OCI user and keeps its data in your database and your Object Storage bucket.
 
 ## Components
 
@@ -14,7 +14,7 @@ Infrayard runs in an environment you control: a Kubernetes cluster or a single V
 | Object Storage bucket | Terraform state of every managed cluster | In your OCI tenancy |
 | OCI and OKE | The cloud resources themselves | Your OCI tenancy |
 
-On Kubernetes the services are installed by the Helm chart; on a single VM by Docker Compose, with Caddy in front for HTTPS. Both use the same images.
+The Helm chart installs these services. An ingress controller in your cluster, such as Traefik, terminates HTTPS in front of the portal.
 
 The portal and the bundled Keycloak share one address: the portal at `https://infrayard.example.com`, Keycloak at `https://infrayard.example.com/auth`. The portal forwards `/api` to the API and `/auth` to Keycloak; the Keycloak admin console is not reachable this way.
 

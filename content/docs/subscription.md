@@ -60,7 +60,7 @@ Agree offboarding before access ends, including required configuration, operatio
 
 ## Licence and delivery
 
-The commercial agreement governs production rights, deployment scope and restrictions. Standard delivery includes released images, registry access, the Helm chart, the Docker Compose bundle and documentation. Product source code and release automation are not included unless separately agreed. Managed-service resale and redistribution require explicit written permission.
+The commercial agreement governs production rights, deployment scope and restrictions. Standard delivery includes released images, registry access, the Helm chart and documentation. Product source code and release automation are not included unless separately agreed. Managed-service resale and redistribution require explicit written permission.
 
 This public website and documentation do not grant an open-source or Business Source License to the commercial product and do not change rights granted under any separately issued licence. See the [website legal notice](/legal/terms.html) and your commercial agreement.
 

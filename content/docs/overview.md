@@ -2,7 +2,7 @@
 
 Infrayard is a self-service portal for Oracle Kubernetes Engine (OKE). Engineers create, scale, upgrade and delete OKE clusters through a web portal. Platform administrators decide which templates, sizes and Kubernetes versions are allowed, and approve protected operations. Behind the portal, Terraform creates the resources in your own OCI tenancy.
 
-You install Infrayard in your environment, on Kubernetes or on a single VM. Credentials, state and data stay with you.
+You install Infrayard in your environment: on an OKE cluster, or on k3s on a single VM for an evaluation. Credentials, state and data stay with you.
 
 ## Find your starting point
 

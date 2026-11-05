@@ -41,7 +41,6 @@
 <p class="docs-nav-group">Install</p><a class="docs-nav-link" href="/docs/installation/">Installation</a>
 <a class="docs-nav-link" href="/docs/oci-setup/">Prepare OCI</a>
 <a class="docs-nav-link" href="/docs/install-kubernetes/">Install on Kubernetes</a>
-<a class="docs-nav-link" href="/docs/install-vm/">Install on a single VM</a>
 <a class="docs-nav-link" href="/docs/keycloak/">Use your own Keycloak</a>
 <a class="docs-nav-link" href="/docs/private-access/">Private access (VPN only)</a>
 <p class="docs-nav-group">Use</p><a class="docs-nav-link" href="/docs/cluster-lifecycle/">Cluster lifecycle</a>
@@ -112,39 +111,20 @@
 <p>Database and state belong together: a restored database must match the clusters that actually exist in OCI. Treat backups as sensitive; they contain SSH private keys and, with the bundled Keycloak, password hashes.</p>
 <h2 id="backups">Backups<a class="heading-link" href="#backups" aria-label="Link to Backups">#</a></h2>
 <p>The database backup is one file that contains both Infrayard and the bundled Keycloak.</p>
-<p><strong>Kubernetes:</strong></p>
 <pre><code class="language-bash">kubectl exec -n infrayard infrayard-postgresql-0 -c postgresql -- \
   pg_dump -U infrayard -Fc infrayard &gt; infrayard-$(date +%F).dump
-</code></pre>
-<p><strong>Single VM</strong> (in <code>~/infrayard</code>):</p>
-<pre><code class="language-bash">docker compose exec -T infrayard-postgresql \
-  pg_dump -U infrayard -Fc infrayard &gt; infrayard-$(date +%F).dump
-</code></pre>
-<p>To run it every night on the VM, add a cron entry with <code>crontab -e</code>:</p>
-<pre><code class="language-text">30 2 * * * cd ~/infrayard &amp;&amp; docker compose exec -T infrayard-postgresql pg_dump -U infrayard -Fc infrayard &gt; ~/backups/infrayard-$(date +\%F).dump
 </code></pre>
 <p>Copy the files off the host, for example to an Object Storage bucket with <code>oci os object put</code>, and delete old ones according to your retention policy.</p>
 <p>If you use an external PostgreSQL (<code>postgresql.enabled: false</code>), back it up with your database tooling instead.</p>
 <h2 id="restore">Restore<a class="heading-link" href="#restore" aria-label="Link to Restore">#</a></h2>
 <p>Restore into the same Infrayard version that created the backup, then upgrade if needed. Stop the services that write to the database first.</p>
-<p><strong>Kubernetes:</strong></p>
 <pre><code class="language-bash">kubectl scale deploy -n infrayard infrayard-api infrayard-keycloak --replicas=0
 kubectl exec -i -n infrayard infrayard-postgresql-0 -c postgresql -- \
   pg_restore -U infrayard -d infrayard --clean --if-exists --no-owner &lt; infrayard-2026-01-31.dump
 kubectl scale deploy -n infrayard infrayard-api infrayard-keycloak --replicas=1
 </code></pre>
 <p>Without the bundled Keycloak, leave <code>infrayard-keycloak</code> out of the commands.</p>
-<p><strong>Single VM:</strong></p>
-<pre><code class="language-bash">docker compose stop infrayard-api infrayard-keycloak
-docker compose exec -T infrayard-postgresql \
-  pg_restore -U infrayard -d infrayard --clean --if-exists --no-owner &lt; infrayard-2026-01-31.dump
-docker compose up -d
-</code></pre>
-<p><strong>On a new host</strong>, start only the database first, so that nothing writes to it before the restore:</p>
-<ul>
-<li>Kubernetes: install with your values and <code>--set api.replicaCount=0 --set keycloak.replicaCount=0</code>, restore, then run <code>helm upgrade</code> with the same command without these two options.</li>
-<li>VM: <code>docker compose up -d --wait infrayard-postgresql</code>, restore, then <code>docker compose up -d</code>.</li>
-</ul>
+<p><strong>On a new host</strong>, start only the database first, so that nothing writes to it before the restore: install with your values and <code>--set api.replicaCount=0 --set keycloak.replicaCount=0</code>, restore, then run <code>helm upgrade</code> with the same command without these two options.</p>
 <p>After a restore, compare the cluster list in the portal with what exists in OCI before you start new operations. A cluster created or destroyed after the backup appears in the wrong state; its Terraform state in the bucket is still correct.</p>
 <h2 id="upgrade-infrayard">Upgrade Infrayard<a class="heading-link" href="#upgrade-infrayard" aria-label="Link to Upgrade Infrayard">#</a></h2>
 <p>Before you start:</p>
@@ -154,42 +134,22 @@ docker compose up -d
 <li>Make sure no cluster operation is running (<strong>Admin → All Clusters</strong>).</li>
 </ol>
 <p>The API applies database changes automatically when it starts. They cannot be undone by downgrading; a rollback means restoring the backup.</p>
-<p><strong>Kubernetes:</strong></p>
 <pre><code class="language-bash">helm upgrade infrayard oci://registry.gitlab.com/solvialab/infrayard/charts/infrayard \
   --version 1.5.0 -n infrayard -f values.yaml -f secrets.yaml
 kubectl get pods -n infrayard -w
 </code></pre>
 <p>The chart version selects the image version. Changed configuration or secrets restart the affected pods automatically.</p>
-<p><strong>Single VM:</strong></p>
-<pre><code class="language-bash">cd ~/infrayard
-sed -i &#39;s/^INFRAYARD_VERSION=.*/INFRAYARD_VERSION=1.5.0/&#39; .env
-docker compose pull
-docker compose up -d
-</code></pre>
-<p>If the release notes say that the Compose bundle changed, unpack the new one next to the old directory and copy over your <code>.env</code> and <code>oci_api_key.pem</code>:</p>
-<pre><code class="language-bash">cd ~ &amp;&amp; docker run --rm registry.gitlab.com/solvialab/infrayard/compose:1.5.0 | tar xz
-cp ~/infrayard/.env ~/infrayard/oci_api_key.pem ~/infrayard-compose/
-</code></pre>
-<p>Set <code>INFRAYARD_VERSION=1.5.0</code> in the copied <code>.env</code>, stop the old installation with <code>docker compose down</code> in <code>~/infrayard</code>, and start the new one with <code>docker compose up -d</code> in <code>~/infrayard-compose</code>. The data stays in the Docker volumes, which both directories share because the Compose project name is <code>infrayard</code>.</p>
 <p><strong>After the upgrade:</strong> sign in as an administrator and as a regular user, check the cluster list and the Activity history, and run <strong>Sync</strong> in <strong>Admin → Configuration</strong> to confirm OCI access.</p>
-<p><strong>Rollback</strong> (Kubernetes): <code>helm rollback infrayard -n infrayard</code> returns the previous chart and images. If the new version had already started, also restore the backup taken before the upgrade.</p>
+<p><strong>Rollback:</strong> <code>helm rollback infrayard -n infrayard</code> returns the previous chart and images. If the new version had already started, also restore the backup taken before the upgrade.</p>
 <h2 id="postgresql-and-keycloak-versions">PostgreSQL and Keycloak versions<a class="heading-link" href="#postgresql-and-keycloak-versions" aria-label="Link to PostgreSQL and Keycloak versions">#</a></h2>
-<p>The chart and the bundle pin the PostgreSQL major version (currently 18) and the Keycloak version (currently 26.8). Patch releases arrive with Infrayard upgrades.</p>
+<p>The chart pins the PostgreSQL major version (currently 18) and the Keycloak version (currently 26.8). Patch releases arrive with Infrayard upgrades.</p>
 <p>A new PostgreSQL major version cannot read the old data directory. When a release moves to a new major version, its notes say so, and the upgrade needs a dump and restore:</p>
 <ol>
 <li>Take a <a href="#backups">database backup</a>.</li>
-<li>Stop everything and delete the database volume:<ul>
-<li>Kubernetes: <code>kubectl scale deploy -n infrayard infrayard-api infrayard-keycloak --replicas=0</code>, then <code>kubectl delete statefulset infrayard-postgresql -n infrayard</code> and <code>kubectl delete pvc data-infrayard-postgresql-0 -n infrayard</code>.</li>
-<li>VM: <code>docker compose down</code>, then <code>docker volume rm infrayard_postgres</code>.</li>
-</ul>
-</li>
-<li>Start the new version with only the database running:<ul>
-<li>Kubernetes: the <code>helm upgrade</code> command from above with <code>--set api.replicaCount=0 --set keycloak.replicaCount=0</code>.</li>
-<li>VM: set the new version in <code>.env</code>, then <code>docker compose pull</code> and <code>docker compose up -d --wait infrayard-postgresql</code>.</li>
-</ul>
-</li>
+<li>Stop everything and delete the database volume: <code>kubectl scale deploy -n infrayard infrayard-api infrayard-keycloak --replicas=0</code>, then <code>kubectl delete statefulset infrayard-postgresql -n infrayard</code> and <code>kubectl delete pvc data-infrayard-postgresql-0 -n infrayard</code>.</li>
+<li>Start the new version with only the database running: the <code>helm upgrade</code> command from above with <code>--set api.replicaCount=0 --set keycloak.replicaCount=0</code>.</li>
 <li><a href="#restore">Restore</a> the backup with the <code>pg_restore</code> command.</li>
-<li>Start everything: the same <code>helm upgrade</code> without the two <code>--set</code> options, or <code>docker compose up -d</code>.</li>
+<li>Start everything: the same <code>helm upgrade</code> without the two <code>--set</code> options.</li>
 </ol>
 <p>Keycloak updates its schema by itself on the first start of a new version.</p>
 <h2 id="oke-clusters-are-a-separate-topic">OKE clusters are a separate topic<a class="heading-link" href="#oke-clusters-are-a-separate-topic" aria-label="Link to OKE clusters are a separate topic">#</a></h2>

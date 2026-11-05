@@ -7,10 +7,9 @@ The documentation now has dedicated pages with permanent URLs.
 - [Requirements and compatibility](https://www.infrayard.eu/docs/requirements/) — Hosts, OCI, network ports, identity, OKE tiers and product scope.
 - [Security and access](https://www.infrayard.eu/docs/security/) — Keycloak roles, OCI credentials, kubeconfig rights, SSH keys and audit records.
 - [Networking and existing infrastructure](https://www.infrayard.eu/docs/networking/) — Kubernetes API access modes, existing VCNs, subnets and compartments, and the anchor compartment.
-- [Installation](https://www.infrayard.eu/docs/installation/) — Choose between Kubernetes and a single VM, and what you need for each.
+- [Installation](https://www.infrayard.eu/docs/installation/) — Choose between OKE and k3s on a single VM, and what you need for each.
 - [Prepare OCI](https://www.infrayard.eu/docs/oci-setup/) — Create the OCI user, policies, API key, Terraform state bucket and S3 key.
 - [Install on Kubernetes](https://www.infrayard.eu/docs/install-kubernetes/) — Install Infrayard with Helm on an existing OKE, k3s or other Kubernetes cluster.
-- [Install on a single VM](https://www.infrayard.eu/docs/install-vm/) — Run Infrayard with Docker Compose and automatic HTTPS on one Linux VM.
 - [Use your own Keycloak](https://www.infrayard.eu/docs/keycloak/) — Sign users in through a realm of your existing Keycloak, with roles or groups.
 - [Private access (VPN only)](https://www.infrayard.eu/docs/private-access/) — Make the portal reachable only from your VPN or company network.
 - [Cluster lifecycle](https://www.infrayard.eu/docs/cluster-lifecycle/) — Create, access, scale, upgrade and clean up OKE clusters.

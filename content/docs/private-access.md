@@ -27,7 +27,7 @@ Annotations must be strings; with `--set`, Helm reads `true` and the numbers as 
 
 **Other Kubernetes distributions:** use your platform's internal load balancer, or expose the ingress controller only on the nodes' private addresses.
 
-**Single VM:** create the VM in a private subnet without a public IP. Give the subnet a NAT gateway for outbound traffic.
+**k3s on a single VM:** create the VM in a private subnet without a public IP. Give the subnet a NAT gateway for outbound traffic.
 
 ## Option B: public address with an allowlist
 
@@ -39,10 +39,10 @@ This is quicker to set up but depends on the VPN's public addresses staying the 
 
 Let's Encrypt's standard check (HTTP-01) connects to your portal from the internet, so it fails once the portal is private. Choose one of these:
 
-| Certificate | Kubernetes | Single VM |
-| --- | --- | --- |
-| From your company CA | `kubectl create secret tls infrayard-tls -n infrayard --cert=fullchain.pem --key=privkey.pem` and remove the `cert-manager.io/cluster-issuer` annotation from the values | Use the `tls` line in the `Caddyfile`, see [own TLS certificate](/docs/install-vm/#variants) |
-| Let's Encrypt with a DNS check (DNS-01) | A cert-manager `ClusterIssuer` with a [DNS-01 solver](https://cert-manager.io/docs/configuration/acme/dns01/) for your DNS provider | Use a Caddy build with your DNS provider's module, or a company CA |
+| Certificate | How |
+| --- | --- |
+| From your company CA | `kubectl create secret tls infrayard-tls -n infrayard --cert=fullchain.pem --key=privkey.pem` and remove the `cert-manager.io/cluster-issuer` annotation from the values |
+| Let's Encrypt with a DNS check (DNS-01) | A cert-manager `ClusterIssuer` with a [DNS-01 solver](https://cert-manager.io/docs/configuration/acme/dns01/) for your DNS provider |
 
 A company CA certificate must be trusted on users' devices; for a public DNS-01 certificate nothing extra is needed. Renew company CA certificates before they expire: Infrayard does not do that for you.
 

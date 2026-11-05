@@ -41,7 +41,6 @@
 <p class="docs-nav-group">Install</p><a class="docs-nav-link" href="/docs/installation/">Installation</a>
 <a class="docs-nav-link" href="/docs/oci-setup/">Prepare OCI</a>
 <a class="docs-nav-link" href="/docs/install-kubernetes/">Install on Kubernetes</a>
-<a class="docs-nav-link" href="/docs/install-vm/">Install on a single VM</a>
 <a class="docs-nav-link" href="/docs/keycloak/">Use your own Keycloak</a>
 <a class="docs-nav-link" href="/docs/private-access/">Private access (VPN only)</a>
 <p class="docs-nav-group">Use</p><a class="docs-nav-link" href="/docs/cluster-lifecycle/">Cluster lifecycle</a>
@@ -66,23 +65,20 @@
 <thead>
 <tr>
 <th>Secret</th>
-<th>Kubernetes</th>
-<th>Single VM</th>
+<th>Where</th>
 </tr>
 </thead>
 <tbody><tr>
 <td>OCI API private key</td>
 <td>Secret <code>infrayard-oci-key</code>, mounted read-only into the API</td>
-<td><code>oci_api_key.pem</code>, readable only by the API container user</td>
 </tr>
 <tr>
 <td>S3 key for the state bucket, database and Keycloak passwords</td>
 <td>Secrets created by the chart from your values</td>
-<td><code>.env</code> file, mode 600</td>
 </tr>
 </tbody></table></div>
 <p>Keep these in your secret manager. Never send them in support requests.</p>
-<p>Rotating the API key: add a new key to the OCI user, update the secret (or file) and the fingerprint, roll out, then delete the old key in OCI.</p>
+<p>Rotating the API key: add a new key to the OCI user, update the secret and the fingerprint, roll out, then delete the old key in OCI.</p>
 <h2 id="kubernetes-access">Kubernetes access<a class="heading-link" href="#kubernetes-access" aria-label="Link to Kubernetes access">#</a></h2>
 <p>Users download a kubeconfig from a running cluster&#39;s detail page. It works with plain <code>kubectl</code>, without the OCI CLI:</p>
 <pre><code class="language-bash">export KUBECONFIG=~/Downloads/oke-my-cluster-kubeconfig.yaml
@@ -104,11 +100,11 @@ kubectl get nodes
 <p>Every lifecycle operation records who did what, on which cluster, the result and the duration. Destroy requests and limit-increase requests record the submission and the decision. Administrators can force-destroy a cluster for incident response; this is recorded too.</p>
 <p>The Activity inbox shows lifecycle events, request outcomes and limit changes. Optional e-mail notifications send event details to the configured recipients through your SMTP server.</p>
 <h2 id="network-exposure">Network exposure<a class="heading-link" href="#network-exposure" aria-label="Link to Network exposure">#</a></h2>
-<p>The portal is the only inbound endpoint. The Keycloak admin console is not exposed: on Kubernetes it is reached with <code>kubectl port-forward</code>, on the single VM through an SSH tunnel. We recommend making the portal reachable <a href="/docs/private-access/">only from your VPN</a>.</p>
+<p>The portal is the only inbound endpoint. The Keycloak admin console is not exposed: it is reached with <code>kubectl port-forward</code>. We recommend making the portal reachable <a href="/docs/private-access/">only from your VPN</a>.</p>
 <p>Outbound, Infrayard needs OCI APIs, the image registry and the cluster APIs; see <a href="/docs/requirements/#network">requirements</a>.</p>
 <h2 id="hardening-built-in">Hardening built in<a class="heading-link" href="#hardening-built-in" aria-label="Link to Hardening built in">#</a></h2>
 <ul>
-<li>On Kubernetes, the Infrayard, Keycloak and PostgreSQL containers run as non-root users and drop all Linux capabilities; the API and the portal also use read-only root file systems. On the single VM, the API runs as a non-root user and the portal container is read-only.</li>
+<li>The Infrayard, Keycloak and PostgreSQL containers run as non-root users and drop all Linux capabilities; the API and the portal also use read-only root file systems.</li>
 <li>The portal sends security headers (<code>X-Content-Type-Options</code>, <code>X-Frame-Options</code>, <code>Referrer-Policy</code>, <code>Permissions-Policy</code>) and redirects HTTP to HTTPS.</li>
 <li>Configuration or secret changes roll the affected pods automatically on <code>helm upgrade</code>.</li>
 </ul>

@@ -20,14 +20,14 @@ Infrayard acts in OCI as one service user with an API key. Its policies are scop
 
 Where the credentials are stored:
 
-| Secret | Kubernetes | Single VM |
-| --- | --- | --- |
-| OCI API private key | Secret `infrayard-oci-key`, mounted read-only into the API | `oci_api_key.pem`, readable only by the API container user |
-| S3 key for the state bucket, database and Keycloak passwords | Secrets created by the chart from your values | `.env` file, mode 600 |
+| Secret | Where |
+| --- | --- |
+| OCI API private key | Secret `infrayard-oci-key`, mounted read-only into the API |
+| S3 key for the state bucket, database and Keycloak passwords | Secrets created by the chart from your values |
 
 Keep these in your secret manager. Never send them in support requests.
 
-Rotating the API key: add a new key to the OCI user, update the secret (or file) and the fingerprint, roll out, then delete the old key in OCI.
+Rotating the API key: add a new key to the OCI user, update the secret and the fingerprint, roll out, then delete the old key in OCI.
 
 ## Kubernetes access
 
@@ -63,13 +63,13 @@ The Activity inbox shows lifecycle events, request outcomes and limit changes. O
 
 ## Network exposure
 
-The portal is the only inbound endpoint. The Keycloak admin console is not exposed: on Kubernetes it is reached with `kubectl port-forward`, on the single VM through an SSH tunnel. We recommend making the portal reachable [only from your VPN](/docs/private-access/).
+The portal is the only inbound endpoint. The Keycloak admin console is not exposed: it is reached with `kubectl port-forward`. We recommend making the portal reachable [only from your VPN](/docs/private-access/).
 
 Outbound, Infrayard needs OCI APIs, the image registry and the cluster APIs; see [requirements](/docs/requirements/#network).
 
 ## Hardening built in
 
-- On Kubernetes, the Infrayard, Keycloak and PostgreSQL containers run as non-root users and drop all Linux capabilities; the API and the portal also use read-only root file systems. On the single VM, the API runs as a non-root user and the portal container is read-only.
+- The Infrayard, Keycloak and PostgreSQL containers run as non-root users and drop all Linux capabilities; the API and the portal also use read-only root file systems.
 - The portal sends security headers (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`) and redirects HTTP to HTTPS.
 - Configuration or secret changes roll the affected pods automatically on `helm upgrade`.
 

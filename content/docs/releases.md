@@ -14,15 +14,15 @@ Choose Infrayard based on capabilities available in the release delivered to you
 - Review cost estimates, Activity notifications and audit history.
 - Sync available shapes and Kubernetes versions with compatibility filtering.
 - Sign in through the bundled Keycloak or your existing Keycloak.
-- Install with Helm on Kubernetes (OKE, k3s and others) or with Docker Compose on a single VM.
+- Install with Helm on Kubernetes: OKE, k3s and other distributions.
 
 Operational behaviour depends on cluster tier and network design; see [requirements](/docs/requirements/) and [cluster lifecycle](/docs/cluster-lifecycle/).
 
 ## Versioned delivery
 
-Each release has a version number such as `1.4.0`. The Helm chart and the images of a release share that version and are published together in the private registry you receive access to; chart `1.4.0` runs images `1.4.0`, and the Compose bundle `compose:1.4.0` starts the same images.
+Each release has a version number such as `1.4.0`. The Helm chart and the images of a release share that version and are published together in the private registry you receive access to; chart `1.4.0` runs images `1.4.0`.
 
-Release notes list changes and any required upgrade steps. Follow [Upgrade Infrayard](/docs/operations/#upgrade-infrayard) and run `helm list -n infrayard` (or check `.env` on a VM) to see which version you run. Source code and build pipelines are not needed to install or operate Infrayard.
+Release notes list changes and any required upgrade steps. Follow [Upgrade Infrayard](/docs/operations/#upgrade-infrayard) and run `helm list -n infrayard` to see which version you run. Source code and build pipelines are not needed to install or operate Infrayard.
 
 ## Planned work
 

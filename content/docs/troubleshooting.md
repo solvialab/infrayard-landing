@@ -7,10 +7,6 @@ Start with the logs. For a failed cluster operation, open the operation's Terraf
 kubectl get pods -n infrayard
 kubectl describe pod -n infrayard <pod>
 kubectl logs -n infrayard deploy/infrayard-api --tail=200
-
-# Single VM (in ~/infrayard)
-docker compose ps
-docker compose logs --tail=200 infrayard-api
 ```
 
 Note the time and the exact error before you retry, and check what actually exists in OCI before starting a second operation on the same cluster.
@@ -20,7 +16,7 @@ Note the time and the exact error before you retry, and check what actually exis
 | Symptom | Cause and fix |
 | --- | --- |
 | `infrayard-api` pod stays in `Init` or `ContainerCreating`; events mention `infrayard-oci-key` | The OCI key secret is missing or in another namespace. Create it as in [step 3](/docs/install-kubernetes/#3-create-the-namespace-and-secrets) |
-| `ImagePullBackOff`, `docker compose pull` or `helm show chart` fails with `401`, `403`, `unauthorized` or `denied` | The registry login or the `regcred` secret is missing, has a typo, or the token has expired. Check `global.imagePullSecrets` and the image addresses. If the login succeeds but pulling still fails, the token lacks read access to the registry; ask support for a new token |
+| `ImagePullBackOff`, or `helm show chart` fails with `401`, `403`, `unauthorized` or `denied` | The registry login or the `regcred` secret is missing, has a typo, or the token has expired. Check `global.imagePullSecrets` and the image addresses. If the login succeeds but pulling still fails, the token lacks read access to the registry; ask support for a new token |
 | API log or `oci` CLI shows `401 NotAuthenticated` right after the OCI user or API key was created | OCI needs a few minutes to activate a new user and key in every service. Wait five minutes and retry. If it persists, compare the fingerprint, user OCID and tenancy OCID with the API key page |
 | API log shows `404 NotAuthorizedOrNotFound` for OCI calls | A policy statement is missing or names the wrong group or compartment. Compare with [Prepare OCI](/docs/oci-setup/#3-add-the-policies) |
 | Traefik install on OKE fails with `cannot unmarshal number into Go struct field ObjectMeta.metadata.annotations of type string` | The load balancer annotations were passed with `--set`, which turns `10` and `100` into numbers. Use `--set-string` as in [step 1](/docs/install-kubernetes/#1-ingress-controller-and-certificates) |
@@ -28,7 +24,6 @@ Note the time and the exact error before you retry, and check what actually exis
 | After a `helm upgrade` that fixes an image or setting, `infrayard-postgresql-0` keeps its old error | A StatefulSet does not replace a pod that never became ready. Delete it with `kubectl delete pod -n infrayard infrayard-postgresql-0`; it starts again with the new settings and keeps its volume |
 | `helm install` fails with `... is required` | A required value is missing, for example `postgresql.auth.password` or `keycloak.admin.password`. Add it to `secrets.yaml` |
 | Certificate stays `READY False` | DNS does not point to the ingress yet, or port 80 is not reachable from the internet. Check `kubectl describe certificate -n infrayard infrayard-tls` and `kubectl get challenges -A` |
-| VM: browser shows a certificate error | Caddy could not get a certificate. Check `docker compose logs caddy`; DNS and ports 80/443 must reach the VM |
 | Sign-in shows `502 Bad Gateway` or a Keycloak error page | Keycloak is still starting (about a minute on the first start) or the realm import failed. Check the Keycloak logs for `Realm 'infrayard' imported` |
 | Keycloak does not start, log shows `password authentication failed` | The database password changed after the first start. The database keeps the password it was created with; set the original value again |
 
@@ -83,7 +78,7 @@ Do not repair Infrayard-managed resources by hand in the OCI Console as a routin
 
 Write to [support@infrayard.eu](mailto:support@infrayard.eu) or use the [support form](/?enquiry=support#demo). Include:
 
-- The Infrayard version and the installation path (OKE, other Kubernetes, single VM).
+- The Infrayard version and where it runs (OKE, k3s or other Kubernetes).
 - What you did, the approximate time and the region.
 - The error message and the relevant log lines.
 - Recent changes and what you have already tried.

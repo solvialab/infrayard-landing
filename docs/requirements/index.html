@@ -41,7 +41,6 @@
 <p class="docs-nav-group">Install</p><a class="docs-nav-link" href="/docs/installation/">Installation</a>
 <a class="docs-nav-link" href="/docs/oci-setup/">Prepare OCI</a>
 <a class="docs-nav-link" href="/docs/install-kubernetes/">Install on Kubernetes</a>
-<a class="docs-nav-link" href="/docs/install-vm/">Install on a single VM</a>
 <a class="docs-nav-link" href="/docs/keycloak/">Use your own Keycloak</a>
 <a class="docs-nav-link" href="/docs/private-access/">Private access (VPN only)</a>
 <p class="docs-nav-group">Use</p><a class="docs-nav-link" href="/docs/cluster-lifecycle/">Cluster lifecycle</a>
@@ -57,53 +56,46 @@
 <th></th>
 <th>Existing OKE cluster</th>
 <th>Other Kubernetes (k3s, …)</th>
-<th>Single VM</th>
 </tr>
 </thead>
 <tbody><tr>
 <td>Intended use</td>
 <td>Production</td>
-<td>Production or evaluation</td>
-<td>Evaluation, demos, small teams</td>
+<td>Evaluation on a single VM, or production</td>
 </tr>
 <tr>
 <td>Tooling</td>
 <td><code>kubectl</code>, Helm 3.8+</td>
 <td><code>kubectl</code>, Helm 3.8+</td>
-<td>Docker with Compose v2</td>
 </tr>
 <tr>
 <td>Ingress</td>
 <td>An ingress controller you install, e.g. Traefik with an OCI load balancer</td>
 <td>Your ingress controller; k3s ships Traefik</td>
-<td>Caddy, included</td>
 </tr>
 <tr>
 <td>TLS</td>
 <td>cert-manager or your own certificate</td>
 <td>cert-manager or your own certificate</td>
-<td>Automatic Let&#39;s Encrypt or your own certificate</td>
 </tr>
 <tr>
 <td>Storage</td>
 <td>50 GB block volume, <code>oci-bv</code> (the OCI minimum; the chart requests 10 GiB)</td>
 <td>10 GiB volume from your StorageClass</td>
-<td>Docker volume, 30 GB disk</td>
 </tr>
 <tr>
 <td>Capacity</td>
-<td>About 1 CPU and 2 GiB free (limits up to 4.7 CPU, 3.2 GiB)</td>
-<td>Same</td>
-<td>2 CPUs, 4 GB memory minimum, 8 GB recommended</td>
+<td>About 1 CPU and 2 GiB free (requests 0.9 CPU and 1.6 GiB, limits 3.7 CPU and 3.2 GiB)</td>
+<td>Same; a k3s VM: 2 OCPUs and 8 GB memory</td>
 </tr>
 <tr>
 <td>Keycloak</td>
 <td>Bundled or your own</td>
 <td>Bundled or your own</td>
-<td>Bundled</td>
 </tr>
 </tbody></table></div>
-<p>Infrayard is tested on OKE 1.36 and k3s 1.36, both with Traefik and cert-manager, and with the Docker Compose bundle. The images are built for x86 (<code>amd64</code>) and Arm (<code>arm64</code>).</p>
+<p>At rest Infrayard uses about 0.9 GB memory and almost no CPU; Keycloak takes most of it. On a k3s VM, k3s with Traefik and cert-manager adds about 1.8 GB. Terraform jobs run inside the API, whose limit is 1 GiB.</p>
+<p>Infrayard is tested on OKE 1.36 and k3s 1.36, both with Traefik and cert-manager. The images are built for x86 (<code>amd64</code>) and Arm (<code>arm64</code>).</p>
 <h2 id="oci">OCI<a class="heading-link" href="#oci" aria-label="Link to OCI">#</a></h2>
 <ul>
 <li>A tenancy and a region where you create OKE clusters.</li>
@@ -166,7 +158,7 @@
 <h2 id="identity">Identity<a class="heading-link" href="#identity" aria-label="Link to Identity">#</a></h2>
 <p>Sign-in uses Keycloak: either the Keycloak bundled with Infrayard (realm, client and admin role are created automatically) or a realm in your existing Keycloak 22 or newer. See <a href="/docs/keycloak/">Use your own Keycloak</a>.</p>
 <h2 id="costs-outside-the-subscription">Costs outside the subscription<a class="heading-link" href="#costs-outside-the-subscription" aria-label="Link to Costs outside the subscription">#</a></h2>
-<p>The subscription covers the Infrayard software. Your Oracle Cloud bill covers the OKE clusters and their nodes, load balancers and storage, and the host that runs Infrayard: a VM, or capacity and one block volume in your cluster (50 GB on OKE, the OCI minimum), plus a load balancer for the ingress.</p>
+<p>The subscription covers the Infrayard software. Your Oracle Cloud bill covers the OKE clusters and their nodes, load balancers and storage, and the host that runs Infrayard: capacity and one block volume in your cluster (50 GB on OKE, the OCI minimum) plus a load balancer for the ingress, or the VM for k3s.</p>
 <h2 id="oke-versions-shapes-and-images">OKE versions, shapes and images<a class="heading-link" href="#oke-versions-shapes-and-images" aria-label="Link to OKE versions, shapes and images">#</a></h2>
 <p>Which Kubernetes versions, shapes and node images exist depends on your region and tenancy. Administrators sync them from OCI in <strong>Admin → Configuration</strong> and enable what users may choose. Newly synced Kubernetes versions stay disabled until an administrator enables them.</p>
 <p>The deploy and template forms only offer Kubernetes versions that have a node image for the selected shape. If Infrayard cannot check this with OCI, deployment is blocked rather than allowing an unverified combination. See <a href="/docs/troubleshooting/#missing-versions-or-shapes">troubleshooting</a>.</p>

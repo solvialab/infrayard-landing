@@ -11,7 +11,7 @@ Time needed: about 30 minutes, after [Prepare OCI](/docs/oci-setup/).
 - An ingress controller. OKE has none by default; k3s ships Traefik.
 - [cert-manager](https://cert-manager.io/) for Let's Encrypt certificates, or your own TLS certificate.
 - A StorageClass for the PostgreSQL volume. The chart requests 10 GiB. OKE: `oci-bv`, which creates a 50 GB block volume, the OCI minimum. k3s: `local-path`.
-- Free capacity of about 1 CPU and 2 GiB memory. Limits allow peaks up to 4.7 CPU and 3.2 GiB.
+- Free capacity of about 1 CPU and 2 GiB memory. Limits allow peaks up to 3.7 CPU and 3.2 GiB.
 - Outbound internet access from the pods. Each cluster deployment downloads the Terraform providers from `registry.terraform.io`, `releases.hashicorp.com` and GitHub releases. On OKE with private worker nodes, this traffic goes through the VCN's NAT gateway; a service gateway alone is not enough.
 - A DNS name for the portal, for example `infrayard.example.com`. Keycloak is served on the same name under `/auth`, so one name is enough.
 - The values from the [OCI checklist](/docs/oci-setup/#values-checklist).

@@ -173,4 +173,4 @@ oci --config-file infrayard-oci-config os object list --bucket-name infrayard-tf
 | State bucket | `infrayard-tfstate` | Step 5 |
 | S3 access key and secret key | `0a1b2c…` | Step 6 |
 
-Continue with your installation path: [Kubernetes](/docs/install-kubernetes/) or [single VM](/docs/install-vm/).
+Continue with [Install on Kubernetes](/docs/install-kubernetes/).
