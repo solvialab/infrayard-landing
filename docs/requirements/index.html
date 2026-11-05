@@ -76,8 +76,8 @@
 </tr>
 <tr>
 <td>Identity</td>
-<td>Bundled Keycloak or an existing OIDC provider</td>
-<td>Bundled Keycloak or an existing OIDC provider</td>
+<td>Bundled Keycloak or your existing Keycloak</td>
+<td>Bundled Keycloak or your existing Keycloak</td>
 </tr>
 <tr>
 <td>Scheduling</td>
@@ -95,7 +95,7 @@
 <li>DNS and TLS arrangements for the portal and identity endpoints.</li>
 <li>Network reachability from the runner and authorised users to the OKE API endpoints they will use.</li>
 <li>An approved image delivery path and the release-specific Helm assets.</li>
-<li>An identity provider configuration and admin role mapping.</li>
+<li>Bundled Keycloak, or a realm in your existing Keycloak, and the admin role assignment.</li>
 </ul>
 <p>The installation includes PostgreSQL and identity services when configured in the supplied chart. Budget for these services, their persistent storage, any load balancer and your OKE resources. The software subscription does not pay your Oracle Cloud bill.</p>
 <h2 id="oke-versions-shapes-and-images">OKE versions, shapes and images<a class="heading-link" href="#oke-versions-shapes-and-images" aria-label="Link to OKE versions, shapes and images">#</a></h2>

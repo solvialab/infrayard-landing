@@ -11,14 +11,14 @@ Infrayard is installed in a customer-managed Kubernetes environment. It has no r
 | PostgreSQL | Cluster and job records, users, configuration, templates, requests and audit history |
 | Terraform runner | Isolated execution for provisioning, scale, upgrade and destroy jobs |
 | OCI Object Storage | Terraform state for Infrayard-managed clusters |
-| Identity provider | OIDC login, user identity and role claims; bundled Keycloak or an existing provider |
+| Keycloak | Login, user identity and roles; bundled with Infrayard or your existing Keycloak |
 | Oracle Cloud / OKE | The actual cloud resources and managed Kubernetes service |
 
 The portal and services are delivered as released container images with Helm deployment assets. Customers pull approved images into their own environment or use an agreed internal registry mirror.
 
 ## Request flow
 
-1. The user signs in through the configured identity provider.
+1. The user signs in through Keycloak.
 2. The portal displays the templates, cluster options and limits available to that user.
 3. The API validates the request, compatibility and applicable configuration.
 4. A Terraform job executes with the installation's OCI permissions and cluster state.
@@ -34,7 +34,7 @@ Resources created by Infrayard are managed by their cluster's Terraform state. M
 
 ## Connectivity and external dependencies
 
-The installation must reach the required OCI APIs, configured identity provider and OKE API endpoints. Initial image delivery also requires registry access, or an agreed mirror. Optional SMTP notifications use your configured email service.
+The installation must reach the required OCI APIs, Keycloak and OKE API endpoints. Initial image delivery also requires registry access, or an agreed mirror. Optional SMTP notifications use your configured email service.
 
 Running the control plane in your tenancy does not remove these dependencies or automatically provide a disconnected deployment. Review the required routes and any delivery constraints during onboarding.
 

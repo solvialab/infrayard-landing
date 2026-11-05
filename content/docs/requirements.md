@@ -10,7 +10,7 @@ Use this page to assess deployment fit before committing to an installation. Exa
 | Deployment | Customer Helm chart and OKE values | The same chart with k3s values |
 | Ingress | ingress-nginx with an OCI Load Balancer, configured separately | Traefik, supplied by k3s |
 | Storage | OCI Block Volume storage class (`oci-bv`) | Local-path storage |
-| Identity | Bundled Keycloak or an existing OIDC provider | Bundled Keycloak or an existing OIDC provider |
+| Identity | Bundled Keycloak or your existing Keycloak | Bundled Keycloak or your existing Keycloak |
 | Scheduling | Dedicated worker nodes | Single-node scheduling settings in the supplied values |
 
 An existing supported Kubernetes host can run the platform; this does not imply that every Kubernetes distribution or version has been validated. Confirm the intended distribution and release during onboarding.
@@ -24,7 +24,7 @@ An existing supported Kubernetes host can run the platform; this does not imply 
 - DNS and TLS arrangements for the portal and identity endpoints.
 - Network reachability from the runner and authorised users to the OKE API endpoints they will use.
 - An approved image delivery path and the release-specific Helm assets.
-- An identity provider configuration and admin role mapping.
+- Bundled Keycloak, or a realm in your existing Keycloak, and the admin role assignment.
 
 The installation includes PostgreSQL and identity services when configured in the supplied chart. Budget for these services, their persistent storage, any load balancer and your OKE resources. The software subscription does not pay your Oracle Cloud bill.
 

@@ -74,8 +74,8 @@
 <td>Terraform state for Infrayard-managed clusters</td>
 </tr>
 <tr>
-<td>Identity provider</td>
-<td>OIDC login, user identity and role claims; bundled Keycloak or an existing provider</td>
+<td>Keycloak</td>
+<td>Login, user identity and roles; bundled with Infrayard or your existing Keycloak</td>
 </tr>
 <tr>
 <td>Oracle Cloud / OKE</td>
@@ -85,7 +85,7 @@
 <p>The portal and services are delivered as released container images with Helm deployment assets. Customers pull approved images into their own environment or use an agreed internal registry mirror.</p>
 <h2 id="request-flow">Request flow<a class="heading-link" href="#request-flow" aria-label="Link to Request flow">#</a></h2>
 <ol>
-<li>The user signs in through the configured identity provider.</li>
+<li>The user signs in through Keycloak.</li>
 <li>The portal displays the templates, cluster options and limits available to that user.</li>
 <li>The API validates the request, compatibility and applicable configuration.</li>
 <li>A Terraform job executes with the installation&#39;s OCI permissions and cluster state.</li>
@@ -96,7 +96,7 @@
 <p>PostgreSQL stores platform metadata. Terraform state is stored in OCI Object Storage. Both are part of your operating and recovery responsibilities; backing up only the portal does not preserve the full platform state.</p>
 <p>Resources created by Infrayard are managed by their cluster&#39;s Terraform state. Manual edits to those managed resources can be overwritten by a subsequent apply. Supplied existing network resources are referenced according to the <a href="/docs/networking/#bringing-your-own-network">BYON ownership rules</a>.</p>
 <h2 id="connectivity-and-external-dependencies">Connectivity and external dependencies<a class="heading-link" href="#connectivity-and-external-dependencies" aria-label="Link to Connectivity and external dependencies">#</a></h2>
-<p>The installation must reach the required OCI APIs, configured identity provider and OKE API endpoints. Initial image delivery also requires registry access, or an agreed mirror. Optional SMTP notifications use your configured email service.</p>
+<p>The installation must reach the required OCI APIs, Keycloak and OKE API endpoints. Initial image delivery also requires registry access, or an agreed mirror. Optional SMTP notifications use your configured email service.</p>
 <p>Running the control plane in your tenancy does not remove these dependencies or automatically provide a disconnected deployment. Review the required routes and any delivery constraints during onboarding.</p>
 <h2 id="operating-responsibility">Operating responsibility<a class="heading-link" href="#operating-responsibility" aria-label="Link to Operating responsibility">#</a></h2>
 <p>Your team operates the customer installation, its database, secrets, storage, network and workloads. Oracle provides the contracted OCI and OKE services. Solvia Lab supplies the Infrayard release, documentation and support defined in your agreement. Deployment assistance and additional operational support can be scoped in Enterprise.</p>

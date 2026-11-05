@@ -2,7 +2,7 @@
 
 Administrators configure the approved options and operating boundaries available to each team. Review [security and access](/docs/security/) for the identity and privilege model.
 
-Admin access is granted via your identity provider through role assignment — see customer integration docs (gated). Admins have a separate panel accessible from the top nav.
+Admin access is granted by a Keycloak role assignment (realm role, client role or group) — see customer integration docs (gated). Admins have a separate panel accessible from the top nav.
 
 ## All clusters
 

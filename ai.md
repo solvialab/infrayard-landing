@@ -20,7 +20,7 @@ Subscriptions are arranged directly with Solvia Lab. Commercial production right
 
 ## Customer boundary
 
-OCI credentials, state and operational records stay in the customer's managed environment. OCI APIs, the configured identity provider, required OKE endpoints, image delivery and optional SMTP remain dependencies. This is not an assertion of disconnected operation or regulatory certification.
+OCI credentials, state and operational records stay in the customer's managed environment. OCI APIs, Keycloak, required OKE endpoints, image delivery and optional SMTP remain dependencies. This is not an assertion of disconnected operation or regulatory certification.
 
 ## Roadmap
 

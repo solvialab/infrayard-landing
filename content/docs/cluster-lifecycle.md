@@ -4,7 +4,7 @@ These workflows apply to supported OKE clusters managed through Infrayard. Check
 
 ## Signing in
 
-Infrayard uses your organisation's existing identity provider (Keycloak, Azure AD, Okta, Google Workspace, or any OIDC-compliant IdP). Click **Log In** — you are redirected to your IdP's login page and returned to the portal after authentication. No separate Infrayard account is needed.
+Infrayard signs you in through Keycloak — the bundled instance or your organisation's existing Keycloak. Click **Log In** — you are redirected to the Keycloak login page and returned to the portal after authentication. No separate Infrayard account is needed.
 
 ## Deploying a cluster
 

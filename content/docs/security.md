@@ -4,9 +4,9 @@ Infrayard runs in the customer environment. OCI credentials, Terraform state, pl
 
 ## Identity and roles
 
-Authentication uses OpenID Connect with the Authorization Code flow and PKCE. The browser does not store a confidential OIDC client secret. Use bundled Keycloak or connect an existing OIDC-compatible provider, such as Microsoft Entra ID, Okta or Google Workspace.
+Authentication uses OpenID Connect with the Authorization Code flow and PKCE. The browser does not store a confidential OIDC client secret. Sign-in is handled by Keycloak: either the Keycloak bundled with Infrayard, or a realm in your organisation's existing Keycloak.
 
-Users are created on first login from their identity claim. An admin role grants access to the administration panel. Template role requirements can restrict which approved configurations a user sees. Role claim mapping is configured for your identity provider during onboarding.
+Users are created on first login from their identity claim. An admin role grants access to the administration panel. Template role requirements can restrict which approved configurations a user sees. Roles come from Keycloak realm roles, client roles or groups; an optional access role limits who can sign in at all.
 
 Changing template visibility or resource limits is not a substitute for reviewing OCI permissions and Kubernetes access rights. Review each layer against your organisation's access policy.
 

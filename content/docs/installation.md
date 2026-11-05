@@ -15,7 +15,7 @@ See the [requirements comparison](/docs/requirements/#deployment-options). An OC
 2. Establish the OCI service identity and release-specific IAM policies.
 3. Prepare the OCI Object Storage state backend.
 4. Confirm host capacity, ingress, persistent storage, DNS and TLS.
-5. Agree an OIDC provider and configure the required endpoints and role claims.
+5. Choose the bundled Keycloak or a realm in your existing Keycloak, and agree the admin role.
 6. Check runner access to OCI services and OKE API endpoints, plus the intended user access path.
 7. Receive registry credentials and the pinned release, or arrange an approved mirror.
 
