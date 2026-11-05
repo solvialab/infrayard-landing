@@ -16,6 +16,8 @@ const rootFiles = entries.filter(name => /^(?:index\.html|404\.html|robots\.txt|
 for (const name of [...rootFiles, '.well-known', 'assets', 'docs', 'resources', 'legal', 'demo']) {
   await cp(resolve(root, name), resolve(output, name), { recursive: true, dereference: false, filter: async path => {
     if ((await lstat(path)).isSymbolicLink()) throw new Error(`Public export must not contain symlinks: ${path}`);
+    // Source recordings for scripts/mix-demo.py stay local; only the mixed demo video is published.
+    if (/[\\/]assets[\\/]final_hq[^\\/]*\.mp4$/.test(path)) return false;
     return true;
   } });
 }

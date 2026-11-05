@@ -39,6 +39,9 @@ Pripravené 17. októbra 2026, doplnené 5. novembra 2026. Search Console vidí 
 - `404.html`: vlastná stránka „Page not found“ s odkazmi, `noindex`, mimo sitemap. Vercel ju vráti so stavom 404.
 - `/.well-known/security.txt` (RFC 9116): kontakt `support@infrayard.eu`, platnosť rok od `site.updated`. Kontrola zlyhá, keď platnosť vyprší; stačí aktualizovať `site.updated` a znovu zostaviť.
 - **IndexNow** (Bing a ďalšie vyhľadávače; z Bingu čerpajú aj ChatGPT search a Copilot): kľúč v `content/seo.mjs` → `indexNowKey`, súbor `/<kľúč>.txt` vytvára build. Po každom nasadení s podstatnou zmenou spusti `npm run indexnow` (všetky URL zo sitemap) alebo `npm run indexnow -- /docs/` (iba časť). Google IndexNow nepoužíva, číta sitemap.
+- `demo.publishedAt` je `2026-10-17` (prvé verejné nasadenie videa s hudbou, commit 3555ead). `/demo/` má teraz VideoObject a sitemap dátum publikovania; Search Console predtým hlásil „Video isn't on a watch page“.
+- Pôvodné nahrávky `assets/final_hq*.mp4` zostávajú v repozitári pre `scripts/mix-demo.py`, ale export ich už nepublikuje. Staré `docs/readme.md` a `docs/features.md` majú hlavičku `X-Robots-Tag: noindex`.
+- Search Console: používaj službu `https://www.infrayard.eu/`. Služba `https://infrayard.eu/` ukazuje iba presmerované adresy, preto má 0 indexovaných stránok.
 - Presmerovanie `infrayard.eu` → `www.infrayard.eu` má byť trvalé (**308**), nie dočasné (307). Nastavuje sa vo Vercel → Project → Settings → Domains pri `infrayard.eu`.
 
 ## 1. Vlastníctvo webu v Search Console

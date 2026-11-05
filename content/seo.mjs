@@ -10,7 +10,7 @@ export const demo = {
   thumbnailPath: '/assets/product-poster.jpg',
   duration: 'PT2M59.267S',
   seconds: 179,
-  publishedAt: null,
+  publishedAt: '2026-10-17', // first public deploy of the music version (commit 3555ead)
 };
 
 export const docsTitles = {
