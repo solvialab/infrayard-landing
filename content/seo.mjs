@@ -37,19 +37,19 @@ export const docsTitles = {
 export const docsDescriptions = {
   '': "Infrayard documentation: requirements, architecture, OCI setup, installation on OKE or k3s, Keycloak sign-in, cluster lifecycle, operations and support.",
   architecture: "How Infrayard works: portal, API, Terraform runner, PostgreSQL and Keycloak run in your environment and create OKE clusters in your own OCI tenancy.",
-  requirements: "What Infrayard needs: a Kubernetes cluster or Linux VM, an OCI user and policies, network ports, Keycloak, supported OKE tiers and the product scope.",
+  requirements: "What Infrayard needs: an OKE cluster or a k3s VM, an OCI user and policies, network ports, Keycloak, supported OKE tiers and the product scope.",
   security: "Infrayard security model: Keycloak roles, the OCI service user and API key, Kubernetes access rights, SSH access, audit, approvals and network exposure.",
   networking: "OKE networking with Infrayard: Kubernetes API endpoint modes, CIDR allowlists, existing VCNs, subnets and compartments, and the anchor compartment.",
-  installation: "Install Infrayard with Helm on an OKE cluster for production or on k3s on a single VM for an evaluation. Compare the paths and see what you need.",
+  installation: "Install Infrayard with Helm on OKE for production or on a k3s VM for an evaluation: what the onboarding e-mail contains, the steps and what to prepare.",
   'oci-setup': "Prepare OCI for Infrayard step by step: service user, group, IAM policies, API key, Terraform state bucket and S3 key, in the Console or with the OCI CLI.",
   'install-kubernetes': "Install Infrayard with Helm on OKE, k3s or another Kubernetes cluster: ingress, cert-manager, registry login, secrets, values files, DNS and first sign-in.",
   keycloak: "Connect Infrayard to your existing Keycloak: Helm values, client import, roles or groups, a private CA, an internal cluster address and sign-in troubleshooting.",
   'private-access': "Keep the Infrayard portal off the internet: a private address or a public address with an allowlist, certificates, DNS, Keycloak and OKE API endpoints.",
   'cluster-lifecycle': "Create, scale, upgrade and destroy OKE clusters in Infrayard: deployment, Basic and Enhanced tiers, Kubernetes upgrades, Activity, expiry and cleanup.",
   administration: "Administer Infrayard: all clusters, users and limits, configuration, cluster templates, requests and approvals, the audit log and cost estimates.",
-  operations: "Operate Infrayard: responsibilities, backup and restore of PostgreSQL and Terraform state, upgrades, PostgreSQL and Keycloak versions, and offboarding.",
+  operations: "Operate Infrayard: responsibilities, backup and restore of PostgreSQL and Terraform state, upgrades, PostgreSQL and Keycloak versions, uninstall and offboarding.",
   troubleshooting: "Fix Infrayard problems: installation and registry errors, OCI authentication, Keycloak sign-in and roles, missing versions, networks, nodes and kubectl access.",
-  subscription: "Infrayard pricing: Business monthly or annual plans, the founding customer discount, Enterprise, the optional paid evaluation, cancellation and licensing.",
+  subscription: "Infrayard pricing: what each plan includes, Business monthly or annual, the founding discount, Enterprise, the optional paid evaluation and licensing.",
   releases: "Capabilities in the current Infrayard release, how the Helm chart and images share one version, and planned roadmap work kept separate.",
 };
 

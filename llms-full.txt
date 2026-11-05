@@ -38,14 +38,14 @@ AI assistance, advanced cost and policy insights, an access agent, multicloud go
 - [Requirements and compatibility](https://www.infrayard.eu/docs/requirements/): Hosts, OCI, network ports, identity, OKE tiers and product scope.
 - [Security and access](https://www.infrayard.eu/docs/security/): Keycloak roles, OCI credentials, kubeconfig rights, SSH keys and audit records.
 - [Networking and existing infrastructure](https://www.infrayard.eu/docs/networking/): Kubernetes API access modes, existing VCNs, subnets and compartments, and the anchor compartment.
-- [Installation](https://www.infrayard.eu/docs/installation/): Choose between OKE and k3s on a single VM, and what you need for each.
+- [Installation](https://www.infrayard.eu/docs/installation/): What the onboarding e-mail contains, OKE or k3s on a single VM, and the steps to the first cluster.
 - [Prepare OCI](https://www.infrayard.eu/docs/oci-setup/): Create the OCI user, policies, API key, Terraform state bucket and S3 key.
 - [Install on Kubernetes](https://www.infrayard.eu/docs/install-kubernetes/): Install Infrayard with Helm on an existing OKE, k3s or other Kubernetes cluster.
 - [Use your own Keycloak](https://www.infrayard.eu/docs/keycloak/): Sign users in through a realm of your existing Keycloak, with roles or groups.
 - [Private access (VPN only)](https://www.infrayard.eu/docs/private-access/): Make the portal reachable only from your VPN or company network.
 - [Cluster lifecycle](https://www.infrayard.eu/docs/cluster-lifecycle/): Create, access, scale, upgrade and clean up OKE clusters.
 - [Administration](https://www.infrayard.eu/docs/administration/): Configure templates, roles, resource limits, approvals, cost estimates and audit records.
-- [Operations, upgrades and recovery](https://www.infrayard.eu/docs/operations/): Upgrade Infrayard, back up and restore the database, and plan responsibilities.
+- [Operations, upgrades and recovery](https://www.infrayard.eu/docs/operations/): Upgrade, back up, restore and uninstall Infrayard, and plan responsibilities.
 - [Troubleshooting and support](https://www.infrayard.eu/docs/troubleshooting/): Fix installation, sign-in, network and cluster operation problems.
 - [Subscription, billing and licensing](https://www.infrayard.eu/docs/subscription/): Monthly and annual Business plans, founding pricing, evaluation and commercial access.
 - [Releases and roadmap](https://www.infrayard.eu/docs/releases/): Available capabilities, versioning and separately identified roadmap items.
@@ -448,26 +448,34 @@ Infrayard runs on a Kubernetes cluster in your environment: an OKE cluster for p
 
 Both paths run one replica of each service, and Kubernetes restarts a service that fails. Neither is a high-availability setup for the portal itself. Your OKE clusters keep running if Infrayard is down.
 
-### Steps
-
-1. **[Prepare OCI](https://www.infrayard.eu/docs/oci-setup/)**: the service user, policies, API key, state bucket and S3 key. Needed for every path.
-2. **Install** with [the Kubernetes guide](https://www.infrayard.eu/docs/install-kubernetes/).
-3. **Optional:** connect [your own Keycloak](https://www.infrayard.eu/docs/keycloak/).
-4. **Recommended:** make the portal reachable [only from your VPN](https://www.infrayard.eu/docs/private-access/).
-5. **Verify** with a test cluster, as described at the end of the guide.
-6. Plan [upgrades and backups](https://www.infrayard.eu/docs/operations/).
-
 ### What you receive
 
-With your subscription or evaluation you get by e-mail:
+When your order is accepted and the first invoice is paid, or when your evaluation starts, your technical contact receives an onboarding e-mail with:
 
-- **Registry access**: a user name and token for the private registry that holds the Helm chart and the images.
-- **Addresses** of the chart (`oci://…/charts/infrayard`) and the images (`…/api`, `…/frontend`).
-- **The version** to install, for example `1.4.0`. Chart and images share it.
+| Item | Value |
+| --- | --- |
+| Registry user and token | Personal to your organisation; the token can only pull |
+| Registry | `registry.gitlab.com` |
+| Helm chart | `oci://registry.gitlab.com/solvialab/infrayard/charts/infrayard` |
+| Images | `registry.gitlab.com/solvialab/infrayard/api` and `registry.gitlab.com/solvialab/infrayard/frontend` |
+| Version to install | A number such as `1.4.0`; chart and images share it |
+| Support | [support@infrayard.eu](mailto:support@infrayard.eu) |
 
-Nothing is downloaded from a public website; everything comes from this registry.
+The guides on this site are written so that your team can install Infrayard with these values on its own. Nothing is downloaded from a public website: the chart and the images come only from this registry.
 
-The token is personal to your organisation. Store it in your secret manager and request a new one from [support](mailto:support@infrayard.eu) if it leaks.
+The token reads the registry and nothing else, for the term of your subscription or evaluation. Store it in your secret manager and ask [support](mailto:support@infrayard.eu) for a new one if it leaks.
+
+### From the e-mail to the first cluster
+
+1. **[Prepare OCI](https://www.infrayard.eu/docs/oci-setup/)**, about 20 minutes: the service user, policies, API key, state bucket and S3 key. Needed for every path.
+2. **Prepare the host:** an OKE cluster you already run, or a VM with k3s from the [k3s quick start](https://docs.k3s.io/quick-start).
+3. **[Install with Helm](https://www.infrayard.eu/docs/install-kubernetes/)**, about 30 minutes, including DNS and the certificate.
+4. **Configure and test:** sign in, set up **Admin → Configuration** and create a test cluster, as in [step 7 of the guide](https://www.infrayard.eu/docs/install-kubernetes/#7-sign-in). The test cluster proves the OCI policies, the state bucket and the network path to the cluster API.
+5. **Give people access:** [add users](https://www.infrayard.eu/docs/install-kubernetes/#add-users) in the bundled Keycloak, or connect [your own Keycloak](https://www.infrayard.eu/docs/keycloak/).
+6. **Recommended:** make the portal reachable [only from your VPN](https://www.infrayard.eu/docs/private-access/).
+7. **Before production use:** schedule the daily [database backup](https://www.infrayard.eu/docs/operations/#backups) and read how to [upgrade](https://www.infrayard.eu/docs/operations/#upgrade-infrayard).
+
+If a step fails, look it up in [troubleshooting](https://www.infrayard.eu/docs/troubleshooting/#installation). If that does not help, write to [support](https://www.infrayard.eu/docs/troubleshooting/#contact-support) with the details listed there.
 
 ### What you prepare
 
@@ -481,8 +489,6 @@ The token is personal to your organisation. Store it in your secret manager and 
 | Network paths | Users → portal (443); Infrayard → OCI APIs, registry, cluster APIs (6443) |
 
 Details for each item are in [requirements](https://www.infrayard.eu/docs/requirements/).
-
-For errors during installation, see [troubleshooting](https://www.infrayard.eu/docs/troubleshooting/#installation).
 
 
 ## Prepare OCI
@@ -916,7 +922,7 @@ Then, in **Admin → Configuration**:
    oci network nat-gateway list -c <compartment of that VCN> --query 'data[]."nat-ip"'
    ```
 
-   On k3s or a VM with a public IP, it is that IP. The setting applies to clusters created afterwards.
+   On a k3s VM with a public IP, it is that IP. The setting applies to clusters created afterwards.
 4. Review the default limits and the templates.
 
 Create a small test cluster and watch the Terraform log. It ends with `OK Cluster ready for kubeconfig downloads`; if it reports `Cluster API endpoint … not reachable from Infrayard` instead, fix the API access from step 3. When the cluster reaches **Running**, download the kubeconfig and run `kubectl get nodes`. Destroy the test cluster afterwards. This run proves the OCI policies, the state bucket and the network path to the cluster API; a successful `helm install` alone does not. See [cluster lifecycle](https://www.infrayard.eu/docs/cluster-lifecycle/).
@@ -1396,13 +1402,13 @@ Review the rates and included components against your contract. Networking, load
 
 Canonical page: https://www.infrayard.eu/docs/operations/
 
-You operate the Infrayard installation; Solvia Lab supplies releases, documentation and support. This page covers upgrades, backups and restores for both installation paths, with the commands to run.
+You operate the Infrayard installation; Solvia Lab supplies releases, documentation and support. This page covers upgrades, backups, restores and uninstalling, with the commands to run. They are the same on OKE and k3s.
 
 ### Responsibilities
 
 | Area | Who |
 | --- | --- |
-| Host (Kubernetes or VM), ingress, TLS, storage, network | You |
+| Host (Kubernetes cluster or k3s VM), ingress, TLS, storage, network | You |
 | OCI user, policies and keys | You |
 | Backups of the database, secrets and Terraform state | You |
 | Applications on the OKE clusters | You |
@@ -1414,7 +1420,7 @@ You operate the Infrayard installation; Solvia Lab supplies releases, documentat
 | --- | --- | --- |
 | PostgreSQL database `infrayard` | Clusters, jobs, users, configuration, templates, requests, audit log, SSH keys of the worker nodes and, with the bundled Keycloak, all Keycloak users and settings | [Database backup](#backups), daily |
 | Terraform state bucket | The state of every managed cluster | Object versioning on the bucket; optionally a copy to another region |
-| Configuration | Kubernetes: `values.yaml` and `secrets.yaml`. VM: the `~/infrayard` directory with `.env` | Your secret manager or configuration repository |
+| Configuration | `values.yaml` and `secrets.yaml` | Your secret manager (`secrets.yaml`) and configuration repository (`values.yaml`) |
 | OCI API key | `oci_api_key.pem` | Your secret manager |
 
 Database and state belong together: a restored database must match the clusters that actually exist in OCI. Treat backups as sensitive; they contain SSH private keys and, with the bundled Keycloak, password hashes.
@@ -1640,6 +1646,20 @@ Infrayard is commercial software deployed into the customer environment. Busines
 
 Annual payment saves €6,000 compared with twelve monthly payments. Oracle Cloud usage is billed separately by Oracle. Any applicable taxes and the contracted deployment scope are specified in your quote or invoice.
 
+### What you receive
+
+When the order is accepted and the first invoice is paid, your technical contact receives the onboarding e-mail: the registry user and token, the chart and image addresses, the version to install and the support address. [Installation](https://www.infrayard.eu/docs/installation/#what-you-receive) lists its contents. With it, your team installs Infrayard on its own with the public guides; they plan about an hour, including the OCI preparation.
+
+| | Business | Enterprise | Guided evaluation |
+| --- | --- | --- | --- |
+| Use | Production, for the agreed installation scope | Agreed in the proposal | Non-production, 30 days |
+| Registry access to the Helm chart and images | For the subscription term | For the agreed term | For the evaluation period |
+| New releases | Included | Included | Included during the evaluation |
+| Product features | All available features | All available features | All available features |
+| Installation | By your team with the public guides | Deployment and rollout assistance as agreed | A guided deployment session |
+| Onboarding | Onboarding workshop | As agreed | Agreed scope and success criteria |
+| Support | E-mail, 48-hour response in business hours | Agreed response times and escalation | E-mail in business hours |
+
 ### What your subscription covers
 
 Business includes the commercial production subscription for the agreed installation scope, released images and deployment assets, core OKE lifecycle workflows, templates, role-based access, resource limits, protected requests, cost estimates, execution logs and activity history. It includes an onboarding workshop and email support.
@@ -1673,7 +1693,7 @@ A paid evaluation is optional. After a demo and prerequisite review, a customer 
 
 The optional guided evaluation costs €1,500 for 30 days in your own tenancy, for non-production validation. Agree scope, success criteria and environment readiness first. The window starts when the agreed prerequisites are ready and the evaluation is activated.
 
-The evaluation includes a guided deployment session, evaluation instructions, time-limited registry access and business-hours email support. Oracle usage remains payable to Oracle. Evaluation access ends with the agreed evaluation period; production use requires a production subscription.
+The evaluation includes a guided deployment session, time-limited registry access, the same public installation guides and business-hours email support. A single VM with k3s in your tenancy is enough; see [installation](https://www.infrayard.eu/docs/installation/). Oracle usage remains payable to Oracle. Evaluation access ends with the agreed evaluation period; production use requires a production subscription.
 
 The full evaluation fee is credited once against your first production invoice if the production order is accepted within 30 days after the evaluation ends. This applies to monthly or annual Business, qualifying Founding Business or an agreed Enterprise order. The fee is not described as a refundable deposit. [Discuss an evaluation](https://www.infrayard.eu/?enquiry=evaluation#demo).
 
@@ -1724,7 +1744,7 @@ Operational behaviour depends on cluster tier and network design; see [requireme
 
 Each release has a version number such as `1.4.0`. The Helm chart and the images of a release share that version and are published together in the private registry you receive access to; chart `1.4.0` runs images `1.4.0`.
 
-Release notes list changes and any required upgrade steps. Follow [Upgrade Infrayard](https://www.infrayard.eu/docs/operations/#upgrade-infrayard) and run `helm list -n infrayard` to see which version you run. Source code and build pipelines are not needed to install or operate Infrayard.
+Each release is announced by e-mail to your technical contact, with release notes that list the changes and any required upgrade steps. Follow [Upgrade Infrayard](https://www.infrayard.eu/docs/operations/#upgrade-infrayard) and run `helm list -n infrayard` to see which version you run. Source code and build pipelines are not needed to install or operate Infrayard.
 
 ### Planned work
 

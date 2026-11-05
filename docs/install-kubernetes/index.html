@@ -231,7 +231,7 @@ kubectl get svc -n kube-system traefik    # k3s
 <li><p>Set <strong>Kubernetes API Access</strong> under <strong>OCI Settings</strong>. Infrayard calls the API of every new cluster on port 6443 to issue kubeconfigs, so it needs a network path to it. With the box off (the default), clusters get a private endpoint. Infrayard creates a new VCN for each cluster unless you supply one, so it reaches a private endpoint only if its own network is routed into that VCN; without such a route the cluster still deploys, but the kubeconfig download fails. To use a public endpoint instead, turn on <strong>Public endpoint restricted by CIDR allowlist</strong>, enter your VPN or office ranges and Infrayard&#39;s own outbound address in <strong>Allowed API CIDRs</strong>, and click <strong>Save OCI settings</strong>. On OKE with private worker nodes, that address is the public IP of the NAT gateway in the VCN of the cluster that runs Infrayard:</p>
 <pre><code class="language-bash">oci network nat-gateway list -c &lt;compartment of that VCN&gt; --query &#39;data[].&quot;nat-ip&quot;&#39;
 </code></pre>
-<p>On k3s or a VM with a public IP, it is that IP. The setting applies to clusters created afterwards.</p>
+<p>On a k3s VM with a public IP, it is that IP. The setting applies to clusters created afterwards.</p>
 </li>
 <li><p>Review the default limits and the templates.</p>
 </li>

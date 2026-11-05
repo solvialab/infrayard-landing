@@ -247,7 +247,7 @@ Then, in **Admin → Configuration**:
    oci network nat-gateway list -c <compartment of that VCN> --query 'data[]."nat-ip"'
    ```
 
-   On k3s or a VM with a public IP, it is that IP. The setting applies to clusters created afterwards.
+   On a k3s VM with a public IP, it is that IP. The setting applies to clusters created afterwards.
 4. Review the default limits and the templates.
 
 Create a small test cluster and watch the Terraform log. It ends with `OK Cluster ready for kubeconfig downloads`; if it reports `Cluster API endpoint … not reachable from Infrayard` instead, fix the API access from step 3. When the cluster reaches **Running**, download the kubeconfig and run `kubectl get nodes`. Destroy the test cluster afterwards. This run proves the OCI policies, the state bucket and the network path to the cluster API; a successful `helm install` alone does not. See [cluster lifecycle](/docs/cluster-lifecycle/).

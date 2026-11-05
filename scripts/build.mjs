@@ -66,6 +66,20 @@ Infrayard is commercial software deployed into the customer environment. Busines
 
 Annual payment saves ${money(pricing.business.monthly * 12 - pricing.business.annual)} compared with twelve monthly payments. Oracle Cloud usage is billed separately by Oracle. Any applicable taxes and the contracted deployment scope are specified in your quote or invoice.
 
+## What you receive
+
+When the order is accepted and the first invoice is paid, your technical contact receives the onboarding e-mail: the registry user and token, the chart and image addresses, the version to install and the support address. [Installation](/docs/installation/#what-you-receive) lists its contents. With it, your team installs Infrayard on its own with the public guides; they plan about an hour, including the OCI preparation.
+
+| | Business | Enterprise | Guided evaluation |
+| --- | --- | --- | --- |
+| Use | Production, for the agreed installation scope | Agreed in the proposal | Non-production, ${pricing.evaluation.days} days |
+| Registry access to the Helm chart and images | For the subscription term | For the agreed term | For the evaluation period |
+| New releases | Included | Included | Included during the evaluation |
+| Product features | All available features | All available features | All available features |
+| Installation | By your team with the public guides | Deployment and rollout assistance as agreed | A guided deployment session |
+| Onboarding | Onboarding workshop | As agreed | Agreed scope and success criteria |
+| Support | E-mail, 48-hour response in business hours | Agreed response times and escalation | E-mail in business hours |
+
 ## What your subscription covers
 
 Business includes the commercial production subscription for the agreed installation scope, released images and deployment assets, core OKE lifecycle workflows, templates, role-based access, resource limits, protected requests, cost estimates, execution logs and activity history. It includes an onboarding workshop and email support.
@@ -99,7 +113,7 @@ A paid evaluation is optional. After a demo and prerequisite review, a customer 
 
 The optional guided evaluation costs ${money(pricing.evaluation.fee)} for ${pricing.evaluation.days} days in your own tenancy, for non-production validation. Agree scope, success criteria and environment readiness first. The window starts when the agreed prerequisites are ready and the evaluation is activated.
 
-The evaluation includes a guided deployment session, evaluation instructions, time-limited registry access and business-hours email support. Oracle usage remains payable to Oracle. Evaluation access ends with the agreed evaluation period; production use requires a production subscription.
+The evaluation includes a guided deployment session, time-limited registry access, the same public installation guides and business-hours email support. A single VM with k3s in your tenancy is enough; see [installation](/docs/installation/). Oracle usage remains payable to Oracle. Evaluation access ends with the agreed evaluation period; production use requires a production subscription.
 
 The full evaluation fee is credited once against your first production invoice if the production order is accepted within ${pricing.evaluation.conversionDays} days after the evaluation ends. This applies to monthly or annual Business, qualifying Founding Business or an agreed Enterprise order. The fee is not described as a refundable deposit. [Discuss an evaluation](/?enquiry=evaluation#demo).
 

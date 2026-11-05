@@ -1,12 +1,12 @@
 # Operations, upgrades and recovery
 
-You operate the Infrayard installation; Solvia Lab supplies releases, documentation and support. This page covers upgrades, backups and restores for both installation paths, with the commands to run.
+You operate the Infrayard installation; Solvia Lab supplies releases, documentation and support. This page covers upgrades, backups, restores and uninstalling, with the commands to run. They are the same on OKE and k3s.
 
 ## Responsibilities
 
 | Area | Who |
 | --- | --- |
-| Host (Kubernetes or VM), ingress, TLS, storage, network | You |
+| Host (Kubernetes cluster or k3s VM), ingress, TLS, storage, network | You |
 | OCI user, policies and keys | You |
 | Backups of the database, secrets and Terraform state | You |
 | Applications on the OKE clusters | You |
@@ -18,7 +18,7 @@ You operate the Infrayard installation; Solvia Lab supplies releases, documentat
 | --- | --- | --- |
 | PostgreSQL database `infrayard` | Clusters, jobs, users, configuration, templates, requests, audit log, SSH keys of the worker nodes and, with the bundled Keycloak, all Keycloak users and settings | [Database backup](#backups), daily |
 | Terraform state bucket | The state of every managed cluster | Object versioning on the bucket; optionally a copy to another region |
-| Configuration | Kubernetes: `values.yaml` and `secrets.yaml`. VM: the `~/infrayard` directory with `.env` | Your secret manager or configuration repository |
+| Configuration | `values.yaml` and `secrets.yaml` | Your secret manager (`secrets.yaml`) and configuration repository (`values.yaml`) |
 | OCI API key | `oci_api_key.pem` | Your secret manager |
 
 Database and state belong together: a restored database must match the clusters that actually exist in OCI. Treat backups as sensitive; they contain SSH private keys and, with the bundled Keycloak, password hashes.

@@ -22,7 +22,7 @@ Operational behaviour depends on cluster tier and network design; see [requireme
 
 Each release has a version number such as `1.4.0`. The Helm chart and the images of a release share that version and are published together in the private registry you receive access to; chart `1.4.0` runs images `1.4.0`.
 
-Release notes list changes and any required upgrade steps. Follow [Upgrade Infrayard](/docs/operations/#upgrade-infrayard) and run `helm list -n infrayard` to see which version you run. Source code and build pipelines are not needed to install or operate Infrayard.
+Each release is announced by e-mail to your technical contact, with release notes that list the changes and any required upgrade steps. Follow [Upgrade Infrayard](/docs/operations/#upgrade-infrayard) and run `helm list -n infrayard` to see which version you run. Source code and build pipelines are not needed to install or operate Infrayard.
 
 ## Planned work
 

@@ -7,7 +7,7 @@ Pripravené 17. októbra 2026, doplnené 5. novembra 2026. Search Console vidí 
 - Jednotné, samostatné titulky a popisy pre landing page, docs, články, právne stránky a demo.
 - Kanonické URL na `https://www.infrayard.eu/`, údaje pre zdieľanie, favicon a jazyk stránky.
 - Prepojené entity WebSite, Organization, WebPage, články a breadcrumbs. Komerčné predplatné je označené ako Service s reálnymi ponukami. Nevkladáme vymyslené recenzie ani hviezdičky.
-- `sitemap.xml` pre 23 kanonických HTML stránok, s obrázkami a video záznamom pri `/demo/`. Samostatný video sitemap netreba posielať.
+- `sitemap.xml` pre 27 kanonických HTML stránok, s obrázkami a video záznamom pri `/demo/`. Samostatný video sitemap netreba posielať.
 - `robots.txt` povoľuje verejný obsah všetkým crawlerom vrátane vyhľadávacích a AI botov; pracovné priečinky sú vylúčené.
 - `ai.md` obsahuje aktuálne produktové fakty; `llms.txt` stručný prehľad a odkazy; `llms-full.txt` aj celú verejnú dokumentáciu.
 - Pôvodný overovací súbor `googlebfff5ec03fea908c.html` zostal zachovaný.
@@ -43,6 +43,23 @@ Pripravené 17. októbra 2026, doplnené 5. novembra 2026. Search Console vidí 
 - Pôvodné nahrávky `assets/final_hq*.mp4` zostávajú v repozitári pre `scripts/mix-demo.py`, ale export ich už nepublikuje. Staré `docs/readme.md` a `docs/features.md` majú hlavičku `X-Robots-Tag: noindex`.
 - Search Console: používaj službu `https://www.infrayard.eu/`. Služba `https://infrayard.eu/` ukazuje iba presmerované adresy, preto má 0 indexovaných stránok.
 - Presmerovanie `infrayard.eu` → `www.infrayard.eu` má byť trvalé (**308**), nie dočasné (307). Nastavuje sa vo Vercel → Project → Settings → Domains pri `infrayard.eu`.
+
+## Po pushi z 5. novembra 2026 (inštalácia iba OKE alebo k3s, cenník)
+
+- Stránka `/docs/install-vm/` je zrušená a vo `vercel.json` trvalo presmerovaná (308) na `/docs/install-kubernetes/`. V sitemap už nie je. Google ju z indexu vyradí sám; nástroj **Removals** netreba.
+- V **URL Inspection** požiadaj o indexovanie zmenených stránok:
+
+  ```text
+  https://www.infrayard.eu/
+  https://www.infrayard.eu/docs/installation/
+  https://www.infrayard.eu/docs/install-kubernetes/
+  https://www.infrayard.eu/docs/requirements/
+  https://www.infrayard.eu/docs/operations/
+  https://www.infrayard.eu/docs/subscription/
+  ```
+
+- Spusti `npm run indexnow` a v **Sitemaps** znovu odošli `sitemap.xml`.
+- O týždeň skontroluj v **Page indexing**, že `/docs/install-vm/` je v skupine „Page with redirect“ a žiadna URL zo sitemap nie je v chybách.
 
 ## 1. Vlastníctvo webu v Search Console
 

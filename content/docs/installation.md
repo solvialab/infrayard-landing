@@ -17,26 +17,34 @@ Infrayard runs on a Kubernetes cluster in your environment: an OKE cluster for p
 
 Both paths run one replica of each service, and Kubernetes restarts a service that fails. Neither is a high-availability setup for the portal itself. Your OKE clusters keep running if Infrayard is down.
 
-## Steps
-
-1. **[Prepare OCI](/docs/oci-setup/)**: the service user, policies, API key, state bucket and S3 key. Needed for every path.
-2. **Install** with [the Kubernetes guide](/docs/install-kubernetes/).
-3. **Optional:** connect [your own Keycloak](/docs/keycloak/).
-4. **Recommended:** make the portal reachable [only from your VPN](/docs/private-access/).
-5. **Verify** with a test cluster, as described at the end of the guide.
-6. Plan [upgrades and backups](/docs/operations/).
-
 ## What you receive
 
-With your subscription or evaluation you get by e-mail:
+When your order is accepted and the first invoice is paid, or when your evaluation starts, your technical contact receives an onboarding e-mail with:
 
-- **Registry access**: a user name and token for the private registry that holds the Helm chart and the images.
-- **Addresses** of the chart (`oci://…/charts/infrayard`) and the images (`…/api`, `…/frontend`).
-- **The version** to install, for example `1.4.0`. Chart and images share it.
+| Item | Value |
+| --- | --- |
+| Registry user and token | Personal to your organisation; the token can only pull |
+| Registry | `registry.gitlab.com` |
+| Helm chart | `oci://registry.gitlab.com/solvialab/infrayard/charts/infrayard` |
+| Images | `registry.gitlab.com/solvialab/infrayard/api` and `registry.gitlab.com/solvialab/infrayard/frontend` |
+| Version to install | A number such as `1.4.0`; chart and images share it |
+| Support | [support@infrayard.eu](mailto:support@infrayard.eu) |
 
-Nothing is downloaded from a public website; everything comes from this registry.
+The guides on this site are written so that your team can install Infrayard with these values on its own. Nothing is downloaded from a public website: the chart and the images come only from this registry.
 
-The token is personal to your organisation. Store it in your secret manager and request a new one from [support](mailto:support@infrayard.eu) if it leaks.
+The token reads the registry and nothing else, for the term of your subscription or evaluation. Store it in your secret manager and ask [support](mailto:support@infrayard.eu) for a new one if it leaks.
+
+## From the e-mail to the first cluster
+
+1. **[Prepare OCI](/docs/oci-setup/)**, about 20 minutes: the service user, policies, API key, state bucket and S3 key. Needed for every path.
+2. **Prepare the host:** an OKE cluster you already run, or a VM with k3s from the [k3s quick start](https://docs.k3s.io/quick-start).
+3. **[Install with Helm](/docs/install-kubernetes/)**, about 30 minutes, including DNS and the certificate.
+4. **Configure and test:** sign in, set up **Admin → Configuration** and create a test cluster, as in [step 7 of the guide](/docs/install-kubernetes/#7-sign-in). The test cluster proves the OCI policies, the state bucket and the network path to the cluster API.
+5. **Give people access:** [add users](/docs/install-kubernetes/#add-users) in the bundled Keycloak, or connect [your own Keycloak](/docs/keycloak/).
+6. **Recommended:** make the portal reachable [only from your VPN](/docs/private-access/).
+7. **Before production use:** schedule the daily [database backup](/docs/operations/#backups) and read how to [upgrade](/docs/operations/#upgrade-infrayard).
+
+If a step fails, look it up in [troubleshooting](/docs/troubleshooting/#installation). If that does not help, write to [support](/docs/troubleshooting/#contact-support) with the details listed there.
 
 ## What you prepare
 
@@ -50,5 +58,3 @@ The token is personal to your organisation. Store it in your secret manager and 
 | Network paths | Users → portal (443); Infrayard → OCI APIs, registry, cluster APIs (6443) |
 
 Details for each item are in [requirements](/docs/requirements/).
-
-For errors during installation, see [troubleshooting](/docs/troubleshooting/#installation).
