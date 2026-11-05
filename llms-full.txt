@@ -7,10 +7,15 @@ Infrayard by Solvia Lab is a commercial self-service portal for creating and ope
 Canonical website: https://www.infrayard.eu/
 Company: Solvia Lab s.r.o.
 Contact: hello@infrayard.eu
+Support: support@infrayard.eu
 
 ## Current product scope
 
 OKE provisioning, scale, Kubernetes upgrades, destroy and cleanup, access downloads, existing-network support, templates, resource limits, protected destroy requests, limit-increase requests, Activity and audit history, and cost estimates. Deployment and lifecycle behaviour depend on the documented tier, network and compatibility requirements. Application delivery is outside this scope. Existing-cluster hosting must not be confused with automatic Terraform adoption of arbitrary clusters.
+
+## Deployment
+
+Infrayard is self-hosted. It is installed with a Helm chart on an existing Kubernetes cluster (OKE, k3s or another distribution) or with a Docker Compose bundle on a single Linux VM; both use the same images and one version number. Sign-in uses the bundled Keycloak or the customer's existing Keycloak. The chart, images and Compose bundle come from a private container registry with a customer token; nothing is downloaded from the public website. Infrayard works under one dedicated OCI user with documented IAM policies, an API key and an Object Storage bucket for Terraform state. The portal can be limited to a VPN or company network. Setup guides: https://www.infrayard.eu/docs/oci-setup/, https://www.infrayard.eu/docs/install-kubernetes/ and https://www.infrayard.eu/docs/install-vm/.
 
 ## Commercial access
 

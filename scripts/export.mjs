@@ -12,8 +12,8 @@ try {
 await rm(output, { force: true, recursive: true });
 await mkdir(output);
 const entries = await readdir(root);
-const rootFiles = entries.filter(name => /^(?:index\.html|robots\.txt|sitemap\.xml|ai\.md|llms(?:-full)?\.txt|site\.webmanifest|favicon[^/]*\.(?:png|ico|svg)|google[a-f0-9]+\.html)$/.test(name));
-for (const name of [...rootFiles, 'assets', 'docs', 'resources', 'legal', 'demo']) {
+const rootFiles = entries.filter(name => /^(?:index\.html|404\.html|robots\.txt|sitemap\.xml|ai\.md|llms(?:-full)?\.txt|site\.webmanifest|favicon[^/]*\.(?:png|ico|svg)|google[a-f0-9]+\.html|[a-f0-9]{32}\.txt)$/.test(name));
+for (const name of [...rootFiles, '.well-known', 'assets', 'docs', 'resources', 'legal', 'demo']) {
   await cp(resolve(root, name), resolve(output, name), { recursive: true, dereference: false, filter: async path => {
     if ((await lstat(path)).isSymbolicLink()) throw new Error(`Public export must not contain symlinks: ${path}`);
     return true;

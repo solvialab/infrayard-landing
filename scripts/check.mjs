@@ -7,7 +7,7 @@ import { checkSEO } from './check-seo.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const errors = [];
-for (const script of ['assets/site.js', 'assets/image-viewer.js', 'assets/docs.js', 'assets/docs-legacy.js', 'assets/theme.js', 'assets/contact-request.js', 'scripts/build.mjs', 'scripts/templates.mjs', 'scripts/preview.mjs', 'scripts/seo.mjs', 'scripts/check-seo.mjs', 'scripts/export.mjs']) {
+for (const script of ['assets/site.js', 'assets/image-viewer.js', 'assets/docs.js', 'assets/docs-legacy.js', 'assets/theme.js', 'assets/contact-request.js', 'scripts/build.mjs', 'scripts/templates.mjs', 'scripts/preview.mjs', 'scripts/seo.mjs', 'scripts/check-seo.mjs', 'scripts/export.mjs', 'scripts/indexnow.mjs']) {
   const result = spawnSync(process.execPath, ['--check', resolve(root, script)], { encoding: 'utf8' });
   if (result.status !== 0) errors.push(`JavaScript syntax error in ${script}: ${result.stderr}`);
 }
@@ -21,7 +21,7 @@ const walk = async directory => {
   }
   return files;
 };
-const files = (await walk(root)).filter(path => extname(path) === '.html' && !/^google[a-f0-9]+\.html$/.test(basename(path)));
+const files = (await walk(root)).filter(path => extname(path) === '.html' && !/^google[a-f0-9]+\.html$/.test(basename(path)) && path !== resolve(root, '404.html'));
 const htmlByPath = new Map(await Promise.all(files.map(async path => [path, await readFile(path, 'utf8')])));
 const exists = async path => { try { return await stat(path); } catch { return null; } };
 let checkedLinks = 0;
@@ -70,6 +70,14 @@ for (const page of docs) {
   if (!htmlByPath.has(path)) errors.push(`Missing documentation page: ${page.slug}`);
 }
 if (pricing.founding.monthly !== pricing.business.monthly * .6 || pricing.founding.annual !== pricing.business.annual * .6) errors.push('Founding discount differs between billing periods');
+const notFound = await readFile(resolve(root, '404.html'), 'utf8');
+if (!notFound.includes('<meta name="robots" content="noindex,follow">') || (notFound.match(/<h1\b/g) || []).length !== 1 || notFound.includes('rel="canonical"')) errors.push('404.html must be a single-h1 noindex page without a canonical URL');
+for (const match of notFound.matchAll(/\bhref="(\/[^"#]*)"/g)) if (!await exists(resolve(root, '.' + match[1], ...(match[1].endsWith('/') ? ['index.html'] : [])))) errors.push(`404.html: missing local target ${match[1]}`);
+const securityTxt = await readFile(resolve(root, '.well-known/security.txt'), 'utf8');
+const securityExpires = Date.parse(securityTxt.match(/^Expires: (.+)$/m)?.[1]);
+if (!/^Contact: mailto:/m.test(securityTxt) || !(securityExpires > Date.now())) errors.push('security.txt needs a Contact and an Expires date in the future; update site.updated and rebuild');
+const { indexNowKey } = await import('../content/seo.mjs');
+if (!/^[a-f0-9]{32}$/.test(indexNowKey) || (await readFile(resolve(root, indexNowKey + '.txt'), 'utf8')).trim() !== indexNowKey) errors.push('IndexNow key file is missing or differs from content/seo.mjs');
 const publicText = [...htmlByPath.values()].join('\n');
 errors.push(...await checkSEO(htmlByPath, root));
 if (/list-rate anchor|16,500|39,000|14-day|14 days|first 12 months, paid upfront before access|Get in before the rest/.test(publicText)) errors.push('Stale commercial wording remains');

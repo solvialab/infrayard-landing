@@ -4,6 +4,10 @@
 
 Last substantive website update: 2026-11-05.
 
+## Deployment
+
+Infrayard is self-hosted. It is installed with a Helm chart on an existing Kubernetes cluster (OKE, k3s or another distribution) or with a Docker Compose bundle on a single Linux VM; both use the same images and one version number. Sign-in uses the bundled Keycloak or the customer's existing Keycloak. The chart, images and Compose bundle come from a private container registry with a customer token; nothing is downloaded from the public website. Infrayard works under one dedicated OCI user with documented IAM policies, an API key and an Object Storage bucket for Terraform state. The portal can be limited to a VPN or company network. Setup guides: https://www.infrayard.eu/docs/oci-setup/, https://www.infrayard.eu/docs/install-kubernetes/ and https://www.infrayard.eu/docs/install-vm/.
+
 ## Pricing
 
 Business: EUR 3000 per month, billed monthly with a monthly commitment, or EUR 30000 annually paid upfront (EUR 2500/month equivalent). Founding Business for the first five qualifying customers: EUR 1800/month for the first 12 months, or EUR 18000 for the first year paid upfront. Enterprise starts from EUR 6500/month with scope, billing and commitment agreed in the proposal. Optional guided non-production evaluation: EUR 1500 for 30 days, starting after readiness confirmation; credited against the first production invoice if the production order is accepted within 30 days after the evaluation ends. Oracle usage is separate.

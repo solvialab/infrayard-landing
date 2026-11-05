@@ -1,6 +1,6 @@
 # Infrayard: SEO a Google Search Console
 
-Pripravené 17. októbra 2026. Zmeny sú zatiaľ lokálne. Search Console bude vidieť nový obsah až po jeho nasadení na verejnú doménu.
+Pripravené 17. októbra 2026, doplnené 5. novembra 2026. Search Console vidí obsah až po nasadení na verejnú doménu.
 
 ## Čo je pripravené v projekte
 
@@ -31,6 +31,15 @@ Pripravené 17. októbra 2026. Zmeny sú zatiaľ lokálne. Search Console bude v
 4. `dist/` je pripravený verejný statický web. Neobsahuje pracovné zdroje, testy, lokálne nástroje ani tento návod. Lokálny export nič nepublikuje. Vercel má v `vercel.json` nastavené zostavenie, kontroly a výstup `dist`; po schválení sa zmeny nasadia bežným postupom projektu.
 5. V nastaveniach Vercelu zachovaj presmerovanie `infrayard.eu` na `www.infrayard.eu`. Na verejnej produkcii skontroluj, že firewall ani bot protection nevyžadujú interaktívnu challenge od legitímnych crawlerov. Neverejné preview nechaj chránené pred indexovaním.
 6. Po nasadení over, že `/`, `/docs/`, `/demo/`, `/resources/`, `/robots.txt`, `/sitemap.xml`, `/llms.txt`, `/llms-full.txt`, `/ai.md`, poster aj MP4 vracajú úspešnú odpoveď. MP4 musí ísť prehrať a posúvať. Neexistujúca URL má vracať 404. Zmeny v lokálnom kóde samy neoveria odpovede produkčného servera.
+
+## Doplnené 5. novembra 2026
+
+- Každá stránka dokumentácie má vlastný popis pre výsledky vyhľadávania (110–160 znakov) v `content/seo.mjs` → `docsDescriptions`. Kratší popis v `content/site.mjs` zostáva ako text v navigácii a pod nadpisom. `npm run check` odmietne popis kratší ako 50 alebo dlhší ako 170 znakov.
+- `ai.md` a `llms.txt` majú sekciu **Deployment**: self-hosted, Helm alebo Docker Compose, Keycloak, privátna registry, OCI používateľ a VPN-only prístup.
+- `404.html`: vlastná stránka „Page not found“ s odkazmi, `noindex`, mimo sitemap. Vercel ju vráti so stavom 404.
+- `/.well-known/security.txt` (RFC 9116): kontakt `support@infrayard.eu`, platnosť rok od `site.updated`. Kontrola zlyhá, keď platnosť vyprší; stačí aktualizovať `site.updated` a znovu zostaviť.
+- **IndexNow** (Bing a ďalšie vyhľadávače; z Bingu čerpajú aj ChatGPT search a Copilot): kľúč v `content/seo.mjs` → `indexNowKey`, súbor `/<kľúč>.txt` vytvára build. Po každom nasadení s podstatnou zmenou spusti `npm run indexnow` (všetky URL zo sitemap) alebo `npm run indexnow -- /docs/` (iba časť). Google IndexNow nepoužíva, číta sitemap.
+- Presmerovanie `infrayard.eu` → `www.infrayard.eu` má byť trvalé (**308**), nie dočasné (307). Nastavuje sa vo Vercel → Project → Settings → Domains pri `infrayard.eu`.
 
 ## 1. Vlastníctvo webu v Search Console
 
