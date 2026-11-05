@@ -17,14 +17,14 @@ All of it belongs to the cluster's Terraform state and is removed when the clust
 
 ## Kubernetes API endpoint access
 
-Choose the mode in **Admin → Configuration → Kubernetes API Access**. It applies to clusters created afterwards.
+Choose the mode in **Admin → Configuration → OCI Settings → Kubernetes API Access**: the box **Public endpoint restricted by CIDR allowlist** and the list **Allowed API CIDRs**. The setting applies to clusters created afterwards.
 
 | Mode | Where the API is | Who can reach it |
 | --- | --- | --- |
-| Private endpoint | Private subnet, no public IP | Anything with a route into the VCN: VPN through a DRG, FastConnect, a bastion, or Infrayard running in a peered network |
-| Public endpoint with allowlist | Dedicated public subnet | Only the CIDR ranges you list; `0.0.0.0/0` is rejected |
+| Private endpoint (box off, default) | Private subnet, no public IP | Anything with a route into the VCN: VPN through a DRG, FastConnect, a bastion, or Infrayard running in a peered network |
+| Public endpoint restricted by CIDR allowlist | Dedicated public subnet | Only the CIDR ranges you list; `0.0.0.0/0` is rejected |
 
-With the **public endpoint with allowlist**, list both:
+With **Public endpoint restricted by CIDR allowlist** on, list both in **Allowed API CIDRs**:
 
 - your **VPN or office egress** ranges, so users can run `kubectl`, and
 - the **outbound address of Infrayard** itself (NAT gateway or VM public IP), because Infrayard calls the cluster API to issue kubeconfigs.
@@ -58,7 +58,7 @@ Rules:
 - **Stay inside the anchor.** A supplied compartment must be the anchor compartment or any compartment below it. Others are rejected before Terraform starts, because the OCI policies only cover the anchor subtree.
 - **No automatic discovery.** Supplying only a compartment does not reuse a VCN that already exists in it; Infrayard creates a new one.
 - **Routing must be ready.** With your own VCN or subnet, the worker subnet needs a route `0.0.0.0/0` to a NAT gateway (or your egress path) and a route for `all-<region>-services-in-oracle-services-network` to a service gateway. Otherwise nodes cannot register.
-- **Public endpoint with allowlist** needs an Infrayard-managed VCN. While this mode is on, deployments with an existing VCN or subnet are rejected; an existing compartment is fine.
+- **Public endpoint restricted by CIDR allowlist** needs an Infrayard-managed VCN. While this mode is on, deployments with an existing VCN or subnet are rejected; an existing compartment is fine.
 - **Sharing a compartment:** to place several clusters in one compartment, create a compartment for them and supply it to each cluster. Do not reuse a compartment that Infrayard created for another cluster.
 
 The OCID fields check the OCID type and offer autocomplete lists of the compartments, VCNs and subnets Infrayard can see.

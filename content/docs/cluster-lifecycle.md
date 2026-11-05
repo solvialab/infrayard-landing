@@ -47,7 +47,7 @@ Destroy is permanent and cannot be undone.
 
 ## Activity
 
-The user nav includes an **Activity** inbox with an unread badge. It persists important events across refreshes and sessions; today it records destroy-request approvals/denials, limit request submissions and reviews, TTL expiry warnings at 24h, 4h, and 1h remaining, deploy/scale/upgrade/destroy start and completion events, and admin-driven account limit changes.
+The user nav includes an **Activity** inbox with an unread badge. It persists important events across refreshes and sessions; today it records destroy-request approvals/denials, limit request submissions and reviews, TTL expiry warnings at 24h, 4h, and 1h remaining, deploy/scale/upgrade/destroy start and completion events, and admin-driven account limit changes. Administrators also receive the deploy, scale, upgrade and destroy events of other users' clusters, with the owner's name, and an entry for every new destroy or limit request.
 
 ## Cluster detail
 

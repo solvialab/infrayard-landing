@@ -156,13 +156,13 @@ docker compose logs --tail=200 infrayard-api
 <li>An existing subnet also needs its VCN OCID.</li>
 <li>The compartment must be the anchor or below it.</li>
 <li>A compartment alone does not reuse its VCN; Infrayard creates a new one.</li>
-<li>With the <strong>public endpoint with allowlist</strong> mode, existing VCNs and subnets are rejected.</li>
+<li>With <strong>Public endpoint restricted by CIDR allowlist</strong> on, existing VCNs and subnets are rejected.</li>
 </ul>
 <p>See <a href="/docs/networking/#bringing-your-own-network">networking</a>.</p>
 <h2 id="worker-nodes-do-not-become-ready">Worker nodes do not become ready<a class="heading-link" href="#worker-nodes-do-not-become-ready" aria-label="Link to Worker nodes do not become ready">#</a></h2>
 <p>Look at the Terraform log and the node pool in the OCI Console. Common causes: service limits or quotas, no capacity for the shape in the availability domain, or a shape without a matching image. With your own subnet, the subnet needs a NAT gateway route and a service gateway route; without them nodes cannot register.</p>
 <h2 id="kubectl-cannot-connect">kubectl cannot connect<a class="heading-link" href="#kubectl-cannot-connect" aria-label="Link to kubectl cannot connect">#</a></h2>
-<p>The kubeconfig only authenticates; it does not open a network path. Check that you are on the VPN, that the cluster&#39;s endpoint mode fits your network, and that your egress range is in the allowlist (<strong>Admin → Configuration → Kubernetes API Access</strong>). Infrayard&#39;s own outbound address must be in the allowlist as well, otherwise the kubeconfig download fails; the deploy log then ends with <code>Cluster API endpoint … not reachable from Infrayard</code>. See <a href="/docs/install-kubernetes/#7-sign-in">step 7 of the Kubernetes guide</a> for how to find that address.</p>
+<p>The kubeconfig only authenticates; it does not open a network path. Check that you are on the VPN, that the cluster&#39;s endpoint mode fits your network, and that your egress range is in <strong>Allowed API CIDRs</strong> (<strong>Admin → Configuration → OCI Settings</strong>). Infrayard&#39;s own outbound address must be in the allowlist as well, otherwise the kubeconfig download fails; the deploy log then ends with <code>Cluster API endpoint … not reachable from Infrayard</code>. See <a href="/docs/install-kubernetes/#7-sign-in">step 7 of the Kubernetes guide</a> for how to find that address.</p>
 <h2 id="a-limit-blocks-a-request">A limit blocks a request<a class="heading-link" href="#a-limit-blocks-a-request" aria-label="Link to A limit blocks a request">#</a></h2>
 <p>Check the global default, the user&#39;s own limit and the template. Users can request more in the portal; administrators approve or adjust it in <strong>Requests</strong>. Templates may allow more than a user&#39;s limit for custom configurations.</p>
 <h2 id="a-cluster-operation-fails">A cluster operation fails<a class="heading-link" href="#a-cluster-operation-fails" aria-label="Link to A cluster operation fails">#</a></h2>

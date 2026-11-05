@@ -49,7 +49,7 @@
 <p class="docs-nav-group">Operate</p><a class="docs-nav-link" href="/docs/operations/" aria-current="page">Operations, upgrades and recovery</a>
 <a class="docs-nav-link" href="/docs/troubleshooting/">Troubleshooting and support</a>
 <p class="docs-nav-group">Reference</p><a class="docs-nav-link" href="/docs/subscription/">Subscription, billing and licensing</a>
-<a class="docs-nav-link" href="/docs/releases/">Releases and roadmap</a></nav></aside><main class="docs-main" id="main"><div class="docs-layout"><div><nav class="docs-breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><a href="/docs/">Documentation</a><span aria-hidden="true">/</span><span aria-current="page">Operations, upgrades and recovery</span></nav><article class="docs-article"><h1>Operations, upgrades and recovery</h1><p class="docs-summary">Upgrade Infrayard, back up and restore the database, and plan responsibilities.</p><p class="docs-maintained">Maintained by Solvia Lab s.r.o. · Updated <time datetime="2026-11-05">2026-11-05</time></p><details class="docs-mobile-toc"><summary>On this page</summary><nav aria-label="Page contents"><a href="#responsibilities">Responsibilities</a><a href="#what-to-back-up">What to back up</a><a href="#backups">Backups</a><a href="#restore">Restore</a><a href="#upgrade-infrayard">Upgrade Infrayard</a><a href="#postgresql-and-keycloak-versions">PostgreSQL and Keycloak versions</a><a href="#oke-clusters-are-a-separate-topic">OKE clusters are a separate topic</a><a href="#ending-a-subscription">Ending a subscription</a></nav></details><div class="docs-content"><p>You operate the Infrayard installation; Solvia Lab supplies releases, documentation and support. This page covers upgrades, backups and restores for both installation paths, with the commands to run.</p>
+<a class="docs-nav-link" href="/docs/releases/">Releases and roadmap</a></nav></aside><main class="docs-main" id="main"><div class="docs-layout"><div><nav class="docs-breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><a href="/docs/">Documentation</a><span aria-hidden="true">/</span><span aria-current="page">Operations, upgrades and recovery</span></nav><article class="docs-article"><h1>Operations, upgrades and recovery</h1><p class="docs-summary">Upgrade Infrayard, back up and restore the database, and plan responsibilities.</p><p class="docs-maintained">Maintained by Solvia Lab s.r.o. · Updated <time datetime="2026-11-05">2026-11-05</time></p><details class="docs-mobile-toc"><summary>On this page</summary><nav aria-label="Page contents"><a href="#responsibilities">Responsibilities</a><a href="#what-to-back-up">What to back up</a><a href="#backups">Backups</a><a href="#restore">Restore</a><a href="#upgrade-infrayard">Upgrade Infrayard</a><a href="#postgresql-and-keycloak-versions">PostgreSQL and Keycloak versions</a><a href="#oke-clusters-are-a-separate-topic">OKE clusters are a separate topic</a><a href="#uninstall-infrayard">Uninstall Infrayard</a><a href="#ending-a-subscription">Ending a subscription</a></nav></details><div class="docs-content"><p>You operate the Infrayard installation; Solvia Lab supplies releases, documentation and support. This page covers upgrades, backups and restores for both installation paths, with the commands to run.</p>
 <h2 id="responsibilities">Responsibilities<a class="heading-link" href="#responsibilities" aria-label="Link to Responsibilities">#</a></h2>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Scrollable reference table"><table>
 <thead>
@@ -194,6 +194,40 @@ cp ~/infrayard/.env ~/infrayard/oci_api_key.pem ~/infrayard-compose/
 <p>Keycloak updates its schema by itself on the first start of a new version.</p>
 <h2 id="oke-clusters-are-a-separate-topic">OKE clusters are a separate topic<a class="heading-link" href="#oke-clusters-are-a-separate-topic" aria-label="Link to OKE clusters are a separate topic">#</a></h2>
 <p>Upgrading Infrayard does not touch your OKE clusters. Kubernetes upgrades of the clusters are done per cluster in the portal; see <a href="/docs/cluster-lifecycle/">cluster lifecycle</a>. Plan them with worker refresh, disruption budgets and temporary extra capacity in mind.</p>
+<h2 id="uninstall-infrayard">Uninstall Infrayard<a class="heading-link" href="#uninstall-infrayard" aria-label="Link to Uninstall Infrayard">#</a></h2>
+<p>Uninstalling Infrayard does not touch the clusters it created, and only Infrayard can destroy them cleanly: their Terraform state is in the state bucket. Work through the steps in this order.</p>
+<ol>
+<li><p><strong>Destroy the clusters</strong> you no longer need in the portal and wait until each one is destroyed. A destroyed cluster takes its compartment, VCN and node pools with it. Clusters you keep go on running and being billed.</p>
+</li>
+<li><p><strong>Back up the database</strong> if you may need the history later; see <a href="#backups">backups</a>.</p>
+</li>
+<li><p><strong>Remove Infrayard.</strong> Helm keeps the PostgreSQL volume; deleting the claim deletes the volume as well, on OKE the 50 GB <code>oci-bv</code> block volume. The namespace also holds the registry and OCI key secrets:</p>
+<pre><code class="language-bash">helm uninstall infrayard -n infrayard
+kubectl delete pvc -n infrayard data-infrayard-postgresql-0
+kubectl delete namespace infrayard
+</code></pre>
+</li>
+<li><p><strong>Remove Traefik and cert-manager</strong> if you installed them only for Infrayard in step 1 of the <a href="/docs/install-kubernetes/">Kubernetes guide</a>. When Traefik is removed, OKE deletes its load balancer. cert-manager leaves its CRDs behind; the last command deletes them:</p>
+<pre><code class="language-bash">helm uninstall traefik -n traefik
+helm uninstall cert-manager -n cert-manager
+kubectl delete clusterissuer letsencrypt
+kubectl delete namespace traefik cert-manager
+kubectl get crd -o name | grep &#39;cert-manager.io$&#39; | xargs kubectl delete
+</code></pre>
+</li>
+<li><p><strong>Check OCI.</strong> On OKE, after a minute or two the load balancer is gone and the block volume is <code>TERMINATED</code> in the compartment of the cluster that ran Infrayard:</p>
+<pre><code class="language-bash">oci lb load-balancer list -c &lt;compartment&gt;
+oci bv volume list -c &lt;compartment&gt; --query &#39;data[].{name:&quot;display-name&quot;,state:&quot;lifecycle-state&quot;}&#39;
+</code></pre>
+</li>
+<li><p><strong>Delete the state bucket</strong> once none of its clusters is left. Versioning is on, so <code>--empty</code> removes every object version before the bucket:</p>
+<pre><code class="language-bash">oci os bucket delete --bucket-name infrayard-tfstate --empty --force
+</code></pre>
+</li>
+<li><p><strong>Remove the rest by hand</strong> if no other installation uses it: the DNS record of the portal, and the OCI user, group and policy from <a href="/docs/oci-setup/">OCI setup</a>.</p>
+</li>
+</ol>
+<p>If you destroy the cluster that runs Infrayard, remove the load balancer and the volume first (steps 3 to 5). OKE does not delete them with the cluster: the load balancer keeps the VCN from being deleted, and the volume stays and is billed.</p>
 <h2 id="ending-a-subscription">Ending a subscription<a class="heading-link" href="#ending-a-subscription" aria-label="Link to Ending a subscription">#</a></h2>
 <p>Ending the subscription does not stop or delete anything in OCI, and Oracle keeps billing running clusters. Before access ends, destroy the clusters you no longer need, or keep the Terraform state bucket so that they can still be managed. Details are in your agreement; see <a href="/docs/subscription/#cancellation-and-offboarding">billing and licensing</a>.</p>
-</div></article><nav class="docs-page-nav" aria-label="Documentation pages"><div><a href="/docs/administration/"><small>Previous</small>← Administration</a></div><div><a href="/docs/troubleshooting/"><small>Next</small>Troubleshooting and support →</a></div></nav><p class="docs-footer">Infrayard by Solvia Lab · <a href="/">Product</a> · <a href="/docs/subscription/">Plans and licensing</a> · <a href="mailto:support@infrayard.eu">Support</a> · <a href="/legal/privacy.html">Privacy</a></p></div><aside class="docs-toc" aria-label="On this page"><h2>On this page</h2><a href="#responsibilities">Responsibilities</a><a href="#what-to-back-up">What to back up</a><a href="#backups">Backups</a><a href="#restore">Restore</a><a href="#upgrade-infrayard">Upgrade Infrayard</a><a href="#postgresql-and-keycloak-versions">PostgreSQL and Keycloak versions</a><a href="#oke-clusters-are-a-separate-topic">OKE clusters are a separate topic</a><a href="#ending-a-subscription">Ending a subscription</a></aside></div></main></div></body></html>
+</div></article><nav class="docs-page-nav" aria-label="Documentation pages"><div><a href="/docs/administration/"><small>Previous</small>← Administration</a></div><div><a href="/docs/troubleshooting/"><small>Next</small>Troubleshooting and support →</a></div></nav><p class="docs-footer">Infrayard by Solvia Lab · <a href="/">Product</a> · <a href="/docs/subscription/">Plans and licensing</a> · <a href="mailto:support@infrayard.eu">Support</a> · <a href="/legal/privacy.html">Privacy</a></p></div><aside class="docs-toc" aria-label="On this page"><h2>On this page</h2><a href="#responsibilities">Responsibilities</a><a href="#what-to-back-up">What to back up</a><a href="#backups">Backups</a><a href="#restore">Restore</a><a href="#upgrade-infrayard">Upgrade Infrayard</a><a href="#postgresql-and-keycloak-versions">PostgreSQL and Keycloak versions</a><a href="#oke-clusters-are-a-separate-topic">OKE clusters are a separate topic</a><a href="#uninstall-infrayard">Uninstall Infrayard</a><a href="#ending-a-subscription">Ending a subscription</a></aside></div></main></div></body></html>

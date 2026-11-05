@@ -99,7 +99,7 @@
 <h2 id="your-own-keycloak">Your own Keycloak<a class="heading-link" href="#your-own-keycloak" aria-label="Link to Your own Keycloak">#</a></h2>
 <p>If you <a href="/docs/keycloak/">use your own Keycloak</a>, users&#39; browsers must reach it from the VPN, and the Infrayard API must reach it from the cluster. If the API sees Keycloak under a different internal address, set <code>api.oidc.internalUrl</code>.</p>
 <h2 id="cluster-api-endpoints">Cluster API endpoints<a class="heading-link" href="#cluster-api-endpoints" aria-label="Link to Cluster API endpoints">#</a></h2>
-<p>Clusters created by Infrayard can use a private Kubernetes API endpoint or a public one restricted to allowed source ranges. With a restricted public endpoint, add the VPN&#39;s egress ranges <strong>and</strong> Infrayard&#39;s own outbound address in <strong>Admin → Configuration</strong> as allowed CIDRs; Infrayard calls the cluster API to issue kubeconfigs. See <a href="/docs/networking/">networking</a>.</p>
+<p>Clusters created by Infrayard can use a private Kubernetes API endpoint or a public one restricted to allowed source ranges. With a restricted public endpoint, add the VPN&#39;s egress ranges <strong>and</strong> Infrayard&#39;s own outbound address to <strong>Allowed API CIDRs</strong> in <strong>Admin → Configuration → OCI Settings</strong>; Infrayard calls the cluster API to issue kubeconfigs. See <a href="/docs/networking/">networking</a>.</p>
 <h2 id="check-it">Check it<a class="heading-link" href="#check-it" aria-label="Link to Check it">#</a></h2>
 <p>From a machine outside the VPN, the portal must not answer:</p>
 <pre><code class="language-bash">curl -m 10 -sS -o /dev/null https://infrayard.example.com &amp;&amp; echo &quot;STILL PUBLIC&quot;

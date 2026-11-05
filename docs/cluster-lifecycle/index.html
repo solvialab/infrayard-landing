@@ -90,7 +90,7 @@ Kubernetes version changes are handled via a separate <strong>Upgrade</strong> a
 <p><strong>Destroy behavior note:</strong> Infrayard-managed child compartments may be deleted with the cluster. External compartment overrides are retained for shared/multi-cluster setups. In Object Storage, only the destroyed cluster&#39;s <code>.tfstate</code> object is removed; the user-level prefix/folder is kept for other clusters.</p>
 </blockquote>
 <h2 id="activity">Activity<a class="heading-link" href="#activity" aria-label="Link to Activity">#</a></h2>
-<p>The user nav includes an <strong>Activity</strong> inbox with an unread badge. It persists important events across refreshes and sessions; today it records destroy-request approvals/denials, limit request submissions and reviews, TTL expiry warnings at 24h, 4h, and 1h remaining, deploy/scale/upgrade/destroy start and completion events, and admin-driven account limit changes.</p>
+<p>The user nav includes an <strong>Activity</strong> inbox with an unread badge. It persists important events across refreshes and sessions; today it records destroy-request approvals/denials, limit request submissions and reviews, TTL expiry warnings at 24h, 4h, and 1h remaining, deploy/scale/upgrade/destroy start and completion events, and admin-driven account limit changes. Administrators also receive the deploy, scale, upgrade and destroy events of other users&#39; clusters, with the owner&#39;s name, and an entry for every new destroy or limit request.</p>
 <h2 id="cluster-detail">Cluster detail<a class="heading-link" href="#cluster-detail" aria-label="Link to Cluster detail">#</a></h2>
 <p>Click <strong>Details</strong> on any cluster card to see:</p>
 <ul>

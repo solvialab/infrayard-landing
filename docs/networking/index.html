@@ -62,7 +62,7 @@
 </ul>
 <p>All of it belongs to the cluster&#39;s Terraform state and is removed when the cluster is destroyed.</p>
 <h2 id="kubernetes-api-endpoint-access">Kubernetes API endpoint access<a class="heading-link" href="#kubernetes-api-endpoint-access" aria-label="Link to Kubernetes API endpoint access">#</a></h2>
-<p>Choose the mode in <strong>Admin → Configuration → Kubernetes API Access</strong>. It applies to clusters created afterwards.</p>
+<p>Choose the mode in <strong>Admin → Configuration → OCI Settings → Kubernetes API Access</strong>: the box <strong>Public endpoint restricted by CIDR allowlist</strong> and the list <strong>Allowed API CIDRs</strong>. The setting applies to clusters created afterwards.</p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Scrollable reference table"><table>
 <thead>
 <tr>
@@ -72,17 +72,17 @@
 </tr>
 </thead>
 <tbody><tr>
-<td>Private endpoint</td>
+<td>Private endpoint (box off, default)</td>
 <td>Private subnet, no public IP</td>
 <td>Anything with a route into the VCN: VPN through a DRG, FastConnect, a bastion, or Infrayard running in a peered network</td>
 </tr>
 <tr>
-<td>Public endpoint with allowlist</td>
+<td>Public endpoint restricted by CIDR allowlist</td>
 <td>Dedicated public subnet</td>
 <td>Only the CIDR ranges you list; <code>0.0.0.0/0</code> is rejected</td>
 </tr>
 </tbody></table></div>
-<p>With the <strong>public endpoint with allowlist</strong>, list both:</p>
+<p>With <strong>Public endpoint restricted by CIDR allowlist</strong> on, list both in <strong>Allowed API CIDRs</strong>:</p>
 <ul>
 <li>your <strong>VPN or office egress</strong> ranges, so users can run <code>kubectl</code>, and</li>
 <li>the <strong>outbound address of Infrayard</strong> itself (NAT gateway or VM public IP), because Infrayard calls the cluster API to issue kubeconfigs.</li>
@@ -145,7 +145,7 @@
 <li><strong>Stay inside the anchor.</strong> A supplied compartment must be the anchor compartment or any compartment below it. Others are rejected before Terraform starts, because the OCI policies only cover the anchor subtree.</li>
 <li><strong>No automatic discovery.</strong> Supplying only a compartment does not reuse a VCN that already exists in it; Infrayard creates a new one.</li>
 <li><strong>Routing must be ready.</strong> With your own VCN or subnet, the worker subnet needs a route <code>0.0.0.0/0</code> to a NAT gateway (or your egress path) and a route for <code>all-&lt;region&gt;-services-in-oracle-services-network</code> to a service gateway. Otherwise nodes cannot register.</li>
-<li><strong>Public endpoint with allowlist</strong> needs an Infrayard-managed VCN. While this mode is on, deployments with an existing VCN or subnet are rejected; an existing compartment is fine.</li>
+<li><strong>Public endpoint restricted by CIDR allowlist</strong> needs an Infrayard-managed VCN. While this mode is on, deployments with an existing VCN or subnet are rejected; an existing compartment is fine.</li>
 <li><strong>Sharing a compartment:</strong> to place several clusters in one compartment, create a compartment for them and supply it to each cluster. Do not reuse a compartment that Infrayard created for another cluster.</li>
 </ul>
 <p>The OCID fields check the OCID type and offer autocomplete lists of the compartments, VCNs and subnets Infrayard can see.</p>

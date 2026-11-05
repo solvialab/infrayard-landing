@@ -354,14 +354,14 @@ All of it belongs to the cluster's Terraform state and is removed when the clust
 
 ### Kubernetes API endpoint access
 
-Choose the mode in **Admin → Configuration → Kubernetes API Access**. It applies to clusters created afterwards.
+Choose the mode in **Admin → Configuration → OCI Settings → Kubernetes API Access**: the box **Public endpoint restricted by CIDR allowlist** and the list **Allowed API CIDRs**. The setting applies to clusters created afterwards.
 
 | Mode | Where the API is | Who can reach it |
 | --- | --- | --- |
-| Private endpoint | Private subnet, no public IP | Anything with a route into the VCN: VPN through a DRG, FastConnect, a bastion, or Infrayard running in a peered network |
-| Public endpoint with allowlist | Dedicated public subnet | Only the CIDR ranges you list; `0.0.0.0/0` is rejected |
+| Private endpoint (box off, default) | Private subnet, no public IP | Anything with a route into the VCN: VPN through a DRG, FastConnect, a bastion, or Infrayard running in a peered network |
+| Public endpoint restricted by CIDR allowlist | Dedicated public subnet | Only the CIDR ranges you list; `0.0.0.0/0` is rejected |
 
-With the **public endpoint with allowlist**, list both:
+With **Public endpoint restricted by CIDR allowlist** on, list both in **Allowed API CIDRs**:
 
 - your **VPN or office egress** ranges, so users can run `kubectl`, and
 - the **outbound address of Infrayard** itself (NAT gateway or VM public IP), because Infrayard calls the cluster API to issue kubeconfigs.
@@ -395,7 +395,7 @@ Rules:
 - **Stay inside the anchor.** A supplied compartment must be the anchor compartment or any compartment below it. Others are rejected before Terraform starts, because the OCI policies only cover the anchor subtree.
 - **No automatic discovery.** Supplying only a compartment does not reuse a VCN that already exists in it; Infrayard creates a new one.
 - **Routing must be ready.** With your own VCN or subnet, the worker subnet needs a route `0.0.0.0/0` to a NAT gateway (or your egress path) and a route for `all-<region>-services-in-oracle-services-network` to a service gateway. Otherwise nodes cannot register.
-- **Public endpoint with allowlist** needs an Infrayard-managed VCN. While this mode is on, deployments with an existing VCN or subnet are rejected; an existing compartment is fine.
+- **Public endpoint restricted by CIDR allowlist** needs an Infrayard-managed VCN. While this mode is on, deployments with an existing VCN or subnet are rejected; an existing compartment is fine.
 - **Sharing a compartment:** to place several clusters in one compartment, create a compartment for them and supply it to each cluster. Do not reuse a compartment that Infrayard created for another cluster.
 
 The OCID fields check the OCID type and offer autocomplete lists of the compartments, VCNs and subnets Infrayard can see.
@@ -907,7 +907,7 @@ Then, in **Admin → Configuration**:
 
 1. Check the region and the anchor compartment.
 2. **Sync** shapes and Kubernetes versions from OCI and enable the ones your users may choose. New versions start disabled.
-3. Set **Kubernetes API Access**. Infrayard calls the API of every new cluster on port 6443 to issue kubeconfigs, so it needs a network path to it. The default is a private endpoint, reachable only from networks routed into the cluster's VCN. With **Public endpoint with allowlist**, add your VPN or office ranges and Infrayard's own outbound address. On OKE with private worker nodes, that address is the public IP of the NAT gateway in the VCN of the cluster that runs Infrayard:
+3. Set **Kubernetes API Access** under **OCI Settings**. Infrayard calls the API of every new cluster on port 6443 to issue kubeconfigs, so it needs a network path to it. With the box off (the default), clusters get a private endpoint. Infrayard creates a new VCN for each cluster unless you supply one, so it reaches a private endpoint only if its own network is routed into that VCN; without such a route the cluster still deploys, but the kubeconfig download fails. To use a public endpoint instead, turn on **Public endpoint restricted by CIDR allowlist**, enter your VPN or office ranges and Infrayard's own outbound address in **Allowed API CIDRs**, and click **Save OCI settings**. On OKE with private worker nodes, that address is the public IP of the NAT gateway in the VCN of the cluster that runs Infrayard:
 
    ```bash
    oci network nat-gateway list -c <compartment of that VCN> --query 'data[]."nat-ip"'
@@ -1315,7 +1315,7 @@ If you [use your own Keycloak](https://www.infrayard.eu/docs/keycloak/), users' 
 
 ### Cluster API endpoints
 
-Clusters created by Infrayard can use a private Kubernetes API endpoint or a public one restricted to allowed source ranges. With a restricted public endpoint, add the VPN's egress ranges **and** Infrayard's own outbound address in **Admin → Configuration** as allowed CIDRs; Infrayard calls the cluster API to issue kubeconfigs. See [networking](https://www.infrayard.eu/docs/networking/).
+Clusters created by Infrayard can use a private Kubernetes API endpoint or a public one restricted to allowed source ranges. With a restricted public endpoint, add the VPN's egress ranges **and** Infrayard's own outbound address to **Allowed API CIDRs** in **Admin → Configuration → OCI Settings**; Infrayard calls the cluster API to issue kubeconfigs. See [networking](https://www.infrayard.eu/docs/networking/).
 
 ### Check it
 
@@ -1379,7 +1379,7 @@ Destroy is permanent and cannot be undone.
 
 ### Activity
 
-The user nav includes an **Activity** inbox with an unread badge. It persists important events across refreshes and sessions; today it records destroy-request approvals/denials, limit request submissions and reviews, TTL expiry warnings at 24h, 4h, and 1h remaining, deploy/scale/upgrade/destroy start and completion events, and admin-driven account limit changes.
+The user nav includes an **Activity** inbox with an unread badge. It persists important events across refreshes and sessions; today it records destroy-request approvals/denials, limit request submissions and reviews, TTL expiry warnings at 24h, 4h, and 1h remaining, deploy/scale/upgrade/destroy start and completion events, and admin-driven account limit changes. Administrators also receive the deploy, scale, upgrade and destroy events of other users' clusters, with the owner's name, and an entry for every new destroy or limit request.
 
 ### Cluster detail
 
@@ -1719,6 +1719,47 @@ Keycloak updates its schema by itself on the first start of a new version.
 
 Upgrading Infrayard does not touch your OKE clusters. Kubernetes upgrades of the clusters are done per cluster in the portal; see [cluster lifecycle](https://www.infrayard.eu/docs/cluster-lifecycle/). Plan them with worker refresh, disruption budgets and temporary extra capacity in mind.
 
+### Uninstall Infrayard
+
+Uninstalling Infrayard does not touch the clusters it created, and only Infrayard can destroy them cleanly: their Terraform state is in the state bucket. Work through the steps in this order.
+
+1. **Destroy the clusters** you no longer need in the portal and wait until each one is destroyed. A destroyed cluster takes its compartment, VCN and node pools with it. Clusters you keep go on running and being billed.
+2. **Back up the database** if you may need the history later; see [backups](#backups).
+3. **Remove Infrayard.** Helm keeps the PostgreSQL volume; deleting the claim deletes the volume as well, on OKE the 50 GB `oci-bv` block volume. The namespace also holds the registry and OCI key secrets:
+
+   ```bash
+   helm uninstall infrayard -n infrayard
+   kubectl delete pvc -n infrayard data-infrayard-postgresql-0
+   kubectl delete namespace infrayard
+   ```
+
+4. **Remove Traefik and cert-manager** if you installed them only for Infrayard in step 1 of the [Kubernetes guide](https://www.infrayard.eu/docs/install-kubernetes/). When Traefik is removed, OKE deletes its load balancer. cert-manager leaves its CRDs behind; the last command deletes them:
+
+   ```bash
+   helm uninstall traefik -n traefik
+   helm uninstall cert-manager -n cert-manager
+   kubectl delete clusterissuer letsencrypt
+   kubectl delete namespace traefik cert-manager
+   kubectl get crd -o name | grep 'cert-manager.io$' | xargs kubectl delete
+   ```
+
+5. **Check OCI.** On OKE, after a minute or two the load balancer is gone and the block volume is `TERMINATED` in the compartment of the cluster that ran Infrayard:
+
+   ```bash
+   oci lb load-balancer list -c <compartment>
+   oci bv volume list -c <compartment> --query 'data[].{name:"display-name",state:"lifecycle-state"}'
+   ```
+
+6. **Delete the state bucket** once none of its clusters is left. Versioning is on, so `--empty` removes every object version before the bucket:
+
+   ```bash
+   oci os bucket delete --bucket-name infrayard-tfstate --empty --force
+   ```
+
+7. **Remove the rest by hand** if no other installation uses it: the DNS record of the portal, and the OCI user, group and policy from [OCI setup](https://www.infrayard.eu/docs/oci-setup/).
+
+If you destroy the cluster that runs Infrayard, remove the load balancer and the volume first (steps 3 to 5). OKE does not delete them with the cluster: the load balancer keeps the VCN from being deleted, and the volume stays and is billed.
+
 ### Ending a subscription
 
 Ending the subscription does not stop or delete anything in OCI, and Oracle keeps billing running clusters. Before access ends, destroy the clusters you no longer need, or keep the Terraform state bucket so that they can still be managed. Details are in your agreement; see [billing and licensing](https://www.infrayard.eu/docs/subscription/#cancellation-and-offboarding).
@@ -1785,7 +1826,7 @@ oci ce node-pool-options get --node-pool-option-id all --region eu-frankfurt-1
 - An existing subnet also needs its VCN OCID.
 - The compartment must be the anchor or below it.
 - A compartment alone does not reuse its VCN; Infrayard creates a new one.
-- With the **public endpoint with allowlist** mode, existing VCNs and subnets are rejected.
+- With **Public endpoint restricted by CIDR allowlist** on, existing VCNs and subnets are rejected.
 
 See [networking](https://www.infrayard.eu/docs/networking/#bringing-your-own-network).
 
@@ -1795,7 +1836,7 @@ Look at the Terraform log and the node pool in the OCI Console. Common causes: s
 
 ### kubectl cannot connect
 
-The kubeconfig only authenticates; it does not open a network path. Check that you are on the VPN, that the cluster's endpoint mode fits your network, and that your egress range is in the allowlist (**Admin → Configuration → Kubernetes API Access**). Infrayard's own outbound address must be in the allowlist as well, otherwise the kubeconfig download fails; the deploy log then ends with `Cluster API endpoint … not reachable from Infrayard`. See [step 7 of the Kubernetes guide](https://www.infrayard.eu/docs/install-kubernetes/#7-sign-in) for how to find that address.
+The kubeconfig only authenticates; it does not open a network path. Check that you are on the VPN, that the cluster's endpoint mode fits your network, and that your egress range is in **Allowed API CIDRs** (**Admin → Configuration → OCI Settings**). Infrayard's own outbound address must be in the allowlist as well, otherwise the kubeconfig download fails; the deploy log then ends with `Cluster API endpoint … not reachable from Infrayard`. See [step 7 of the Kubernetes guide](https://www.infrayard.eu/docs/install-kubernetes/#7-sign-in) for how to find that address.
 
 ### A limit blocks a request
 

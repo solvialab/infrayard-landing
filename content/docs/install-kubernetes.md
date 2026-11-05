@@ -241,7 +241,7 @@ Then, in **Admin → Configuration**:
 
 1. Check the region and the anchor compartment.
 2. **Sync** shapes and Kubernetes versions from OCI and enable the ones your users may choose. New versions start disabled.
-3. Set **Kubernetes API Access**. Infrayard calls the API of every new cluster on port 6443 to issue kubeconfigs, so it needs a network path to it. The default is a private endpoint, reachable only from networks routed into the cluster's VCN. With **Public endpoint with allowlist**, add your VPN or office ranges and Infrayard's own outbound address. On OKE with private worker nodes, that address is the public IP of the NAT gateway in the VCN of the cluster that runs Infrayard:
+3. Set **Kubernetes API Access** under **OCI Settings**. Infrayard calls the API of every new cluster on port 6443 to issue kubeconfigs, so it needs a network path to it. With the box off (the default), clusters get a private endpoint. Infrayard creates a new VCN for each cluster unless you supply one, so it reaches a private endpoint only if its own network is routed into that VCN; without such a route the cluster still deploys, but the kubeconfig download fails. To use a public endpoint instead, turn on **Public endpoint restricted by CIDR allowlist**, enter your VPN or office ranges and Infrayard's own outbound address in **Allowed API CIDRs**, and click **Save OCI settings**. On OKE with private worker nodes, that address is the public IP of the NAT gateway in the VCN of the cluster that runs Infrayard:
 
    ```bash
    oci network nat-gateway list -c <compartment of that VCN> --query 'data[]."nat-ip"'

@@ -57,7 +57,7 @@ oci ce node-pool-options get --node-pool-option-id all --region eu-frankfurt-1
 - An existing subnet also needs its VCN OCID.
 - The compartment must be the anchor or below it.
 - A compartment alone does not reuse its VCN; Infrayard creates a new one.
-- With the **public endpoint with allowlist** mode, existing VCNs and subnets are rejected.
+- With **Public endpoint restricted by CIDR allowlist** on, existing VCNs and subnets are rejected.
 
 See [networking](/docs/networking/#bringing-your-own-network).
 
@@ -67,7 +67,7 @@ Look at the Terraform log and the node pool in the OCI Console. Common causes: s
 
 ## kubectl cannot connect
 
-The kubeconfig only authenticates; it does not open a network path. Check that you are on the VPN, that the cluster's endpoint mode fits your network, and that your egress range is in the allowlist (**Admin → Configuration → Kubernetes API Access**). Infrayard's own outbound address must be in the allowlist as well, otherwise the kubeconfig download fails; the deploy log then ends with `Cluster API endpoint … not reachable from Infrayard`. See [step 7 of the Kubernetes guide](/docs/install-kubernetes/#7-sign-in) for how to find that address.
+The kubeconfig only authenticates; it does not open a network path. Check that you are on the VPN, that the cluster's endpoint mode fits your network, and that your egress range is in **Allowed API CIDRs** (**Admin → Configuration → OCI Settings**). Infrayard's own outbound address must be in the allowlist as well, otherwise the kubeconfig download fails; the deploy log then ends with `Cluster API endpoint … not reachable from Infrayard`. See [step 7 of the Kubernetes guide](/docs/install-kubernetes/#7-sign-in) for how to find that address.
 
 ## A limit blocks a request
 

@@ -146,6 +146,47 @@ Keycloak updates its schema by itself on the first start of a new version.
 
 Upgrading Infrayard does not touch your OKE clusters. Kubernetes upgrades of the clusters are done per cluster in the portal; see [cluster lifecycle](/docs/cluster-lifecycle/). Plan them with worker refresh, disruption budgets and temporary extra capacity in mind.
 
+## Uninstall Infrayard
+
+Uninstalling Infrayard does not touch the clusters it created, and only Infrayard can destroy them cleanly: their Terraform state is in the state bucket. Work through the steps in this order.
+
+1. **Destroy the clusters** you no longer need in the portal and wait until each one is destroyed. A destroyed cluster takes its compartment, VCN and node pools with it. Clusters you keep go on running and being billed.
+2. **Back up the database** if you may need the history later; see [backups](#backups).
+3. **Remove Infrayard.** Helm keeps the PostgreSQL volume; deleting the claim deletes the volume as well, on OKE the 50 GB `oci-bv` block volume. The namespace also holds the registry and OCI key secrets:
+
+   ```bash
+   helm uninstall infrayard -n infrayard
+   kubectl delete pvc -n infrayard data-infrayard-postgresql-0
+   kubectl delete namespace infrayard
+   ```
+
+4. **Remove Traefik and cert-manager** if you installed them only for Infrayard in step 1 of the [Kubernetes guide](/docs/install-kubernetes/). When Traefik is removed, OKE deletes its load balancer. cert-manager leaves its CRDs behind; the last command deletes them:
+
+   ```bash
+   helm uninstall traefik -n traefik
+   helm uninstall cert-manager -n cert-manager
+   kubectl delete clusterissuer letsencrypt
+   kubectl delete namespace traefik cert-manager
+   kubectl get crd -o name | grep 'cert-manager.io$' | xargs kubectl delete
+   ```
+
+5. **Check OCI.** On OKE, after a minute or two the load balancer is gone and the block volume is `TERMINATED` in the compartment of the cluster that ran Infrayard:
+
+   ```bash
+   oci lb load-balancer list -c <compartment>
+   oci bv volume list -c <compartment> --query 'data[].{name:"display-name",state:"lifecycle-state"}'
+   ```
+
+6. **Delete the state bucket** once none of its clusters is left. Versioning is on, so `--empty` removes every object version before the bucket:
+
+   ```bash
+   oci os bucket delete --bucket-name infrayard-tfstate --empty --force
+   ```
+
+7. **Remove the rest by hand** if no other installation uses it: the DNS record of the portal, and the OCI user, group and policy from [OCI setup](/docs/oci-setup/).
+
+If you destroy the cluster that runs Infrayard, remove the load balancer and the volume first (steps 3 to 5). OKE does not delete them with the cluster: the load balancer keeps the VCN from being deleted, and the volume stays and is billed.
+
 ## Ending a subscription
 
 Ending the subscription does not stop or delete anything in OCI, and Oracle keeps billing running clusters. Before access ends, destroy the clusters you no longer need, or keep the Terraform state bucket so that they can still be managed. Details are in your agreement; see [billing and licensing](/docs/subscription/#cancellation-and-offboarding).

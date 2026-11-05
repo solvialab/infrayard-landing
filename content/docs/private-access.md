@@ -56,7 +56,7 @@ If you [use your own Keycloak](/docs/keycloak/), users' browsers must reach it f
 
 ## Cluster API endpoints
 
-Clusters created by Infrayard can use a private Kubernetes API endpoint or a public one restricted to allowed source ranges. With a restricted public endpoint, add the VPN's egress ranges **and** Infrayard's own outbound address in **Admin → Configuration** as allowed CIDRs; Infrayard calls the cluster API to issue kubeconfigs. See [networking](/docs/networking/).
+Clusters created by Infrayard can use a private Kubernetes API endpoint or a public one restricted to allowed source ranges. With a restricted public endpoint, add the VPN's egress ranges **and** Infrayard's own outbound address to **Allowed API CIDRs** in **Admin → Configuration → OCI Settings**; Infrayard calls the cluster API to issue kubeconfigs. See [networking](/docs/networking/).
 
 ## Check it
 
