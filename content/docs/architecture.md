@@ -1,45 +1,53 @@
 # Architecture
 
-Infrayard is installed in a customer-managed Kubernetes environment. It has no required Solvia-hosted SaaS control plane. The customer operates the installation and retains control of its OCI credentials, infrastructure state and operational records.
+Infrayard runs in an environment you control: a Kubernetes cluster or a single VM. There is no Solvia Lab cloud service in between. Infrayard works in your OCI tenancy with its own OCI user and keeps its data in your database and your Object Storage bucket.
 
 ## Components
 
-| Component | Responsibility |
-| --- | --- |
-| Web portal | Cluster requests, lifecycle actions, access downloads and administration |
-| FastAPI service | Authentication validation, resource validation, configuration, requests and lifecycle coordination |
-| PostgreSQL | Cluster and job records, users, configuration, templates, requests and audit history |
-| Terraform runner | Isolated execution for provisioning, scale, upgrade and destroy jobs |
-| OCI Object Storage | Terraform state for Infrayard-managed clusters |
-| Keycloak | Login, user identity and roles; bundled with Infrayard or your existing Keycloak |
-| Oracle Cloud / OKE | The actual cloud resources and managed Kubernetes service |
+| Component | What it does | Runs as |
+| --- | --- | --- |
+| Portal | Web interface: clusters, requests, access downloads, administration | `infrayard-frontend` (nginx) |
+| API | Checks tokens and requests, stores data, starts and tracks Terraform jobs | `infrayard-api` |
+| Terraform runner | Runs provisioning, scale, upgrade and destroy jobs | Inside `infrayard-api` |
+| PostgreSQL | Clusters, jobs, users, configuration, templates, requests, audit log | `infrayard-postgresql`, or your external PostgreSQL |
+| Keycloak | Sign-in, users and roles | `infrayard-keycloak`, or your existing Keycloak |
+| Object Storage bucket | Terraform state of every managed cluster | In your OCI tenancy |
+| OCI and OKE | The cloud resources themselves | Your OCI tenancy |
 
-The portal and services are delivered as released container images with Helm deployment assets. Customers pull approved images into their own environment or use an agreed internal registry mirror.
+On Kubernetes the services are installed by the Helm chart; on a single VM by Docker Compose, with Caddy in front for HTTPS. Both use the same images.
 
-## Request flow
+The portal and the bundled Keycloak share one address: the portal at `https://infrayard.example.com`, Keycloak at `https://infrayard.example.com/auth`. The portal forwards `/api` to the API and `/auth` to Keycloak; the Keycloak admin console is not reachable this way.
 
-1. The user signs in through Keycloak.
-2. The portal displays the templates, cluster options and limits available to that user.
-3. The API validates the request, compatibility and applicable configuration.
-4. A Terraform job executes with the installation's OCI permissions and cluster state.
-5. The portal exposes the run output and resulting cluster status. Lifecycle events are recorded for operational visibility.
+## What happens when a user creates a cluster
 
-Protected destroy requests and requests for higher resource limits use the admin review workflow. This is not a general approval gate on every cluster creation or lifecycle action.
+1. The user signs in through Keycloak and receives a token.
+2. The portal shows the templates, options and limits that apply to this user.
+3. The API checks the request: limits, template, compatibility of version, shape and image, and network settings.
+4. The API starts a Terraform job with the Infrayard OCI user. Terraform stores the cluster's state in the bucket.
+5. The portal streams the Terraform log. When the job ends, the cluster status, Activity entry and audit record are updated.
+6. For a running cluster, the API creates a per-user ServiceAccount in the cluster and issues the kubeconfig.
+
+Destroy requests and requests for higher limits go through the administrator review. Other operations run immediately within the user's limits.
 
 ## State and ownership
 
-PostgreSQL stores platform metadata. Terraform state is stored in OCI Object Storage. Both are part of your operating and recovery responsibilities; backing up only the portal does not preserve the full platform state.
+PostgreSQL holds the platform data; the bucket holds the Terraform state. Back up both and keep them consistent; see [operations](/docs/operations/).
 
-Resources created by Infrayard are managed by their cluster's Terraform state. Manual edits to those managed resources can be overwritten by a subsequent apply. Supplied existing network resources are referenced according to the [BYON ownership rules](/docs/networking/#bringing-your-own-network).
+Resources created by Infrayard are managed by their cluster's Terraform state, and manual changes are overwritten by the next run. Existing networks you supply are only referenced; see [networking](/docs/networking/#who-owns-what).
 
-## Connectivity and external dependencies
+## Connections
 
-The installation must reach the required OCI APIs, Keycloak and OKE API endpoints. Initial image delivery also requires registry access, or an agreed mirror. Optional SMTP notifications use your configured email service.
+| From | To | Why |
+| --- | --- | --- |
+| Users | Portal (443) | Use Infrayard and sign in |
+| API | OCI APIs and Object Storage (443) | Create and inspect resources, Terraform state |
+| API | Kubernetes API of managed clusters (6443) | Issue kubeconfigs |
+| API | Keycloak | Fetch the realm's signing keys |
+| Host | Image registry (443) | Pull the Infrayard images |
+| API, optional | SMTP server | E-mail notifications |
 
-Running the control plane in your tenancy does not remove these dependencies or automatically provide a disconnected deployment. Review the required routes and any delivery constraints during onboarding.
+The installation needs no inbound connection from the internet when users come through a VPN. See [private access](/docs/private-access/).
 
 ## Operating responsibility
 
-Your team operates the customer installation, its database, secrets, storage, network and workloads. Oracle provides the contracted OCI and OKE services. Solvia Lab supplies the Infrayard release, documentation and support defined in your agreement. Deployment assistance and additional operational support can be scoped in Enterprise.
-
-Continue with [security and access](/docs/security/), [networking](/docs/networking/) and [operations](/docs/operations/).
+You operate the installation, its database, secrets, storage and network, and the workloads on your clusters. Oracle provides OCI and OKE. Solvia Lab provides the Infrayard releases, documentation and the support defined in your agreement.

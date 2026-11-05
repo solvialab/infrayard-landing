@@ -103,7 +103,7 @@ The portal shows tier-specific warnings/messages for this flow.
 
 ## Expiry and cleanup
 
-A time-to-live can be set for temporary clusters. When its TTL is reached, Infrayard starts the destroy workflow. Use TTL deliberately and review its interaction with your protected-cluster policy for the supplied release. Activity includes expiry warnings at 24 hours, 4 hours and 1 hour remaining.
+A time-to-live can be set for temporary clusters. When its TTL is reached, Infrayard starts the destroy workflow. Use TTL deliberately and check how it interacts with your protected-cluster policy. Activity includes expiry warnings at 24 hours, 4 hours and 1 hour remaining.
 
 Scaling a Basic cluster to zero worker nodes can pause compute use, but does not guarantee a zero Oracle bill: retained resources and other services can still be charged.
 

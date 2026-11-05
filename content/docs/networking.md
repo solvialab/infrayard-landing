@@ -1,75 +1,89 @@
 # Networking and existing infrastructure
 
-Choose the endpoint model and ownership boundary before deployment. Kubernetes access files provide authentication; your runner and users still need a working network path.
+Each cluster needs a network, and its Kubernetes API must be reachable from Infrayard and from your users. This page explains what Infrayard creates by default, how to reuse your own VCNs, subnets and compartments, and which access mode to choose for the Kubernetes API.
 
 ## Default setup
 
-By default, Infrayard creates a full network stack per cluster:
+Without any overrides, Infrayard creates a complete network for every cluster, in the cluster's own compartment:
 
-- A **VCN** with a /16 range derived from the cluster's /24 CIDR
-- A **private worker subnet** (/24)
-- A **public Kubernetes API endpoint subnet** when public restricted API access is enabled
-- A **public load balancer subnet** for Kubernetes `LoadBalancer` services
-- Internet Gateway, NAT Gateway, Service Gateway, and route tables for public/private paths
-- Security lists with OKE-required ingress/egress rules plus API endpoint TCP/6443 allowlist rules
+- A **VCN** whose /16 range is derived from the cluster's /24 CIDR.
+- A **private worker subnet** (/24). Worker nodes have no public IPs.
+- A **public load balancer subnet** for Kubernetes `LoadBalancer` services.
+- A **public API endpoint subnet**, only in the restricted public API mode (below).
+- Internet, NAT and service gateways with route tables.
+- Security lists with the rules OKE needs, plus the TCP/6443 allowlist for the API.
+
+All of it belongs to the cluster's Terraform state and is removed when the cluster is destroyed.
 
 ## Kubernetes API endpoint access
 
-Admin Configuration includes **Kubernetes API Access**:
+Choose the mode in **Admin → Configuration → Kubernetes API Access**. It applies to clusters created afterwards.
 
-- **Private endpoint** keeps the OKE API on a private subnet. Infrayard and kubectl clients need an existing private route, VPN, or bastion path.
-- **Public endpoint restricted by CIDR allowlist** creates a dedicated public API endpoint subnet and allows TCP/6443 only from configured CIDRs. Add both the Infrayard runner egress IP/range and company VPN/corporate egress ranges. `0.0.0.0/0` is rejected.
+| Mode | Where the API is | Who can reach it |
+| --- | --- | --- |
+| Private endpoint | Private subnet, no public IP | Anything with a route into the VCN: VPN through a DRG, FastConnect, a bastion, or Infrayard running in a peered network |
+| Public endpoint with allowlist | Dedicated public subnet | Only the CIDR ranges you list; `0.0.0.0/0` is rejected |
 
-This is the supported path when DRG is too costly and LPG does not scale past the per-VCN peering limit. Users still need to be on the corporate/VPN network for `kubectl`.
+With the **public endpoint with allowlist**, list both:
+
+- your **VPN or office egress** ranges, so users can run `kubectl`, and
+- the **outbound address of Infrayard** itself (NAT gateway or VM public IP), because Infrayard calls the cluster API to issue kubeconfigs.
+
+This mode avoids routing every cluster VCN to your network, which helps when DRG attachments are costly or local peering limits are reached. Users still connect from the VPN or office network.
+
+The kubeconfig only provides authentication. Without a network path to port 6443, `kubectl` times out.
 
 ## Bringing your own network
 
-Users can supply existing OCIDs via the **Advanced tab** in the deploy form. Infrayard skips creating whichever resources are already provided:
+In the deploy form, the **Advanced** tab accepts existing OCIDs. Infrayard then skips creating those resources:
 
-| Override | Effect |
-|---|---|
-| Existing VCN OCID | Uses your VCN — skips VCN, IGW, gateway, and route table creation; generated subnets use the VCN's existing/default routing |
-| Existing Compartment OCID | Places resources in your compartment — skips compartment creation |
-| Existing Subnet OCID | Places nodes in your subnet — requires Existing VCN OCID, and skips subnet and security list creation |
+| Field | Effect |
+| --- | --- |
+| Existing Compartment OCID | Resources go into this compartment instead of a new one |
+| Existing VCN OCID | Uses your VCN; Infrayard creates only the cluster subnets and their security lists inside it |
+| Existing Subnet OCID | Worker nodes go into your subnet; requires the VCN OCID as well |
 
-Supported private-endpoint combinations:
+Supported combinations:
 
-| Combination | Behavior |
-|---|---|
-| No overrides | Infrayard creates and manages the compartment, VCN, subnets, gateways, route tables, and security lists |
-| Existing Compartment OCID only | Infrayard creates a new managed VCN/network stack inside that compartment |
-| Existing VCN OCID, with or without Existing Compartment OCID | Infrayard reuses the VCN and creates cluster subnets/security lists inside it; existing VCN gateways and route tables are not managed |
-| Existing VCN OCID + Existing Subnet OCID, with or without Existing Compartment OCID | True BYON networking: Infrayard creates OKE/node-pool resources and references the supplied network read-only |
-| Existing Subnet OCID without Existing VCN OCID | Unsupported and rejected before Terraform starts |
+| You provide | Infrayard creates and manages |
+| --- | --- |
+| Nothing | Compartment, VCN, subnets, gateways, route tables, security lists, cluster |
+| Compartment | VCN and the complete network inside that compartment, cluster |
+| VCN (optionally compartment) | Subnets and security lists in your VCN, cluster. Your gateways and route tables are used as they are |
+| VCN and subnet (optionally compartment) | Only the cluster and node pools. Your network is used read-only |
+| Subnet without VCN | Rejected before Terraform starts |
 
-**Compartment subtree rule.** `Existing Compartment OCID` must be a descendant (any depth) of the **anchor compartment** chosen at install time — the compartment Infrayard uses as the parent for new cluster compartments. The anchor is whatever existing compartment you point us at; it does not have to be a dedicated Infrayard-owned compartment. Direct children, grandchildren, and the anchor itself are all accepted. Siblings, ancestors, or compartments in unrelated subtrees are rejected with a 400 *before* Terraform starts — without this guard the deploy would fail mid-`terraform apply` with a confusing IAM error, because the runner's `manage` policies are scoped to the anchor subtree. Non-existent OCIDs return "compartment not found"; if OCI is briefly unreachable for the validation call, the API returns 503 so the deploy can simply be retried.
+Rules:
 
-The anchor is a knob, not a fixture. Pick the layout that matches your tenancy posture:
+- **Stay inside the anchor.** A supplied compartment must be the anchor compartment or any compartment below it. Others are rejected before Terraform starts, because the OCI policies only cover the anchor subtree.
+- **No automatic discovery.** Supplying only a compartment does not reuse a VCN that already exists in it; Infrayard creates a new one.
+- **Routing must be ready.** With your own VCN or subnet, the worker subnet needs a route `0.0.0.0/0` to a NAT gateway (or your egress path) and a route for `all-<region>-services-in-oracle-services-network` to a service gateway. Otherwise nodes cannot register.
+- **Public endpoint with allowlist** needs an Infrayard-managed VCN. While this mode is on, deployments with an existing VCN or subnet are rejected; an existing compartment is fine.
+- **Sharing a compartment:** to place several clusters in one compartment, create a compartment for them and supply it to each cluster. Do not reuse a compartment that Infrayard created for another cluster.
 
-- **Tenancy root anchor.** No new compartments, nothing to rearrange — the entire tenancy is BYON-eligible. Right for "we don't want Infrayard adding any hierarchy on top of what we already have." Trade-off: the runner's IAM group needs `manage` permissions at tenancy scope (or scoped to the relevant resource families).
-- **Anchor at an existing org compartment.** Slot Infrayard into a `platforms`, `production`, or `infra` compartment you already maintain. BYON works for anything under it, including peer compartments that already existed there. You don't have to create a new compartment to enable Infrayard.
-- **Dedicated anchor compartment.** Create one (e.g. `infrayard`) for explicit blast-radius isolation. Functionally identical to the previous case, just a narrower IAM scope.
+The OCID fields check the OCID type and offer autocomplete lists of the compartments, VCNs and subnets Infrayard can see.
 
-The single-install pattern that's *not* supported today is "one Infrayard spanning multiple unrelated subtrees of the same tenancy." That posture requires either tenancy-wide grants (use the tenancy-root anchor) or two installs.
+## Choosing the anchor compartment
 
-Restricted public API endpoint mode requires Infrayard-managed networking when `Existing VCN OCID` or `Existing Subnet OCID` would otherwise make the network read-only.
+The anchor is set at installation and can be changed in **Admin → Configuration**. Typical choices:
 
-Important behavior: `Existing Compartment OCID` does **not** auto-discover an existing VCN or subnet from that compartment. If VCN/subnet fields are left empty, Infrayard creates a new VCN/subnets/network stack inside the provided compartment.
+| Anchor | Good for | Note |
+| --- | --- | --- |
+| A dedicated compartment, e.g. `infrayard` | Clear separation and the narrowest permissions | Existing networks must be inside it |
+| An existing compartment such as `platform` | Reusing networks and compartments that already exist there | The policies grant management of everything below it |
+| The tenancy root | Reusing anything in the tenancy | Policies at tenancy scope; widest permissions |
 
-Advanced override UX guardrails: OCID fields validate type prefixes (`ocid1.vcn.`, `ocid1.compartment.`, `ocid1.subnet.`) and provide OCI-backed autocomplete lists for compartments, VCNs, and subnets.
+One installation cannot span several unrelated compartment trees. Use the tenancy root as anchor, or run separate installations.
 
-> Shared compartment guidance: if you want multiple clusters in one compartment, use a dedicated BYO compartment via `Existing Compartment OCID` for all those clusters. Do not reuse a compartment that was auto-created for another cluster as a shared target.
+## Who owns what
 
-> Note: If you deploy with existing VCN/subnet overrides, Infrayard does not manage route tables for those existing resources. Your existing network must already provide equivalent private-subnet egress required for OKE worker node registration: route `0.0.0.0/0` to a NAT Gateway (or equivalent corporate egress path) and route `all-<region>-services-in-oracle-services-network` to a Service Gateway. This is a routing requirement, not an "open ingress" security rule.
-
-> ⚠️ **Drift behaviour.** Infrayard-created VCN, subnet, IGW, route table, and security list resources are fully managed by the cluster's Terraform state — manual edits in the OCI Console will be overwritten on the next apply. Supplied BYO resources (existing VCN / subnet / compartment) are referenced read-only and never modified.
+- Resources Infrayard creates are managed by the cluster's Terraform state. Manual changes in the OCI Console are overwritten by the next scale or upgrade.
+- Resources you supply (compartment, VCN, subnet) are only referenced, never changed or deleted.
 
 ## Custom security rules
 
-Infrayard's default security list covers the ports required by OKE. For custom ingress/egress rules — exposing specific node ports, restricting egress to corporate CIDRs, or integrating with existing NSGs — the recommended approach is to **bring your own subnet** via the Advanced tab with your security configuration already applied. Infrayard uses your subnet and skips creating its own security list entirely, giving your network team full control without adding UI complexity.
+The default security lists cover what OKE needs. For your own rules, for example extra node ports, restricted egress or network security groups, supply your own subnet with those rules already in place. Infrayard then creates no security list of its own.
 
-## Pre-deployment review
+## The Infrayard installation itself
 
-Confirm the chosen endpoint mode, runner and client routes, anchor compartment, OCI policies, DNS and required service egress. Test reachability from the actual runner and authorised client network. Do not treat a VPN label or an existing subnet as proof that all routes are ready.
-
-See [installation](/docs/installation/) and [security and access](/docs/security/).
+To make the portal reachable only from your VPN, see [private access](/docs/private-access/).

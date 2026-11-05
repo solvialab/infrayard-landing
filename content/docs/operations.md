@@ -1,51 +1,151 @@
 # Operations, upgrades and recovery
 
-The customer operates the Infrayard installation and the cloud environment around it. This page defines the operating areas to cover. Use the deployment and upgrade runbook for your supplied release for exact commands, supported versions and migration steps.
+You operate the Infrayard installation; Solvia Lab supplies releases, documentation and support. This page covers upgrades, backups and restores for both installation paths, with the commands to run.
 
 ## Responsibilities
 
-| Area | Operating responsibility |
+| Area | Who |
 | --- | --- |
-| Kubernetes host, ingress, TLS, storage and network | Customer, with deployment assistance if agreed |
-| OCI IAM and API credentials | Customer |
-| PostgreSQL and Terraform state backup | Customer |
-| Workload deployment, application backup and availability | Customer |
-| Infrayard release images, documentation and contracted support | Solvia Lab |
-| Extra rollout or incident assistance | As scoped in the support agreement |
+| Host (Kubernetes or VM), ingress, TLS, storage, network | You |
+| OCI user, policies and keys | You |
+| Backups of the database, secrets and Terraform state | You |
+| Applications on the OKE clusters | You |
+| Infrayard releases, release notes, documentation, support | Solvia Lab |
 
-## Before a platform upgrade
+## What to back up
 
-1. Record the installed image versions or digests, Helm release and customer values.
-2. Review the target release notes, compatibility requirements and any database migration guidance supplied with the release.
-3. Back up PostgreSQL, required deployment configuration and secrets using your approved tools. Preserve access to the related Terraform state in OCI Object Storage.
-4. Avoid scheduling a platform upgrade while cluster lifecycle jobs are running.
-5. Test the target release in a non-production installation where possible.
-6. Agree a maintenance window, validation plan and release-specific recovery procedure.
+| Item | Contains | How |
+| --- | --- | --- |
+| PostgreSQL database `infrayard` | Clusters, jobs, users, configuration, templates, requests, audit log, SSH keys of the worker nodes and, with the bundled Keycloak, all Keycloak users and settings | [Database backup](#backups), daily |
+| Terraform state bucket | The state of every managed cluster | Object versioning on the bucket; optionally a copy to another region |
+| Configuration | Kubernetes: `values.yaml` and `secrets.yaml`. VM: the `~/infrayard` directory with `.env` | Your secret manager or configuration repository |
+| OCI API key | `oci_api_key.pem` | Your secret manager |
 
-Use the pinned, released image references supplied for the upgrade. Customer operators consume images; they do not need the product source code or maintainer build pipelines.
+Database and state belong together: a restored database must match the clusters that actually exist in OCI. Treat backups as sensitive; they contain SSH private keys and, with the bundled Keycloak, password hashes.
 
-## Validate after an upgrade
+## Backups
 
-- Sign in as an administrator and a representative regular user.
-- Check role and template visibility, global limits and per-user overrides.
-- Confirm cluster inventory, Activity history and audit records are available.
-- Verify state-backend and OCI connectivity.
-- Validate a suitable non-production lifecycle workflow before allowing wider changes.
+The database backup is one file that contains both Infrayard and the bundled Keycloak.
 
-## Backups and recovery
+**Kubernetes:**
 
-Back up the database, relevant Helm values, necessary secrets and Terraform state under your organisation's retention and access controls. These contain different parts of the platform and need a consistent recovery plan.
+```bash
+kubectl exec -n infrayard infrayard-postgresql-0 -c postgresql -- \
+  pg_dump -U infrayard -Fc infrayard > infrayard-$(date +%F).dump
+```
 
-Define backup frequency, recovery point and recovery time requirements before production. Test restoring into an isolated environment. Do not assume that reinstalling Helm, reverting an image or recovering a single database snapshot will safely undo an infrastructure operation or database migration.
+**Single VM** (in `~/infrayard`):
 
-During recovery, reconcile the restored metadata and state with the resources actually present in OCI before starting new jobs. Do not run competing Terraform operations against the same state.
+```bash
+docker compose exec -T infrayard-postgresql \
+  pg_dump -U infrayard -Fc infrayard > infrayard-$(date +%F).dump
+```
 
-This public guide does not claim a built-in backup service, one-click rollback, or a particular recovery SLA. Any assisted recovery and response commitment is defined in your support agreement.
+To run it every night on the VM, add a cron entry with `crontab -e`:
 
-## OKE and workload operations
+```text
+30 2 * * * cd ~/infrayard && docker compose exec -T infrayard-postgresql pg_dump -U infrayard -Fc infrayard > ~/backups/infrayard-$(date +\%F).dump
+```
 
-An Infrayard platform upgrade and an OKE Kubernetes upgrade are separate changes. Worker refresh, disruption budgets, capacity, temporary scaling cost and application availability must be considered when scheduling OKE changes. See [cluster lifecycle](/docs/cluster-lifecycle/).
+Copy the files off the host, for example to an Object Storage bucket with `oci os object put`, and delete old ones according to your retention policy.
+
+If you use an external PostgreSQL (`postgresql.enabled: false`), back it up with your database tooling instead.
+
+## Restore
+
+Restore into the same Infrayard version that created the backup, then upgrade if needed. Stop the services that write to the database first.
+
+**Kubernetes:**
+
+```bash
+kubectl scale deploy -n infrayard infrayard-api infrayard-keycloak --replicas=0
+kubectl exec -i -n infrayard infrayard-postgresql-0 -c postgresql -- \
+  pg_restore -U infrayard -d infrayard --clean --if-exists --no-owner < infrayard-2026-01-31.dump
+kubectl scale deploy -n infrayard infrayard-api infrayard-keycloak --replicas=1
+```
+
+Without the bundled Keycloak, leave `infrayard-keycloak` out of the commands.
+
+**Single VM:**
+
+```bash
+docker compose stop infrayard-api infrayard-keycloak
+docker compose exec -T infrayard-postgresql \
+  pg_restore -U infrayard -d infrayard --clean --if-exists --no-owner < infrayard-2026-01-31.dump
+docker compose up -d
+```
+
+**On a new host**, start only the database first, so that nothing writes to it before the restore:
+
+- Kubernetes: install with your values and `--set api.replicaCount=0 --set keycloak.replicaCount=0`, restore, then run `helm upgrade` with the same command without these two options.
+- VM: `docker compose up -d --wait infrayard-postgresql`, restore, then `docker compose up -d`.
+
+After a restore, compare the cluster list in the portal with what exists in OCI before you start new operations. A cluster created or destroyed after the backup appears in the wrong state; its Terraform state in the bucket is still correct.
+
+## Upgrade Infrayard
+
+Before you start:
+
+1. Read the release notes of the target version, especially for steps marked as required.
+2. Take a [database backup](#backups).
+3. Make sure no cluster operation is running (**Admin → All Clusters**).
+
+The API applies database changes automatically when it starts. They cannot be undone by downgrading; a rollback means restoring the backup.
+
+**Kubernetes:**
+
+```bash
+helm upgrade infrayard oci://registry.gitlab.com/solvialab/infrayard/charts/infrayard \
+  --version 1.5.0 -n infrayard -f values.yaml -f secrets.yaml
+kubectl get pods -n infrayard -w
+```
+
+The chart version selects the image version. Changed configuration or secrets restart the affected pods automatically.
+
+**Single VM:**
+
+```bash
+cd ~/infrayard
+sed -i 's/^INFRAYARD_VERSION=.*/INFRAYARD_VERSION=1.5.0/' .env
+docker compose pull
+docker compose up -d
+```
+
+If the release notes say that the Compose bundle changed, unpack the new one next to the old directory and copy over your `.env` and `oci_api_key.pem`:
+
+```bash
+cd ~ && docker run --rm registry.gitlab.com/solvialab/infrayard/compose:1.5.0 | tar xz
+cp ~/infrayard/.env ~/infrayard/oci_api_key.pem ~/infrayard-compose/
+```
+
+Set `INFRAYARD_VERSION=1.5.0` in the copied `.env`, stop the old installation with `docker compose down` in `~/infrayard`, and start the new one with `docker compose up -d` in `~/infrayard-compose`. The data stays in the Docker volumes, which both directories share because the Compose project name is `infrayard`.
+
+**After the upgrade:** sign in as an administrator and as a regular user, check the cluster list and the Activity history, and run **Sync** in **Admin → Configuration** to confirm OCI access.
+
+**Rollback** (Kubernetes): `helm rollback infrayard -n infrayard` returns the previous chart and images. If the new version had already started, also restore the backup taken before the upgrade.
+
+## PostgreSQL and Keycloak versions
+
+The chart and the bundle pin the PostgreSQL major version (currently 18) and the Keycloak version (currently 26.8). Patch releases arrive with Infrayard upgrades.
+
+A new PostgreSQL major version cannot read the old data directory. When a release moves to a new major version, its notes say so, and the upgrade needs a dump and restore:
+
+1. Take a [database backup](#backups).
+2. Stop everything and delete the database volume:
+   - Kubernetes: `kubectl scale deploy -n infrayard infrayard-api infrayard-keycloak --replicas=0`, then `kubectl delete statefulset infrayard-postgresql -n infrayard` and `kubectl delete pvc data-infrayard-postgresql-0 -n infrayard`.
+   - VM: `docker compose down`, then `docker volume rm infrayard_postgres`.
+3. Start the new version with only the database running:
+   - Kubernetes: the `helm upgrade` command from above with `--set api.replicaCount=0 --set keycloak.replicaCount=0`.
+   - VM: set the new version in `.env`, then `docker compose pull` and `docker compose up -d --wait infrayard-postgresql`.
+4. [Restore](#restore) the backup with the `pg_restore` command.
+5. Start everything: the same `helm upgrade` without the two `--set` options, or `docker compose up -d`.
+
+Keycloak updates its schema by itself on the first start of a new version.
+
+## OKE clusters are a separate topic
+
+Upgrading Infrayard does not touch your OKE clusters. Kubernetes upgrades of the clusters are done per cluster in the portal; see [cluster lifecycle](/docs/cluster-lifecycle/). Plan them with worker refresh, disruption budgets and temporary extra capacity in mind.
 
 ## Ending a subscription
 
-Arrange the supported handover of required configuration, access and state before the commercial access period ends. Ending a software subscription does not stop Oracle Cloud billing for resources left running. Subscription entitlements and the offboarding procedure are governed by your agreement; see [billing and licensing](/docs/subscription/#cancellation-and-offboarding).
+Ending the subscription does not stop or delete anything in OCI, and Oracle keeps billing running clusters. Before access ends, destroy the clusters you no longer need, or keep the Terraform state bucket so that they can still be managed. Details are in your agreement; see [billing and licensing](/docs/subscription/#cancellation-and-offboarding).

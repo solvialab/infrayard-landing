@@ -1,61 +1,77 @@
 # Requirements and compatibility
 
-Use this page to assess deployment fit before committing to an installation. Exact versions, image references and customer-specific values are confirmed against the release supplied during onboarding.
+Use this page to check whether Infrayard fits your environment before you install it.
 
 ## Deployment options
 
-| Requirement | Existing OKE cluster | Single-node k3s on OCI VM |
+| | Existing OKE cluster | Other Kubernetes (k3s, …) | Single VM |
+| --- | --- | --- | --- |
+| Intended use | Production | Production or evaluation | Evaluation, demos, small teams |
+| Tooling | `kubectl`, Helm 3.8+ | `kubectl`, Helm 3.8+ | Docker with Compose v2 |
+| Ingress | An ingress controller you install, e.g. Traefik with an OCI load balancer | Your ingress controller; k3s ships Traefik | Caddy, included |
+| TLS | cert-manager or your own certificate | cert-manager or your own certificate | Automatic Let's Encrypt or your own certificate |
+| Storage | 10 GiB volume, `oci-bv` | 10 GiB volume from your StorageClass | Docker volume, 30 GB disk |
+| Capacity | About 1 CPU and 2 GiB free (limits up to 4.7 CPU, 3.2 GiB) | Same | 2 CPUs, 4 GB memory minimum, 8 GB recommended |
+| Keycloak | Bundled or your own | Bundled or your own | Bundled |
+
+Infrayard is tested on k3s 1.36 with Traefik and cert-manager, and with the Docker Compose bundle. The images are built for x86 (`amd64`) and Arm (`arm64`).
+
+## OCI
+
+- A tenancy and a region where you create OKE clusters.
+- An **anchor compartment** under which Infrayard creates clusters. See [choosing the anchor](/docs/networking/#choosing-the-anchor-compartment).
+- An OCI user with the [Infrayard policies](/docs/oci-setup/#3-add-the-policies), an API key and a customer secret key.
+- An Object Storage bucket for Terraform state.
+- Service limits and quotas for the clusters you plan: OKE clusters, compute cores of the worker shapes, VCNs and load balancers.
+
+## Network
+
+| Direction | From → to | Port |
 | --- | --- | --- |
-| Intended use | Production customer installations | Evaluation, development and demos |
-| Deployment | Customer Helm chart and OKE values | The same chart with k3s values |
-| Ingress | ingress-nginx with an OCI Load Balancer, configured separately | Traefik, supplied by k3s |
-| Storage | OCI Block Volume storage class (`oci-bv`) | Local-path storage |
-| Identity | Bundled Keycloak or your existing Keycloak | Bundled Keycloak or your existing Keycloak |
-| Scheduling | Dedicated worker nodes | Single-node scheduling settings in the supplied values |
+| Inbound | Users → portal | 443, and 80 for redirects and Let's Encrypt |
+| Outbound | Infrayard → OCI APIs and Object Storage (`*.oraclecloud.com`) | 443 |
+| Outbound | Infrayard → image registry | 443 |
+| Outbound | Infrayard → Kubernetes API of each managed cluster | 6443 |
+| Outbound | Users → Kubernetes API of their clusters, for `kubectl` | 6443 |
+| Outbound, optional | Infrayard → your SMTP server | 587 or your port |
+| Outbound, optional | Infrayard → your own Keycloak | 443 |
 
-An existing supported Kubernetes host can run the platform; this does not imply that every Kubernetes distribution or version has been validated. Confirm the intended distribution and release during onboarding.
+The portal needs no inbound connection from the internet if users come through a VPN; see [private access](/docs/private-access/).
 
-## Before installation
+## Identity
 
-- An OCI tenancy, target region and selected anchor compartment.
-- A service identity with permissions for the resource families Infrayard will manage.
-- OCI Object Storage configuration for Terraform state.
-- A Kubernetes host with appropriate ingress, persistent storage and capacity for the platform services.
-- DNS and TLS arrangements for the portal and identity endpoints.
-- Network reachability from the runner and authorised users to the OKE API endpoints they will use.
-- An approved image delivery path and the release-specific Helm assets.
-- Bundled Keycloak, or a realm in your existing Keycloak, and the admin role assignment.
+Sign-in uses Keycloak: either the Keycloak bundled with Infrayard (realm, client and admin role are created automatically) or a realm in your existing Keycloak 22 or newer. See [Use your own Keycloak](/docs/keycloak/).
 
-The installation includes PostgreSQL and identity services when configured in the supplied chart. Budget for these services, their persistent storage, any load balancer and your OKE resources. The software subscription does not pay your Oracle Cloud bill.
+## Costs outside the subscription
+
+The subscription covers the Infrayard software. Your Oracle Cloud bill covers the OKE clusters and their nodes, load balancers and storage, and the host that runs Infrayard: a VM, or capacity and one 10 GiB block volume in your cluster, plus a load balancer for the ingress.
 
 ## OKE versions, shapes and images
 
-Compatibility is region- and tenancy-specific. Administrators sync OCI shapes and Kubernetes versions, then enable the choices available to users. Newly synced Kubernetes versions are disabled until an administrator enables them.
+Which Kubernetes versions, shapes and node images exist depends on your region and tenancy. Administrators sync them from OCI in **Admin → Configuration** and enable what users may choose. Newly synced Kubernetes versions stay disabled until an administrator enables them.
 
-The deploy and template forms filter Kubernetes versions by the selected shape and available OKE node images. If compatibility validation is unavailable, deployment is blocked rather than allowing an unverified combination. See [troubleshooting](/docs/troubleshooting/#missing-versions-or-shapes).
+The deploy and template forms only offer Kubernetes versions that have a node image for the selected shape. If Infrayard cannot check this with OCI, deployment is blocked rather than allowing an unverified combination. See [troubleshooting](/docs/troubleshooting/#missing-versions-or-shapes).
 
 ## Basic and Enhanced clusters
 
-The platform can allow Basic, Enhanced or both OKE tiers. These are Oracle service tiers, separate from Infrayard subscription plans.
+The platform can allow Basic, Enhanced or both OKE cluster types. These are Oracle service tiers, separate from Infrayard subscription plans.
 
 | Operation | Basic | Enhanced |
 | --- | --- | --- |
-| Add or remove nodes and pools | Supported automatically | Supported automatically |
-| Change per-node shape, OCPU, RAM or storage | Requires rolling worker cycling | Automated supported rollout |
-| Kubernetes upgrade | Control-plane and target updates, followed by rolling worker refresh | Automated supported control-plane and worker rollout |
-| OCI control-plane charges | Follow Oracle's Basic pricing | Follow Oracle's Enhanced pricing |
+| Add or remove nodes and pools | Automatic | Automatic |
+| Change a pool's shape, OCPUs, memory or storage | Needs rolling worker cycling | Automatic rollout |
+| Kubernetes upgrade | Control plane first, then a rolling worker refresh | Automatic control plane and worker rollout |
+| OCI control-plane charges | Oracle's Basic pricing | Oracle's Enhanced pricing |
 
-Check [cluster lifecycle](/docs/cluster-lifecycle/#cluster-tiers) for operational steps and workload considerations.
+See [cluster lifecycle](/docs/cluster-lifecycle/#cluster-tiers) for the steps.
 
 ## Product scope
 
-Current scope is OKE infrastructure provisioning and lifecycle management through Infrayard workflows. The product includes templates, limits, protected requests, cost estimates, identity integration, audit records and supported existing-network configurations.
+Infrayard provisions and manages OKE clusters: create, access, scale, upgrade and destroy, with templates, limits, requests, cost estimates, audit records and existing-network support.
 
-- Application deployment, CI/CD, databases used by your applications and application availability remain within your existing delivery and operating processes.
-- Using an existing OKE cluster to **host Infrayard** is different from importing that cluster into Infrayard's Terraform management. Do not assume arbitrary existing clusters can be adopted; agree the supported lifecycle scope during evaluation.
-- One installation's compartment access follows its anchor and OCI IAM scope. Unrelated compartment subtrees need an appropriate root anchor or separate installations.
-- Existing subnets require an existing VCN reference and prepared routing. Some restricted public endpoint combinations require Infrayard-managed networking.
-- AI assistance, the access agent and non-OCI management are roadmap items unless explicitly delivered in your contracted release.
-- Hosting in your tenancy does not itself certify compliance, provide application high availability or create an air-gapped environment.
-
-See [networking](/docs/networking/) for supported combinations and [releases and roadmap](/docs/releases/) for future work.
+- Deploying applications, CI/CD and application databases stay in your existing tools.
+- Running Infrayard **on** an existing OKE cluster is different from **managing** that cluster with Infrayard. Infrayard manages only clusters it created; existing clusters are not imported.
+- One installation manages one anchor compartment tree. Unrelated trees need the tenancy root as anchor or separate installations.
+- Existing subnets need their VCN as well, and prepared routing. The public API endpoint mode needs Infrayard-managed networking.
+- AI assistance, an access agent and non-OCI clouds are on the [roadmap](/docs/releases/#planned-work), not in the product today.
+- Running in your tenancy does not by itself make the setup compliant, highly available or air-gapped.

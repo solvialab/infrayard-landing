@@ -13,15 +13,16 @@ Choose Infrayard based on capabilities available in the release delivered to you
 - Download Kubernetes access files without requiring local OCI CLI setup in the default access workflow.
 - Review cost estimates, Activity notifications and audit history.
 - Sync available shapes and Kubernetes versions with compatibility filtering.
-- Use customer-managed identity and a Helm-based customer installation.
+- Sign in through the bundled Keycloak or your existing Keycloak.
+- Install with Helm on Kubernetes (OKE, k3s and others) or with Docker Compose on a single VM.
 
 Operational behaviour depends on cluster tier and network design; see [requirements](/docs/requirements/) and [cluster lifecycle](/docs/cluster-lifecycle/).
 
 ## Versioned delivery
 
-Customers receive released container images, pinned references, deployment values and applicable release guidance. Images can be pulled from the approved delivery registry or an agreed mirror. Source code and maintainer CI are not required for customer deployment.
+Each release has a version number such as `1.4.0`. The Helm chart and the images of a release share that version and are published together in the private registry you receive access to; chart `1.4.0` runs images `1.4.0`, and the Compose bundle `compose:1.4.0` starts the same images.
 
-Use the version and upgrade notes included with your supplied release. This public page does not assign invented release dates or release numbers to the current build. Track the exact image versions or digests running in your installation.
+Release notes list changes and any required upgrade steps. Follow [Upgrade Infrayard](/docs/operations/#upgrade-infrayard) and run `helm list -n infrayard` (or check `.env` on a VM) to see which version you run. Source code and build pipelines are not needed to install or operate Infrayard.
 
 ## Planned work
 

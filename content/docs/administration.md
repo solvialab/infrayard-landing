@@ -2,7 +2,7 @@
 
 Administrators configure the approved options and operating boundaries available to each team. Review [security and access](/docs/security/) for the identity and privilege model.
 
-Admin access is granted by a Keycloak role assignment (realm role, client role or group) — see customer integration docs (gated). Admins have a separate panel accessible from the top nav.
+Admin access is granted by the admin role in Keycloak (`admin` in the bundled realm; with your own Keycloak a realm role, client role or group you choose, see [roles](/docs/keycloak/#roles)). Admins see an **Admin** panel in the top navigation.
 
 ## All clusters
 
@@ -72,14 +72,14 @@ Dedicated admin page for creating and managing cluster templates — pre-configu
 | Tier default | Suggested cluster tier — Basic or Enhanced (suggestion only, not enforced) |
 | TTL | Optional time-to-live in hours — when reached, Infrayard automatically starts cluster destroy/cleanup |
 | Destroy protection | When enabled, the "Destroy" button on the user's cluster opens a "Request destroy" modal instead. Requests land in Admin → Requests (with a live count badge in the nav) where an admin approves, reviews the destroy plan, then confirms force-destroy, or denies with a note |
-| Required role | Keycloak realm role — only users with this role can see and use the template (leave empty for all users) |
+| Required role | Keycloak role (or group, depending on your role source) — only users with it can see and use the template. Leave empty for all users |
 | Sort order | Controls display position in the deploy form (lower numbers appear first) |
 
 The templates table shows estimated monthly and hourly cost per template. The add/edit modal includes a live cost preview that updates as you change pools, shape, or tier.
 
 Template modal behavior: when a VM shape is selected, the K8s dropdown is filtered to versions OCI reports as compatible for that shape in the current region (node-image-backed compatibility). If compatibility lookup is unavailable, no fallback list is shown (fail-closed). Template save/update re-validates shape+K8s compatibility and blocks incompatible combinations.
 
-**Environment-tier gating** — use `required_role` to control which teams can deploy which cluster sizes. For example, create a `DEV — Small` template visible to everyone, a `TEST — Medium` template requiring a `testing` role, a `UAT — Large` template requiring a `uat` role, and a `PROD — HA` template requiring a `production` role. Users only see the templates they have access to on the deploy form. Create the roles in Keycloak under **Realm roles** and assign them to the relevant users.
+**Environment-tier gating** — use `required_role` to control which teams can deploy which cluster sizes. For example, create a `DEV — Small` template visible to everyone, a `TEST — Medium` template requiring a `testing` role, a `UAT — Large` template requiring a `uat` role, and a `PROD — HA` template requiring a `production` role. Users only see the templates they have access to on the deploy form. Create the roles in Keycloak under **Realm roles** (or as client roles or groups, matching your [role source](/docs/keycloak/#roles)) and assign them to the relevant users.
 
 Templates can be created, edited, enabled/disabled, and permanently deleted. Disabled templates no longer appear in the deploy form but remain referenced by existing clusters. Permanently deleting a template removes it from the admin panel entirely.
 

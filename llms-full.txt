@@ -1,6 +1,6 @@
 # Infrayard by Solvia Lab
 
-Last substantive website update: 2026-10-17.
+Last substantive website update: 2026-11-05.
 
 Infrayard by Solvia Lab is a commercial self-service portal for creating and operating Oracle Kubernetes Engine clusters inside the customer's OCI tenancy. Platform teams define templates, roles and limits. Engineers use the portal for supported cluster lifecycle workflows. No Solvia-hosted SaaS control plane is required.
 
@@ -28,18 +28,23 @@ AI assistance, advanced cost and policy insights, an access agent, multicloud go
 
 ## Documentation
 
-- [Overview](https://www.infrayard.eu/docs/): Evaluate, deploy and operate Infrayard in your OCI environment.
-- [Architecture](https://www.infrayard.eu/docs/architecture/): Components, Terraform execution, state storage and the customer tenancy boundary.
-- [Requirements and compatibility](https://www.infrayard.eu/docs/requirements/): Deployment prerequisites, supported cluster tiers and product scope.
-- [Security and access](https://www.infrayard.eu/docs/security/): Identity, roles, OCI credentials, Kubernetes access and data boundaries.
-- [Networking and existing infrastructure](https://www.infrayard.eu/docs/networking/): Private and restricted public endpoints, BYON combinations, routing and ownership.
-- [Installation](https://www.infrayard.eu/docs/installation/): Prepare your OCI environment, install with Helm and verify your first workflow.
+- [Overview](https://www.infrayard.eu/docs/): What Infrayard does and where to find each topic.
+- [Architecture](https://www.infrayard.eu/docs/architecture/): Components, the request flow, state storage and network connections.
+- [Requirements and compatibility](https://www.infrayard.eu/docs/requirements/): Hosts, OCI, network ports, identity, OKE tiers and product scope.
+- [Security and access](https://www.infrayard.eu/docs/security/): Keycloak roles, OCI credentials, kubeconfig rights, SSH keys and audit records.
+- [Networking and existing infrastructure](https://www.infrayard.eu/docs/networking/): Kubernetes API access modes, existing VCNs, subnets and compartments, and the anchor compartment.
+- [Installation](https://www.infrayard.eu/docs/installation/): Choose between Kubernetes and a single VM, and what you need for each.
+- [Prepare OCI](https://www.infrayard.eu/docs/oci-setup/): Create the OCI user, policies, API key, Terraform state bucket and S3 key.
+- [Install on Kubernetes](https://www.infrayard.eu/docs/install-kubernetes/): Install Infrayard with Helm on an existing OKE, k3s or other Kubernetes cluster.
+- [Install on a single VM](https://www.infrayard.eu/docs/install-vm/): Run Infrayard with Docker Compose and automatic HTTPS on one Linux VM.
+- [Use your own Keycloak](https://www.infrayard.eu/docs/keycloak/): Sign users in through a realm of your existing Keycloak, with roles or groups.
+- [Private access (VPN only)](https://www.infrayard.eu/docs/private-access/): Make the portal reachable only from your VPN or company network.
 - [Cluster lifecycle](https://www.infrayard.eu/docs/cluster-lifecycle/): Create, access, scale, upgrade and clean up OKE clusters.
 - [Administration](https://www.infrayard.eu/docs/administration/): Configure templates, roles, resource limits, approvals, cost estimates and audit records.
-- [Operations, upgrades and recovery](https://www.infrayard.eu/docs/operations/): Plan platform upgrades, backups and recovery with clear operating responsibilities.
-- [Troubleshooting and support](https://www.infrayard.eu/docs/troubleshooting/): Diagnose deployment, connectivity, identity and lifecycle issues.
+- [Operations, upgrades and recovery](https://www.infrayard.eu/docs/operations/): Upgrade Infrayard, back up and restore the database, and plan responsibilities.
+- [Troubleshooting and support](https://www.infrayard.eu/docs/troubleshooting/): Fix installation, sign-in, network and cluster operation problems.
 - [Subscription, billing and licensing](https://www.infrayard.eu/docs/subscription/): Monthly and annual Business plans, founding pricing, evaluation and commercial access.
-- [Releases and roadmap](https://www.infrayard.eu/docs/releases/): Available capabilities, versioned delivery and separately identified roadmap items.
+- [Releases and roadmap](https://www.infrayard.eu/docs/releases/): Available capabilities, versioning and separately identified roadmap items.
 
 ## Disambiguation
 
@@ -63,347 +68,1169 @@ Infrayard by Solvia Lab is the Oracle Cloud Kubernetes product at https://www.in
 
 Canonical page: https://www.infrayard.eu/docs/
 
-Infrayard is a self-service portal for Oracle Kubernetes Engine (OKE). Engineers create and operate clusters through approved workflows. Platform administrators define templates, identity roles, resource limits and protected operations. Terraform and OCI APIs execute the infrastructure work inside the customer environment.
+Infrayard is a self-service portal for Oracle Kubernetes Engine (OKE). Engineers create, scale, upgrade and delete OKE clusters through a web portal. Platform administrators decide which templates, sizes and Kubernetes versions are allowed, and approve protected operations. Behind the portal, Terraform creates the resources in your own OCI tenancy.
+
+You install Infrayard in your environment, on Kubernetes or on a single VM. Credentials, state and data stay with you.
 
 ### Find your starting point
 
-| You want to… | Start here |
+| You want to… | Read |
 | --- | --- |
-| Check whether Infrayard fits your environment | [Requirements and compatibility](https://www.infrayard.eu/docs/requirements/) |
-| Review the system and its data boundary | [Architecture](https://www.infrayard.eu/docs/architecture/) and [security](https://www.infrayard.eu/docs/security/) |
-| Reuse your network and compartments | [Networking and existing infrastructure](https://www.infrayard.eu/docs/networking/) |
-| Prepare an installation or evaluation | [Installation](https://www.infrayard.eu/docs/installation/) |
-| Create, access, scale or upgrade a cluster | [Cluster lifecycle](https://www.infrayard.eu/docs/cluster-lifecycle/) |
-| Configure the platform for your teams | [Administration](https://www.infrayard.eu/docs/administration/) |
-| Plan an upgrade or investigate an issue | [Operations](https://www.infrayard.eu/docs/operations/) and [troubleshooting](https://www.infrayard.eu/docs/troubleshooting/) |
-| Compare subscriptions or plan an evaluation | [Subscription, billing and licensing](https://www.infrayard.eu/docs/subscription/) |
+| Check whether Infrayard fits your environment | [Requirements](https://www.infrayard.eu/docs/requirements/) |
+| Understand the components and data flow | [Architecture](https://www.infrayard.eu/docs/architecture/) and [security](https://www.infrayard.eu/docs/security/) |
+| Install Infrayard | [Installation](https://www.infrayard.eu/docs/installation/), starting with [Prepare OCI](https://www.infrayard.eu/docs/oci-setup/) |
+| Connect your company Keycloak | [Use your own Keycloak](https://www.infrayard.eu/docs/keycloak/) |
+| Keep the portal off the internet | [Private access](https://www.infrayard.eu/docs/private-access/) |
+| Reuse your VCNs, subnets and compartments | [Networking](https://www.infrayard.eu/docs/networking/) |
+| Create, access, scale or upgrade clusters | [Cluster lifecycle](https://www.infrayard.eu/docs/cluster-lifecycle/) |
+| Set up templates, limits and approvals | [Administration](https://www.infrayard.eu/docs/administration/) |
+| Upgrade, back up or restore Infrayard | [Operations](https://www.infrayard.eu/docs/operations/) |
+| Fix a problem | [Troubleshooting](https://www.infrayard.eu/docs/troubleshooting/) |
+| Compare plans | [Subscription](https://www.infrayard.eu/docs/subscription/) |
 
-### What is available
+### What Infrayard does
 
-The current product focuses on OKE cluster provisioning and lifecycle operations: create, access, scale, upgrade and destroy. It includes templates, role-based visibility, resource limits, protected destroy requests, limit-increase requests, execution logs, Activity notifications and cost estimates.
+- **Clusters:** create, scale, upgrade and destroy OKE clusters (Basic and Enhanced), with live Terraform logs.
+- **Access:** one-click kubeconfig per user, without OCI CLI setup.
+- **Guardrails:** templates, per-user resource limits, protected destroy requests and limit-increase requests.
+- **Visibility:** Activity inbox, audit log and cost estimates before deployment.
+- **Existing infrastructure:** use your own compartments, VCNs and subnets.
 
-Infrayard provisions infrastructure for Kubernetes workloads. Application delivery, workload configuration and application-level operations stay within your existing processes. See [product scope](https://www.infrayard.eu/docs/requirements/#product-scope) for the boundaries.
+Application deployment and day-to-day workload operations stay in your existing tools. See the [product scope](https://www.infrayard.eu/docs/requirements/#product-scope).
 
 ### How to get started
 
-1. [Request a demo](https://www.infrayard.eu/?enquiry=demo#demo) to see a real workflow and discuss your OCI environment.
-2. Review your network, identity, permissions and deployment prerequisites.
-3. Start a monthly production subscription, choose an annual term or arrange an optional guided evaluation.
+1. [Request a demo](https://www.infrayard.eu/?enquiry=demo#demo) to see a real workflow and discuss your environment.
+2. Check the [requirements](https://www.infrayard.eu/docs/requirements/).
+3. Start a subscription or an evaluation, receive your registry access and [install](https://www.infrayard.eu/docs/installation/).
 
-Detailed release-specific deployment runbooks, customer Helm values and registry access are supplied during evaluation or onboarding. Public documentation describes the prerequisites and supported behaviour so you can assess fit first.
-
-### Current capabilities and future plans
-
-The [releases and roadmap](https://www.infrayard.eu/docs/releases/) page separates available capabilities from planned work. Choose the product based on the functionality available in your contracted release.
+The [releases and roadmap](https://www.infrayard.eu/docs/releases/) page separates what is available today from planned work.
 
 
 ## Architecture
 
 Canonical page: https://www.infrayard.eu/docs/architecture/
 
-Infrayard is installed in a customer-managed Kubernetes environment. It has no required Solvia-hosted SaaS control plane. The customer operates the installation and retains control of its OCI credentials, infrastructure state and operational records.
+Infrayard runs in an environment you control: a Kubernetes cluster or a single VM. There is no Solvia Lab cloud service in between. Infrayard works in your OCI tenancy with its own OCI user and keeps its data in your database and your Object Storage bucket.
 
 ### Components
 
-| Component | Responsibility |
-| --- | --- |
-| Web portal | Cluster requests, lifecycle actions, access downloads and administration |
-| FastAPI service | Authentication validation, resource validation, configuration, requests and lifecycle coordination |
-| PostgreSQL | Cluster and job records, users, configuration, templates, requests and audit history |
-| Terraform runner | Isolated execution for provisioning, scale, upgrade and destroy jobs |
-| OCI Object Storage | Terraform state for Infrayard-managed clusters |
-| Keycloak | Login, user identity and roles; bundled with Infrayard or your existing Keycloak |
-| Oracle Cloud / OKE | The actual cloud resources and managed Kubernetes service |
+| Component | What it does | Runs as |
+| --- | --- | --- |
+| Portal | Web interface: clusters, requests, access downloads, administration | `infrayard-frontend` (nginx) |
+| API | Checks tokens and requests, stores data, starts and tracks Terraform jobs | `infrayard-api` |
+| Terraform runner | Runs provisioning, scale, upgrade and destroy jobs | Inside `infrayard-api` |
+| PostgreSQL | Clusters, jobs, users, configuration, templates, requests, audit log | `infrayard-postgresql`, or your external PostgreSQL |
+| Keycloak | Sign-in, users and roles | `infrayard-keycloak`, or your existing Keycloak |
+| Object Storage bucket | Terraform state of every managed cluster | In your OCI tenancy |
+| OCI and OKE | The cloud resources themselves | Your OCI tenancy |
 
-The portal and services are delivered as released container images with Helm deployment assets. Customers pull approved images into their own environment or use an agreed internal registry mirror.
+On Kubernetes the services are installed by the Helm chart; on a single VM by Docker Compose, with Caddy in front for HTTPS. Both use the same images.
 
-### Request flow
+The portal and the bundled Keycloak share one address: the portal at `https://infrayard.example.com`, Keycloak at `https://infrayard.example.com/auth`. The portal forwards `/api` to the API and `/auth` to Keycloak; the Keycloak admin console is not reachable this way.
 
-1. The user signs in through Keycloak.
-2. The portal displays the templates, cluster options and limits available to that user.
-3. The API validates the request, compatibility and applicable configuration.
-4. A Terraform job executes with the installation's OCI permissions and cluster state.
-5. The portal exposes the run output and resulting cluster status. Lifecycle events are recorded for operational visibility.
+### What happens when a user creates a cluster
 
-Protected destroy requests and requests for higher resource limits use the admin review workflow. This is not a general approval gate on every cluster creation or lifecycle action.
+1. The user signs in through Keycloak and receives a token.
+2. The portal shows the templates, options and limits that apply to this user.
+3. The API checks the request: limits, template, compatibility of version, shape and image, and network settings.
+4. The API starts a Terraform job with the Infrayard OCI user. Terraform stores the cluster's state in the bucket.
+5. The portal streams the Terraform log. When the job ends, the cluster status, Activity entry and audit record are updated.
+6. For a running cluster, the API creates a per-user ServiceAccount in the cluster and issues the kubeconfig.
+
+Destroy requests and requests for higher limits go through the administrator review. Other operations run immediately within the user's limits.
 
 ### State and ownership
 
-PostgreSQL stores platform metadata. Terraform state is stored in OCI Object Storage. Both are part of your operating and recovery responsibilities; backing up only the portal does not preserve the full platform state.
+PostgreSQL holds the platform data; the bucket holds the Terraform state. Back up both and keep them consistent; see [operations](https://www.infrayard.eu/docs/operations/).
 
-Resources created by Infrayard are managed by their cluster's Terraform state. Manual edits to those managed resources can be overwritten by a subsequent apply. Supplied existing network resources are referenced according to the [BYON ownership rules](https://www.infrayard.eu/docs/networking/#bringing-your-own-network).
+Resources created by Infrayard are managed by their cluster's Terraform state, and manual changes are overwritten by the next run. Existing networks you supply are only referenced; see [networking](https://www.infrayard.eu/docs/networking/#who-owns-what).
 
-### Connectivity and external dependencies
+### Connections
 
-The installation must reach the required OCI APIs, Keycloak and OKE API endpoints. Initial image delivery also requires registry access, or an agreed mirror. Optional SMTP notifications use your configured email service.
+| From | To | Why |
+| --- | --- | --- |
+| Users | Portal (443) | Use Infrayard and sign in |
+| API | OCI APIs and Object Storage (443) | Create and inspect resources, Terraform state |
+| API | Kubernetes API of managed clusters (6443) | Issue kubeconfigs |
+| API | Keycloak | Fetch the realm's signing keys |
+| Host | Image registry (443) | Pull the Infrayard images |
+| API, optional | SMTP server | E-mail notifications |
 
-Running the control plane in your tenancy does not remove these dependencies or automatically provide a disconnected deployment. Review the required routes and any delivery constraints during onboarding.
+The installation needs no inbound connection from the internet when users come through a VPN. See [private access](https://www.infrayard.eu/docs/private-access/).
 
 ### Operating responsibility
 
-Your team operates the customer installation, its database, secrets, storage, network and workloads. Oracle provides the contracted OCI and OKE services. Solvia Lab supplies the Infrayard release, documentation and support defined in your agreement. Deployment assistance and additional operational support can be scoped in Enterprise.
-
-Continue with [security and access](https://www.infrayard.eu/docs/security/), [networking](https://www.infrayard.eu/docs/networking/) and [operations](https://www.infrayard.eu/docs/operations/).
+You operate the installation, its database, secrets, storage and network, and the workloads on your clusters. Oracle provides OCI and OKE. Solvia Lab provides the Infrayard releases, documentation and the support defined in your agreement.
 
 
 ## Requirements and compatibility
 
 Canonical page: https://www.infrayard.eu/docs/requirements/
 
-Use this page to assess deployment fit before committing to an installation. Exact versions, image references and customer-specific values are confirmed against the release supplied during onboarding.
+Use this page to check whether Infrayard fits your environment before you install it.
 
 ### Deployment options
 
-| Requirement | Existing OKE cluster | Single-node k3s on OCI VM |
+| | Existing OKE cluster | Other Kubernetes (k3s, …) | Single VM |
+| --- | --- | --- | --- |
+| Intended use | Production | Production or evaluation | Evaluation, demos, small teams |
+| Tooling | `kubectl`, Helm 3.8+ | `kubectl`, Helm 3.8+ | Docker with Compose v2 |
+| Ingress | An ingress controller you install, e.g. Traefik with an OCI load balancer | Your ingress controller; k3s ships Traefik | Caddy, included |
+| TLS | cert-manager or your own certificate | cert-manager or your own certificate | Automatic Let's Encrypt or your own certificate |
+| Storage | 10 GiB volume, `oci-bv` | 10 GiB volume from your StorageClass | Docker volume, 30 GB disk |
+| Capacity | About 1 CPU and 2 GiB free (limits up to 4.7 CPU, 3.2 GiB) | Same | 2 CPUs, 4 GB memory minimum, 8 GB recommended |
+| Keycloak | Bundled or your own | Bundled or your own | Bundled |
+
+Infrayard is tested on k3s 1.36 with Traefik and cert-manager, and with the Docker Compose bundle. The images are built for x86 (`amd64`) and Arm (`arm64`).
+
+### OCI
+
+- A tenancy and a region where you create OKE clusters.
+- An **anchor compartment** under which Infrayard creates clusters. See [choosing the anchor](https://www.infrayard.eu/docs/networking/#choosing-the-anchor-compartment).
+- An OCI user with the [Infrayard policies](https://www.infrayard.eu/docs/oci-setup/#3-add-the-policies), an API key and a customer secret key.
+- An Object Storage bucket for Terraform state.
+- Service limits and quotas for the clusters you plan: OKE clusters, compute cores of the worker shapes, VCNs and load balancers.
+
+### Network
+
+| Direction | From → to | Port |
 | --- | --- | --- |
-| Intended use | Production customer installations | Evaluation, development and demos |
-| Deployment | Customer Helm chart and OKE values | The same chart with k3s values |
-| Ingress | ingress-nginx with an OCI Load Balancer, configured separately | Traefik, supplied by k3s |
-| Storage | OCI Block Volume storage class (`oci-bv`) | Local-path storage |
-| Identity | Bundled Keycloak or your existing Keycloak | Bundled Keycloak or your existing Keycloak |
-| Scheduling | Dedicated worker nodes | Single-node scheduling settings in the supplied values |
+| Inbound | Users → portal | 443, and 80 for redirects and Let's Encrypt |
+| Outbound | Infrayard → OCI APIs and Object Storage (`*.oraclecloud.com`) | 443 |
+| Outbound | Infrayard → image registry | 443 |
+| Outbound | Infrayard → Kubernetes API of each managed cluster | 6443 |
+| Outbound | Users → Kubernetes API of their clusters, for `kubectl` | 6443 |
+| Outbound, optional | Infrayard → your SMTP server | 587 or your port |
+| Outbound, optional | Infrayard → your own Keycloak | 443 |
 
-An existing supported Kubernetes host can run the platform; this does not imply that every Kubernetes distribution or version has been validated. Confirm the intended distribution and release during onboarding.
+The portal needs no inbound connection from the internet if users come through a VPN; see [private access](https://www.infrayard.eu/docs/private-access/).
 
-### Before installation
+### Identity
 
-- An OCI tenancy, target region and selected anchor compartment.
-- A service identity with permissions for the resource families Infrayard will manage.
-- OCI Object Storage configuration for Terraform state.
-- A Kubernetes host with appropriate ingress, persistent storage and capacity for the platform services.
-- DNS and TLS arrangements for the portal and identity endpoints.
-- Network reachability from the runner and authorised users to the OKE API endpoints they will use.
-- An approved image delivery path and the release-specific Helm assets.
-- Bundled Keycloak, or a realm in your existing Keycloak, and the admin role assignment.
+Sign-in uses Keycloak: either the Keycloak bundled with Infrayard (realm, client and admin role are created automatically) or a realm in your existing Keycloak 22 or newer. See [Use your own Keycloak](https://www.infrayard.eu/docs/keycloak/).
 
-The installation includes PostgreSQL and identity services when configured in the supplied chart. Budget for these services, their persistent storage, any load balancer and your OKE resources. The software subscription does not pay your Oracle Cloud bill.
+### Costs outside the subscription
+
+The subscription covers the Infrayard software. Your Oracle Cloud bill covers the OKE clusters and their nodes, load balancers and storage, and the host that runs Infrayard: a VM, or capacity and one 10 GiB block volume in your cluster, plus a load balancer for the ingress.
 
 ### OKE versions, shapes and images
 
-Compatibility is region- and tenancy-specific. Administrators sync OCI shapes and Kubernetes versions, then enable the choices available to users. Newly synced Kubernetes versions are disabled until an administrator enables them.
+Which Kubernetes versions, shapes and node images exist depends on your region and tenancy. Administrators sync them from OCI in **Admin → Configuration** and enable what users may choose. Newly synced Kubernetes versions stay disabled until an administrator enables them.
 
-The deploy and template forms filter Kubernetes versions by the selected shape and available OKE node images. If compatibility validation is unavailable, deployment is blocked rather than allowing an unverified combination. See [troubleshooting](https://www.infrayard.eu/docs/troubleshooting/#missing-versions-or-shapes).
+The deploy and template forms only offer Kubernetes versions that have a node image for the selected shape. If Infrayard cannot check this with OCI, deployment is blocked rather than allowing an unverified combination. See [troubleshooting](https://www.infrayard.eu/docs/troubleshooting/#missing-versions-or-shapes).
 
 ### Basic and Enhanced clusters
 
-The platform can allow Basic, Enhanced or both OKE tiers. These are Oracle service tiers, separate from Infrayard subscription plans.
+The platform can allow Basic, Enhanced or both OKE cluster types. These are Oracle service tiers, separate from Infrayard subscription plans.
 
 | Operation | Basic | Enhanced |
 | --- | --- | --- |
-| Add or remove nodes and pools | Supported automatically | Supported automatically |
-| Change per-node shape, OCPU, RAM or storage | Requires rolling worker cycling | Automated supported rollout |
-| Kubernetes upgrade | Control-plane and target updates, followed by rolling worker refresh | Automated supported control-plane and worker rollout |
-| OCI control-plane charges | Follow Oracle's Basic pricing | Follow Oracle's Enhanced pricing |
+| Add or remove nodes and pools | Automatic | Automatic |
+| Change a pool's shape, OCPUs, memory or storage | Needs rolling worker cycling | Automatic rollout |
+| Kubernetes upgrade | Control plane first, then a rolling worker refresh | Automatic control plane and worker rollout |
+| OCI control-plane charges | Oracle's Basic pricing | Oracle's Enhanced pricing |
 
-Check [cluster lifecycle](https://www.infrayard.eu/docs/cluster-lifecycle/#cluster-tiers) for operational steps and workload considerations.
+See [cluster lifecycle](https://www.infrayard.eu/docs/cluster-lifecycle/#cluster-tiers) for the steps.
 
 ### Product scope
 
-Current scope is OKE infrastructure provisioning and lifecycle management through Infrayard workflows. The product includes templates, limits, protected requests, cost estimates, identity integration, audit records and supported existing-network configurations.
+Infrayard provisions and manages OKE clusters: create, access, scale, upgrade and destroy, with templates, limits, requests, cost estimates, audit records and existing-network support.
 
-- Application deployment, CI/CD, databases used by your applications and application availability remain within your existing delivery and operating processes.
-- Using an existing OKE cluster to **host Infrayard** is different from importing that cluster into Infrayard's Terraform management. Do not assume arbitrary existing clusters can be adopted; agree the supported lifecycle scope during evaluation.
-- One installation's compartment access follows its anchor and OCI IAM scope. Unrelated compartment subtrees need an appropriate root anchor or separate installations.
-- Existing subnets require an existing VCN reference and prepared routing. Some restricted public endpoint combinations require Infrayard-managed networking.
-- AI assistance, the access agent and non-OCI management are roadmap items unless explicitly delivered in your contracted release.
-- Hosting in your tenancy does not itself certify compliance, provide application high availability or create an air-gapped environment.
-
-See [networking](https://www.infrayard.eu/docs/networking/) for supported combinations and [releases and roadmap](https://www.infrayard.eu/docs/releases/) for future work.
+- Deploying applications, CI/CD and application databases stay in your existing tools.
+- Running Infrayard **on** an existing OKE cluster is different from **managing** that cluster with Infrayard. Infrayard manages only clusters it created; existing clusters are not imported.
+- One installation manages one anchor compartment tree. Unrelated trees need the tenancy root as anchor or separate installations.
+- Existing subnets need their VCN as well, and prepared routing. The public API endpoint mode needs Infrayard-managed networking.
+- AI assistance, an access agent and non-OCI clouds are on the [roadmap](https://www.infrayard.eu/docs/releases/#planned-work), not in the product today.
+- Running in your tenancy does not by itself make the setup compliant, highly available or air-gapped.
 
 
 ## Security and access
 
 Canonical page: https://www.infrayard.eu/docs/security/
 
-Infrayard runs in the customer environment. OCI credentials, Terraform state, platform metadata and operational records are managed within that environment; a Solvia-hosted SaaS control plane is not required.
+Infrayard runs entirely in your environment. OCI credentials, Terraform state, the database and logs stay with you; there is no Solvia Lab cloud service in the path, and Infrayard sends no data to Solvia Lab.
 
 ### Identity and roles
 
-Authentication uses OpenID Connect with the Authorization Code flow and PKCE. The browser does not store a confidential OIDC client secret. Sign-in is handled by Keycloak: either the Keycloak bundled with Infrayard, or a realm in your organisation's existing Keycloak.
+Sign-in uses OpenID Connect with the Authorization Code flow and PKCE, handled by Keycloak: the one bundled with Infrayard or a realm in your existing Keycloak. The portal is a public client, so no client secret is stored in the browser. The API checks the signature, issuer and audience of every token.
 
-Users are created on first login from their identity claim. An admin role grants access to the administration panel. Template role requirements can restrict which approved configurations a user sees. Roles come from Keycloak realm roles, client roles or groups; an optional access role limits who can sign in at all.
+Infrayard creates a user record on the first sign-in. Access is controlled by Keycloak roles or groups:
 
-Changing template visibility or resource limits is not a substitute for reviewing OCI permissions and Kubernetes access rights. Review each layer against your organisation's access policy.
+- **Admin role**: the administration area, all clusters, users, configuration, templates, requests and audit log.
+- **Access role** (optional): only users with it may sign in. Use it with a shared company realm.
+- **Template roles**: a template can require a role, so only some users see it.
+
+When a role is removed or the Keycloak session ends, the user is signed out within a few minutes. Details: [Use your own Keycloak](https://www.infrayard.eu/docs/keycloak/#roles).
 
 ### OCI credentials
 
-The runner needs an OCI service identity with permissions for the resources it manages. Scope that identity to your selected anchor compartment and required resource families. A tenancy-root anchor needs correspondingly broader permissions.
+Infrayard acts in OCI as one service user with an API key. Its policies are scoped to the anchor compartment; read access covers the tenancy so that regions, shapes and networks can be listed. See [Prepare OCI](https://www.infrayard.eu/docs/oci-setup/#3-add-the-policies).
 
-The exact policy statements and secret provisioning are part of the customer deployment runbook. Keep API keys, signing keys, database passwords and registry tokens in your approved secret-management process. Do not send them through website forms or include them in support attachments.
+Where the credentials are stored:
+
+| Secret | Kubernetes | Single VM |
+| --- | --- | --- |
+| OCI API private key | Secret `infrayard-oci-key`, mounted read-only into the API | `oci_api_key.pem`, readable only by the API container user |
+| S3 key for the state bucket, database and Keycloak passwords | Secrets created by the chart from your values | `.env` file, mode 600 |
+
+Keep these in your secret manager. Never send them in support requests.
+
+Rotating the API key: add a new key to the OCI user, update the secret (or file) and the fingerprint, roll out, then delete the old key in OCI.
 
 ### Kubernetes access
 
-Authorised users can download a kubeconfig from a running cluster's detail page. The documented default uses a per-user Kubernetes ServiceAccount token, allowing `kubectl` access without local OCI CLI configuration. An explicit OCI-exec fallback is available for users who use OCI CLI authentication.
+Users download a kubeconfig from a running cluster's detail page. It works with plain `kubectl`, without the OCI CLI:
 
 ```bash
-export KUBECONFIG=~/oke-my-cluster-kubeconfig.yaml
+export KUBECONFIG=~/Downloads/oke-my-cluster-kubeconfig.yaml
 kubectl get nodes
 ```
 
-Authentication does not establish a network route. The user's machine and runner must reach the OKE API endpoint. See [networking and connectivity](https://www.infrayard.eu/docs/networking/#kubernetes-api-endpoint-access).
+How it works:
 
-During security review, confirm the Kubernetes permissions, token lifetime, revocation procedure and downloaded credential handling for your supplied release. Website documentation is not a guarantee of a particular token expiry or a replacement for that review.
+- Each Infrayard user gets their own ServiceAccount in the namespace `infrayard-system` of the cluster, so Kubernetes audit logs show the actual person.
+- The ServiceAccount is bound to **`cluster-admin`**. Everyone who may download a kubeconfig for a cluster has full rights on it.
+- The embedded token is valid for up to 30 days; the cluster may shorten that. Download a new kubeconfig when it expires.
+- To revoke a user's access to a cluster at once, delete their ServiceAccount: `kubectl delete serviceaccount <user> -n infrayard-system`.
 
-Administrators can download access files for other users' clusters from **All Clusters → Details**. Include this privilege in your role review.
+Users with an OCI CLI setup can download an alternative kubeconfig that authenticates through the OCI CLI.
+
+Cluster owners download access for their clusters; administrators can download it for every cluster in **All Clusters → Details**. Include this in your access review.
+
+The kubeconfig does not create a network path. Users need a route to the cluster's API endpoint; see [networking](https://www.infrayard.eu/docs/networking/#kubernetes-api-endpoint-access).
 
 ### SSH access
 
-Terraform-generated worker-node SSH keys are available through the documented cluster detail workflow. Treat downloaded private keys as credentials and retain them in your approved secure store. Confirm retrieval and rotation behaviour for your release; do not assume a later download will be available.
+Terraform generates an SSH key pair for each cluster's worker nodes. The private key is stored in the Infrayard database and can be downloaded from the cluster's detail page. Treat it as a credential, and treat database backups as sensitive for this reason.
 
 ### Audit and approvals
 
-Lifecycle operations record actor, action, cluster, outcome and duration. Protected destroy requests and limit-increase requests record submission and review decisions. Administrators retain a privileged force-destroy path for incident response.
+Every lifecycle operation records who did what, on which cluster, the result and the duration. Destroy requests and limit-increase requests record the submission and the decision. Administrators can force-destroy a cluster for incident response; this is recorded too.
 
-The Activity inbox also records lifecycle events, request outcomes and limit changes. Optional SMTP notifications can send event details to configured recipients. Account for those emails when reviewing information flows and retention.
+The Activity inbox shows lifecycle events, request outcomes and limit changes. Optional e-mail notifications send event details to the configured recipients through your SMTP server.
 
-### Network and delivery boundary
+### Network exposure
 
-The installation still needs access to OCI APIs, its identity endpoints, required OKE endpoints and the approved registry delivery path. Optional SMTP and customer-selected integrations have their own destinations. Mirroring container images alone does not establish disconnected operation.
+The portal is the only inbound endpoint. The Keycloak admin console is not exposed: on Kubernetes it is reached with `kubectl port-forward`, on the single VM through an SSH tunnel. We recommend making the portal reachable [only from your VPN](https://www.infrayard.eu/docs/private-access/).
 
-Private endpoints and restricted public endpoints have different routing prerequisites. A future access agent is listed separately on the [roadmap](https://www.infrayard.eu/docs/releases/#planned-work).
+Outbound, Infrayard needs OCI APIs, the image registry and the cluster APIs; see [requirements](https://www.infrayard.eu/docs/requirements/#network).
 
-### Customer security review
+### Hardening built in
 
-Review TLS, ingress exposure, IAM scope, Kubernetes roles, secrets, database access, state storage, backups, log access and operational access before production. Security questionnaires and additional evidence requirements can be scoped through [Enterprise](https://www.infrayard.eu/?enquiry=enterprise#demo).
+- On Kubernetes, the Infrayard, Keycloak and PostgreSQL containers run as non-root users and drop all Linux capabilities; the API and the portal also use read-only root file systems. On the single VM, the API runs as a non-root user and the portal container is read-only.
+- The portal sends security headers (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`) and redirects HTTP to HTTPS.
+- Configuration or secret changes roll the affected pods automatically on `helm upgrade`.
+
+### Your security review
+
+Before production, review TLS and exposure, OCI policy scope, who holds the admin role, kubeconfig rights, secret storage, database and state backups, and log access. Security questionnaires and additional evidence can be arranged through [Enterprise](https://www.infrayard.eu/?enquiry=enterprise#demo).
 
 
 ## Networking and existing infrastructure
 
 Canonical page: https://www.infrayard.eu/docs/networking/
 
-Choose the endpoint model and ownership boundary before deployment. Kubernetes access files provide authentication; your runner and users still need a working network path.
+Each cluster needs a network, and its Kubernetes API must be reachable from Infrayard and from your users. This page explains what Infrayard creates by default, how to reuse your own VCNs, subnets and compartments, and which access mode to choose for the Kubernetes API.
 
 ### Default setup
 
-By default, Infrayard creates a full network stack per cluster:
+Without any overrides, Infrayard creates a complete network for every cluster, in the cluster's own compartment:
 
-- A **VCN** with a /16 range derived from the cluster's /24 CIDR
-- A **private worker subnet** (/24)
-- A **public Kubernetes API endpoint subnet** when public restricted API access is enabled
-- A **public load balancer subnet** for Kubernetes `LoadBalancer` services
-- Internet Gateway, NAT Gateway, Service Gateway, and route tables for public/private paths
-- Security lists with OKE-required ingress/egress rules plus API endpoint TCP/6443 allowlist rules
+- A **VCN** whose /16 range is derived from the cluster's /24 CIDR.
+- A **private worker subnet** (/24). Worker nodes have no public IPs.
+- A **public load balancer subnet** for Kubernetes `LoadBalancer` services.
+- A **public API endpoint subnet**, only in the restricted public API mode (below).
+- Internet, NAT and service gateways with route tables.
+- Security lists with the rules OKE needs, plus the TCP/6443 allowlist for the API.
+
+All of it belongs to the cluster's Terraform state and is removed when the cluster is destroyed.
 
 ### Kubernetes API endpoint access
 
-Admin Configuration includes **Kubernetes API Access**:
+Choose the mode in **Admin → Configuration → Kubernetes API Access**. It applies to clusters created afterwards.
 
-- **Private endpoint** keeps the OKE API on a private subnet. Infrayard and kubectl clients need an existing private route, VPN, or bastion path.
-- **Public endpoint restricted by CIDR allowlist** creates a dedicated public API endpoint subnet and allows TCP/6443 only from configured CIDRs. Add both the Infrayard runner egress IP/range and company VPN/corporate egress ranges. `0.0.0.0/0` is rejected.
+| Mode | Where the API is | Who can reach it |
+| --- | --- | --- |
+| Private endpoint | Private subnet, no public IP | Anything with a route into the VCN: VPN through a DRG, FastConnect, a bastion, or Infrayard running in a peered network |
+| Public endpoint with allowlist | Dedicated public subnet | Only the CIDR ranges you list; `0.0.0.0/0` is rejected |
 
-This is the supported path when DRG is too costly and LPG does not scale past the per-VCN peering limit. Users still need to be on the corporate/VPN network for `kubectl`.
+With the **public endpoint with allowlist**, list both:
+
+- your **VPN or office egress** ranges, so users can run `kubectl`, and
+- the **outbound address of Infrayard** itself (NAT gateway or VM public IP), because Infrayard calls the cluster API to issue kubeconfigs.
+
+This mode avoids routing every cluster VCN to your network, which helps when DRG attachments are costly or local peering limits are reached. Users still connect from the VPN or office network.
+
+The kubeconfig only provides authentication. Without a network path to port 6443, `kubectl` times out.
 
 ### Bringing your own network
 
-Users can supply existing OCIDs via the **Advanced tab** in the deploy form. Infrayard skips creating whichever resources are already provided:
+In the deploy form, the **Advanced** tab accepts existing OCIDs. Infrayard then skips creating those resources:
 
-| Override | Effect |
-|---|---|
-| Existing VCN OCID | Uses your VCN — skips VCN, IGW, gateway, and route table creation; generated subnets use the VCN's existing/default routing |
-| Existing Compartment OCID | Places resources in your compartment — skips compartment creation |
-| Existing Subnet OCID | Places nodes in your subnet — requires Existing VCN OCID, and skips subnet and security list creation |
+| Field | Effect |
+| --- | --- |
+| Existing Compartment OCID | Resources go into this compartment instead of a new one |
+| Existing VCN OCID | Uses your VCN; Infrayard creates only the cluster subnets and their security lists inside it |
+| Existing Subnet OCID | Worker nodes go into your subnet; requires the VCN OCID as well |
 
-Supported private-endpoint combinations:
+Supported combinations:
 
-| Combination | Behavior |
-|---|---|
-| No overrides | Infrayard creates and manages the compartment, VCN, subnets, gateways, route tables, and security lists |
-| Existing Compartment OCID only | Infrayard creates a new managed VCN/network stack inside that compartment |
-| Existing VCN OCID, with or without Existing Compartment OCID | Infrayard reuses the VCN and creates cluster subnets/security lists inside it; existing VCN gateways and route tables are not managed |
-| Existing VCN OCID + Existing Subnet OCID, with or without Existing Compartment OCID | True BYON networking: Infrayard creates OKE/node-pool resources and references the supplied network read-only |
-| Existing Subnet OCID without Existing VCN OCID | Unsupported and rejected before Terraform starts |
+| You provide | Infrayard creates and manages |
+| --- | --- |
+| Nothing | Compartment, VCN, subnets, gateways, route tables, security lists, cluster |
+| Compartment | VCN and the complete network inside that compartment, cluster |
+| VCN (optionally compartment) | Subnets and security lists in your VCN, cluster. Your gateways and route tables are used as they are |
+| VCN and subnet (optionally compartment) | Only the cluster and node pools. Your network is used read-only |
+| Subnet without VCN | Rejected before Terraform starts |
 
-**Compartment subtree rule.** `Existing Compartment OCID` must be a descendant (any depth) of the **anchor compartment** chosen at install time — the compartment Infrayard uses as the parent for new cluster compartments. The anchor is whatever existing compartment you point us at; it does not have to be a dedicated Infrayard-owned compartment. Direct children, grandchildren, and the anchor itself are all accepted. Siblings, ancestors, or compartments in unrelated subtrees are rejected with a 400 *before* Terraform starts — without this guard the deploy would fail mid-`terraform apply` with a confusing IAM error, because the runner's `manage` policies are scoped to the anchor subtree. Non-existent OCIDs return "compartment not found"; if OCI is briefly unreachable for the validation call, the API returns 503 so the deploy can simply be retried.
+Rules:
 
-The anchor is a knob, not a fixture. Pick the layout that matches your tenancy posture:
+- **Stay inside the anchor.** A supplied compartment must be the anchor compartment or any compartment below it. Others are rejected before Terraform starts, because the OCI policies only cover the anchor subtree.
+- **No automatic discovery.** Supplying only a compartment does not reuse a VCN that already exists in it; Infrayard creates a new one.
+- **Routing must be ready.** With your own VCN or subnet, the worker subnet needs a route `0.0.0.0/0` to a NAT gateway (or your egress path) and a route for `all-<region>-services-in-oracle-services-network` to a service gateway. Otherwise nodes cannot register.
+- **Public endpoint with allowlist** needs an Infrayard-managed VCN. While this mode is on, deployments with an existing VCN or subnet are rejected; an existing compartment is fine.
+- **Sharing a compartment:** to place several clusters in one compartment, create a compartment for them and supply it to each cluster. Do not reuse a compartment that Infrayard created for another cluster.
 
-- **Tenancy root anchor.** No new compartments, nothing to rearrange — the entire tenancy is BYON-eligible. Right for "we don't want Infrayard adding any hierarchy on top of what we already have." Trade-off: the runner's IAM group needs `manage` permissions at tenancy scope (or scoped to the relevant resource families).
-- **Anchor at an existing org compartment.** Slot Infrayard into a `platforms`, `production`, or `infra` compartment you already maintain. BYON works for anything under it, including peer compartments that already existed there. You don't have to create a new compartment to enable Infrayard.
-- **Dedicated anchor compartment.** Create one (e.g. `infrayard`) for explicit blast-radius isolation. Functionally identical to the previous case, just a narrower IAM scope.
+The OCID fields check the OCID type and offer autocomplete lists of the compartments, VCNs and subnets Infrayard can see.
 
-The single-install pattern that's *not* supported today is "one Infrayard spanning multiple unrelated subtrees of the same tenancy." That posture requires either tenancy-wide grants (use the tenancy-root anchor) or two installs.
+### Choosing the anchor compartment
 
-Restricted public API endpoint mode requires Infrayard-managed networking when `Existing VCN OCID` or `Existing Subnet OCID` would otherwise make the network read-only.
+The anchor is set at installation and can be changed in **Admin → Configuration**. Typical choices:
 
-Important behavior: `Existing Compartment OCID` does **not** auto-discover an existing VCN or subnet from that compartment. If VCN/subnet fields are left empty, Infrayard creates a new VCN/subnets/network stack inside the provided compartment.
+| Anchor | Good for | Note |
+| --- | --- | --- |
+| A dedicated compartment, e.g. `infrayard` | Clear separation and the narrowest permissions | Existing networks must be inside it |
+| An existing compartment such as `platform` | Reusing networks and compartments that already exist there | The policies grant management of everything below it |
+| The tenancy root | Reusing anything in the tenancy | Policies at tenancy scope; widest permissions |
 
-Advanced override UX guardrails: OCID fields validate type prefixes (`ocid1.vcn.`, `ocid1.compartment.`, `ocid1.subnet.`) and provide OCI-backed autocomplete lists for compartments, VCNs, and subnets.
+One installation cannot span several unrelated compartment trees. Use the tenancy root as anchor, or run separate installations.
 
-> Shared compartment guidance: if you want multiple clusters in one compartment, use a dedicated BYO compartment via `Existing Compartment OCID` for all those clusters. Do not reuse a compartment that was auto-created for another cluster as a shared target.
+### Who owns what
 
-> Note: If you deploy with existing VCN/subnet overrides, Infrayard does not manage route tables for those existing resources. Your existing network must already provide equivalent private-subnet egress required for OKE worker node registration: route `0.0.0.0/0` to a NAT Gateway (or equivalent corporate egress path) and route `all-<region>-services-in-oracle-services-network` to a Service Gateway. This is a routing requirement, not an "open ingress" security rule.
-
-> ⚠️ **Drift behaviour.** Infrayard-created VCN, subnet, IGW, route table, and security list resources are fully managed by the cluster's Terraform state — manual edits in the OCI Console will be overwritten on the next apply. Supplied BYO resources (existing VCN / subnet / compartment) are referenced read-only and never modified.
+- Resources Infrayard creates are managed by the cluster's Terraform state. Manual changes in the OCI Console are overwritten by the next scale or upgrade.
+- Resources you supply (compartment, VCN, subnet) are only referenced, never changed or deleted.
 
 ### Custom security rules
 
-Infrayard's default security list covers the ports required by OKE. For custom ingress/egress rules — exposing specific node ports, restricting egress to corporate CIDRs, or integrating with existing NSGs — the recommended approach is to **bring your own subnet** via the Advanced tab with your security configuration already applied. Infrayard uses your subnet and skips creating its own security list entirely, giving your network team full control without adding UI complexity.
+The default security lists cover what OKE needs. For your own rules, for example extra node ports, restricted egress or network security groups, supply your own subnet with those rules already in place. Infrayard then creates no security list of its own.
 
-### Pre-deployment review
+### The Infrayard installation itself
 
-Confirm the chosen endpoint mode, runner and client routes, anchor compartment, OCI policies, DNS and required service egress. Test reachability from the actual runner and authorised client network. Do not treat a VPN label or an existing subnet as proof that all routes are ready.
-
-See [installation](https://www.infrayard.eu/docs/installation/) and [security and access](https://www.infrayard.eu/docs/security/).
+To make the portal reachable only from your VPN, see [private access](https://www.infrayard.eu/docs/private-access/).
 
 
 ## Installation
 
 Canonical page: https://www.infrayard.eu/docs/installation/
 
-Infrayard is deployed with the customer Helm chart into your environment. Registry access, pinned image references, customer values and the release-specific runbook are provided during evaluation or onboarding.
+Infrayard runs in your environment: on a Kubernetes cluster you already operate, or on a single VM. Both paths use the same images and give the same portal. Installation takes about an hour, including the OCI preparation.
 
 ### Choose your deployment path
 
-- **Existing OKE cluster:** the production deployment path for teams with an appropriate Kubernetes host, ingress and persistent storage.
-- **Single-node k3s on an OCI VM:** an evaluation and demo path using the same chart with values adapted for Traefik, local storage and single-node scheduling. It is not a substitute for a production availability design.
+| | Existing OKE cluster | Other Kubernetes (k3s, …) | Single VM |
+| --- | --- | --- | --- |
+| Good for | Production | Production or evaluation | Evaluation, demos, small teams |
+| Installed with | Helm chart | Helm chart | Docker Compose |
+| Ingress and TLS | Your ingress controller (e.g. Traefik) and cert-manager | Same; k3s ships Traefik | Caddy with automatic Let's Encrypt, included |
+| Database storage | OCI Block Volume (`oci-bv`) | Your StorageClass (k3s: `local-path`) | Docker volume on the VM |
+| Keycloak | Bundled or your own | Bundled or your own | Bundled |
+| Guide | [Install on Kubernetes](https://www.infrayard.eu/docs/install-kubernetes/) | [Install on Kubernetes](https://www.infrayard.eu/docs/install-kubernetes/) | [Install on a single VM](https://www.infrayard.eu/docs/install-vm/) |
 
-See the [requirements comparison](https://www.infrayard.eu/docs/requirements/#deployment-options). An OCI Marketplace deployment path is planned, rather than an installation option available from this website.
+All paths run one replica of each service. The Kubernetes paths add automatic restarts across nodes and managed volumes; none of them is a high-availability setup for the portal itself. Your OKE clusters keep running if Infrayard is down.
 
-### Prepare your environment
+### Steps
 
-1. Select the tenancy, region, anchor compartment and intended resource ownership boundary.
-2. Establish the OCI service identity and release-specific IAM policies.
-3. Prepare the OCI Object Storage state backend.
-4. Confirm host capacity, ingress, persistent storage, DNS and TLS.
-5. Choose the bundled Keycloak or a realm in your existing Keycloak, and agree the admin role.
-6. Check runner access to OCI services and OKE API endpoints, plus the intended user access path.
-7. Receive registry credentials and the pinned release, or arrange an approved mirror.
+1. **[Prepare OCI](https://www.infrayard.eu/docs/oci-setup/)**: the service user, policies, API key, state bucket and S3 key. Needed for every path.
+2. **Install** with the guide for your path.
+3. **Optional:** connect [your own Keycloak](https://www.infrayard.eu/docs/keycloak/) (Kubernetes paths).
+4. **Recommended:** make the portal reachable [only from your VPN](https://www.infrayard.eu/docs/private-access/).
+5. **Verify** with a test cluster, as described at the end of each guide.
+6. Plan [upgrades and backups](https://www.infrayard.eu/docs/operations/).
 
-Do not copy broad tenancy permissions from an unrelated deployment. Use the scope appropriate to your [anchor compartment and network design](https://www.infrayard.eu/docs/networking/).
+### What you receive
 
-### Install the supplied release
+With your subscription or evaluation you get by e-mail:
 
-Create the image-pull secret and customer values described in the supplied runbook. Keep credentials out of shell history and source control. The following illustrates the Helm invocation once the chart and customer values are present:
+- **Registry access**: a user name and token for the private registry that holds the Helm chart and the images.
+- **Addresses** of the chart (`oci://…/charts/infrayard`), the images (`…/api`, `…/frontend`) and the Compose bundle (`…/compose`).
+- **The version** to install, for example `1.4.0`. Chart, images and bundle share it.
 
-```bash
-helm upgrade --install infrayard ./deploy/helm/ \
-  --namespace infrayard \
-  --create-namespace \
-  --values ./values.customer.yaml
+Nothing is downloaded from a public website; everything comes from this registry.
+
+The token is personal to your organisation. Store it in your secret manager and request a new one from [support](mailto:support@infrayard.eu) if it leaks.
+
+### What you prepare
+
+| Item | Example |
+| --- | --- |
+| OCI tenancy, region and anchor compartment | `eu-frankfurt-1`, compartment `infrayard` |
+| OCI service user with policies, API key and S3 key | See [Prepare OCI](https://www.infrayard.eu/docs/oci-setup/) |
+| A DNS name for the portal | `infrayard.example.com` |
+| A way to get a TLS certificate | Let's Encrypt (automatic) or your company CA |
+| A host | A Kubernetes cluster with about 1 CPU and 2 GiB free, or a VM with 2 CPUs and 4–8 GB memory |
+| Network paths | Users → portal (443); Infrayard → OCI APIs, registry, cluster APIs (6443) |
+
+Details for each item are in [requirements](https://www.infrayard.eu/docs/requirements/).
+
+For errors during installation, see [troubleshooting](https://www.infrayard.eu/docs/troubleshooting/#installation).
+
+
+## Prepare OCI
+
+Canonical page: https://www.infrayard.eu/docs/oci-setup/
+
+Infrayard creates OKE clusters with Terraform under one OCI user. This page creates that user, its permissions, an API key, the Terraform state bucket and the S3 key for the bucket. Every installation path needs these steps. Plan about 20 minutes in the OCI Console.
+
+At the end you have the values from the [checklist](#values-checklist).
+
+### 1. Choose the anchor compartment
+
+Infrayard creates everything it manages **under one compartment**, the anchor. By default each cluster gets its own child compartment with its network and node pools; a cluster can also use an existing compartment inside the anchor.
+
+- Create a dedicated compartment, for example `infrayard`, or choose an existing one.
+- Note its **OCID** (Identity & Security → Compartments → your compartment).
+- Note its **name path**, which the policies use. For a nested compartment, write it with colons, for example `platform:infrayard`.
+
+Administrators can switch the anchor and region later in **Admin → Configuration**. The OCI user can only manage what the policies below allow.
+
+### 2. Create the user and group
+
+In **Identity & Security → Domains → Default domain**:
+
+1. **Groups → Create group**, name `InfrayardServiceGroup`.
+2. **Users → Create user**: first name `Infrayard`, last name `Service`, username `infrayard-svc`. An e-mail address is required; use a team mailbox. Clear **Use the email address as the username**.
+3. Open the user, **Groups → Assign user to groups**, select `InfrayardServiceGroup`.
+4. Copy the **user OCID** from the user's page.
+
+The user does not need a console password.
+
+### 3. Add the policies
+
+**Identity & Security → Policies**, select the **root compartment**, then **Create policy**. Name it `infrayard-service`, open the **manual editor** and paste the statements. Replace `infrayard` with your compartment name path.
+
+```text
+Allow group InfrayardServiceGroup to manage cluster-family in compartment infrayard
+Allow group InfrayardServiceGroup to manage virtual-network-family in compartment infrayard
+Allow group InfrayardServiceGroup to manage instance-family in compartment infrayard
+Allow group InfrayardServiceGroup to manage compartments in compartment infrayard
+Allow group InfrayardServiceGroup to manage object-family in compartment infrayard
+Allow group InfrayardServiceGroup to read all-resources in tenancy
+Allow group InfrayardServiceGroup to read tenancies in tenancy
+Allow group InfrayardServiceGroup to inspect compartments in tenancy
+Allow group InfrayardServiceGroup to use tag-namespaces in tenancy
+Allow service OKE to manage all-resources in tenancy
 ```
 
-The chart path and values file above refer to delivered customer assets. They are not files available from the public website repository. Use the release-specific layout and approved image references supplied to you.
+What each part is for:
 
-OKE values use the configured ingress controller and OCI storage class. Evaluation k3s values use its ingress and local storage model. Review persistence and scheduling before applying a values file from another target.
+| Statements | Why |
+| --- | --- |
+| `cluster-family`, `virtual-network-family`, `instance-family` | Create, scale, upgrade and delete OKE clusters, their VCNs and worker nodes |
+| `compartments` | Create one child compartment per cluster and remove it on destroy |
+| `object-family` | Read and write Terraform state in the bucket from step 5 |
+| `read all-resources`, `read tenancies`, `inspect compartments` | List regions, shapes, Kubernetes versions, images and existing networks |
+| `use tag-namespaces` | Required when your tenancy applies tag defaults to new resources. Infrayard itself sets free-form tags |
+| `Allow service OKE …` | Lets the OKE service itself work in the tenancy. Add it once per tenancy; skip it if it already exists |
 
-### Verify the installation
+If the group lives in a domain other than **Default**, write it as `group 'MyDomain'/'InfrayardServiceGroup'`.
 
-1. Check that the deployed services and persistent volumes are healthy.
-2. Verify portal and identity URLs, TLS and successful login.
-3. Confirm the admin role and regular-user template visibility.
-4. Validate OCI access, the state backend, enabled shapes and Kubernetes versions.
-5. Create an appropriately scoped non-production cluster.
-6. Inspect Terraform logs, cluster state, the cost estimate and access download.
-7. Validate user connectivity and a suitable lifecycle operation.
-8. Clean up the test resources and review audit history.
+Keep [existing VCNs and subnets](https://www.infrayard.eu/docs/networking/#bringing-your-own-network) that clusters should use inside the anchor compartment; the policies above then cover them.
 
-A successful Helm install alone does not validate your OCI policies, OKE worker network or end-user access path. Complete the workflow checks before production use.
+### 4. Create the API key
 
-### Evaluation readiness
+1. Open the `infrayard-svc` user → **API keys → Add API key**.
+2. Select **Generate API key pair**, click **Download private key** and save it as `oci_api_key.pem`.
+3. Click **Add**. The configuration preview shows `user`, `fingerprint`, `tenancy` and `region`. Note all four.
 
-Agree prerequisites and success criteria before starting an optional paid evaluation. Its 30-day window starts once the agreed environment is ready and the evaluation is activated. See [evaluation terms](https://www.infrayard.eu/docs/subscription/#evaluation).
+The private key is the most sensitive item of the installation. Store it in your secret manager and do not e-mail it.
 
-For errors, use [troubleshooting and support](https://www.infrayard.eu/docs/troubleshooting/). For repeatable operating procedures, continue with [operations](https://www.infrayard.eu/docs/operations/).
+### 5. Create the Terraform state bucket
+
+1. **Storage → Object Storage → Buckets**, select the **anchor compartment**, then **Create bucket**.
+2. Name: `infrayard-tfstate`. Keep the default **Standard** tier and enable **Object versioning**. Versioning keeps earlier state versions if something goes wrong.
+3. Note the **namespace** shown on the bucket page (also: `oci os ns get`).
+
+Use the same region as the one in the API key preview.
+
+### 6. Create the S3 key for the bucket
+
+Terraform reaches the bucket through the S3-compatible API, which needs its own key.
+
+1. Open the `infrayard-svc` user → **Customer secret keys → Generate secret key**, name `infrayard-tfstate`.
+2. Copy the **secret key** right away. OCI shows it only once.
+3. Copy the **access key** from the list.
+
+### Check the setup (optional)
+
+With the OCI CLI configured for the new user (`~/.oci/config` with the key from step 4), these commands must succeed:
+
+```bash
+oci iam compartment get --compartment-id <anchor-compartment-ocid>
+oci ce cluster-options get --cluster-option-id all --query 'data."kubernetes-versions"'
+oci os object list --bucket-name infrayard-tfstate
+```
+
+Infrayard runs the same kind of calls when an administrator opens **Admin → Configuration** and syncs shapes and versions.
+
+### Values checklist
+
+| Value | Example | Where it comes from |
+| --- | --- | --- |
+| Tenancy OCID | `ocid1.tenancy.oc1..aaaa…` | API key preview |
+| User OCID | `ocid1.user.oc1..aaaa…` | Step 2 |
+| Fingerprint | `12:34:56:…` | API key preview |
+| Region | `eu-frankfurt-1` | API key preview |
+| Private key file | `oci_api_key.pem` | Step 4 |
+| Anchor compartment OCID | `ocid1.compartment.oc1..aaaa…` | Step 1 |
+| Object Storage namespace | `frxyz1abcd` | Step 5 |
+| State bucket | `infrayard-tfstate` | Step 5 |
+| S3 access key and secret key | `0a1b2c…` | Step 6 |
+
+Continue with your installation path: [Kubernetes](https://www.infrayard.eu/docs/install-kubernetes/) or [single VM](https://www.infrayard.eu/docs/install-vm/).
+
+
+## Install on Kubernetes
+
+Canonical page: https://www.infrayard.eu/docs/install-kubernetes/
+
+This guide installs Infrayard with Helm into a Kubernetes cluster you already run: an OKE cluster, k3s or another distribution. The steps are the same everywhere; where OKE and k3s differ, both variants are shown. Infrayard is tested on k3s with Traefik and cert-manager.
+
+Time needed: about 30 minutes, after [Prepare OCI](https://www.infrayard.eu/docs/oci-setup/).
+
+### What you need
+
+- A Kubernetes cluster and `kubectl` access with rights to create a namespace.
+- [Helm](https://helm.sh/docs/intro/install/) 3.8 or newer on your workstation.
+- An ingress controller. OKE has none by default; k3s ships Traefik.
+- [cert-manager](https://cert-manager.io/) for Let's Encrypt certificates, or your own TLS certificate.
+- A default StorageClass for one 10 GiB volume (PostgreSQL). OKE: `oci-bv`. k3s: `local-path`.
+- Free capacity of about 1 CPU and 2 GiB memory. Limits allow peaks up to 4.7 CPU and 3.2 GiB.
+- A DNS name for the portal, for example `infrayard.example.com`. Keycloak is served on the same name under `/auth`, so one name is enough.
+- The values from the [OCI checklist](https://www.infrayard.eu/docs/oci-setup/#values-checklist).
+- Your registry access from the onboarding e-mail: user, token, registry address and the Infrayard version (for example `1.4.0`; use it wherever `<version>` appears below).
+
+The examples use the namespace `infrayard`, the release name `infrayard` and the registry `registry.gitlab.com/solvialab/infrayard`. Use the registry address and version from your onboarding e-mail.
+
+### 1. Ingress controller and certificates
+
+Skip this step if your cluster already has an ingress controller and cert-manager.
+
+**OKE: install Traefik.** It creates an OCI flexible load balancer with a public IP:
+
+```bash
+helm repo add traefik https://traefik.github.io/charts
+helm install traefik traefik/traefik -n traefik --create-namespace \
+  --set service.annotations."service\.beta\.kubernetes\.io/oci-load-balancer-shape"=flexible \
+  --set service.annotations."service\.beta\.kubernetes\.io/oci-load-balancer-shape-flex-min"=10 \
+  --set service.annotations."service\.beta\.kubernetes\.io/oci-load-balancer-shape-flex-max"=100
+```
+
+For a portal reachable only from your VPN, use an internal load balancer instead; see [private access](https://www.infrayard.eu/docs/private-access/).
+
+**k3s:** Traefik is already running in `kube-system`.
+
+**cert-manager** (both):
+
+```bash
+helm repo add jetstack https://charts.jetstack.io
+helm install cert-manager jetstack/cert-manager -n cert-manager --create-namespace \
+  --set crds.enabled=true
+```
+
+Then create a Let's Encrypt issuer. Use an e-mail address that receives expiry notices:
+
+```bash
+kubectl apply -f - <<'EOF'
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt
+spec:
+  acme:
+    server: https://acme-v02.api.letsencrypt.org/directory
+    email: platform@example.com
+    privateKeySecretRef:
+      name: letsencrypt
+    solvers:
+      - http01:
+          ingress:
+            ingressClassName: traefik
+EOF
+```
+
+Let's Encrypt must reach the portal on port 80 from the internet. If it cannot, use your own certificate (step 4).
+
+### 2. Log in to the registry
+
+The chart and the images are in the same private registry. Log in once with the token from your onboarding e-mail:
+
+```bash
+helm registry login registry.gitlab.com -u <registry-user>
+# Password: your registry token
+```
+
+Check that you can read the chart:
+
+```bash
+helm show chart oci://registry.gitlab.com/solvialab/infrayard/charts/infrayard --version <version>
+```
+
+### 3. Create the namespace and secrets
+
+Two secrets are created by hand so that they never appear in Helm values. Run the commands from a directory that contains `oci_api_key.pem`:
+
+```bash
+kubectl create namespace infrayard
+
+# Lets Kubernetes pull the images
+kubectl create secret docker-registry regcred -n infrayard \
+  --docker-server=registry.gitlab.com \
+  --docker-username=<registry-user> \
+  --docker-password=<registry-token>
+
+# OCI API private key of the infrayard-svc user
+kubectl create secret generic infrayard-oci-key -n infrayard \
+  --from-file=oci_api_key.pem=./oci_api_key.pem
+```
+
+The key name inside the secret must be `oci_api_key.pem`. Without this secret the API pod stays in `Init` or `ContainerCreating`.
+
+### 4. Write the values files
+
+Keep settings and passwords in two files. `values.yaml` can go into your configuration repository; `secrets.yaml` belongs in your secret manager.
+
+`values.yaml`:
+
+```yaml
+global:
+  domain: infrayard.example.com
+  imagePullSecrets:
+    - name: regcred
+
+api:
+  image:
+    repository: registry.gitlab.com/solvialab/infrayard/api
+  oci:
+    tenancyOcid: ocid1.tenancy.oc1..aaaa...
+    userOcid: ocid1.user.oc1..aaaa...
+    fingerprint: "12:34:56:78:90:ab:cd:ef:12:34:56:78:90:ab:cd:ef"
+    region: eu-frankfurt-1
+    namespace: frxyz1abcd
+    parentCompartmentOcid: ocid1.compartment.oc1..aaaa...
+  terraform:
+    stateBucket: infrayard-tfstate
+
+frontend:
+  image:
+    repository: registry.gitlab.com/solvialab/infrayard/frontend
+
+postgresql:
+  storage:
+    storageClass: oci-bv        # OKE. k3s: local-path. Empty: cluster default
+
+keycloak:
+  realmImport:
+    initialAdmin:               # first Infrayard administrator
+      username: admin
+      email: admin@example.com
+
+ingress:
+  className: traefik            # or nginx, or your controller's class
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+  tls:
+    enabled: true
+    secretName: infrayard-tls
+```
+
+`secrets.yaml` (generate each password with `openssl rand -base64 24`):
+
+```yaml
+postgresql:
+  auth:
+    password: "<database password>"
+keycloak:
+  admin:
+    password: "<Keycloak master admin password>"
+  realmImport:
+    initialAdmin:
+      password: "<temporary password of the first admin>"
+api:
+  terraform:
+    s3AccessKey: "<S3 access key>"
+    s3SecretKey: "<S3 secret key>"
+```
+
+```bash
+chmod 600 secrets.yaml
+```
+
+Notes:
+
+- **Own certificate instead of Let's Encrypt:** create the secret with `kubectl create secret tls infrayard-tls -n infrayard --cert=fullchain.pem --key=privkey.pem` and remove the `cert-manager.io/cluster-issuer` annotation.
+- **ingress-nginx:** set `className: nginx` and add the annotations `nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"` and `nginx.ingress.kubernetes.io/proxy-buffering: "off"`, so that live Terraform logs are not cut off.
+- **Your own Keycloak** instead of the bundled one: see [Use your own Keycloak](https://www.infrayard.eu/docs/keycloak/) before installing.
+- **E-mail notifications** (optional): set `api.email.enabled: true`, `api.email.adminEmails` and the `api.email.smtp` block, with the SMTP password in `secrets.yaml`.
+- **Single-node clusters:** the chart tolerates the control-plane taint by default, so all pods can run on one k3s node.
+
+### 5. Install
+
+```bash
+helm install infrayard oci://registry.gitlab.com/solvialab/infrayard/charts/infrayard \
+  --version <version> -n infrayard -f values.yaml -f secrets.yaml
+```
+
+The chart version selects the matching image version automatically; do not set an image tag.
+
+Watch the pods until all four are `Running` and ready. Keycloak needs about a minute on the first start:
+
+```bash
+kubectl get pods -n infrayard -w
+```
+
+```text
+NAME                                  READY   STATUS    RESTARTS   AGE
+infrayard-api-6c9f7d8b5-x2kqp         1/1     Running   0          2m
+infrayard-frontend-5bd8c7f9d4-7wq9z   1/1     Running   0          2m
+infrayard-keycloak-7d9b6f5c8-k4m2n    1/1     Running   0          2m
+infrayard-postgresql-0                1/1     Running   0          2m
+```
+
+### 6. Point DNS to the cluster
+
+Find the external IP of the ingress controller:
+
+```bash
+kubectl get svc -n traefik traefik        # OKE with Traefik from step 1
+kubectl get svc -n kube-system traefik    # k3s
+```
+
+Create an `A` record from `infrayard.example.com` to the `EXTERNAL-IP`. Once DNS resolves, cert-manager obtains the certificate, usually within two minutes:
+
+```bash
+kubectl get certificate -n infrayard
+# NAME            READY   SECRET          AGE
+# infrayard-tls   True    infrayard-tls   2m
+```
+
+### 7. Sign in
+
+Open `https://infrayard.example.com` and sign in with the first admin's user name and temporary password. Keycloak asks for a new password right away.
+
+Then, in **Admin → Configuration**:
+
+1. Check the region and the anchor compartment.
+2. **Sync** shapes and Kubernetes versions from OCI and enable the ones your users may choose. New versions start disabled.
+3. Review the default limits and the templates.
+
+Create a small test cluster and watch the Terraform log. When it reaches **Running**, download the kubeconfig and run `kubectl get nodes`. Destroy the test cluster afterwards. This run proves the OCI policies, the state bucket and the network path to the cluster API; a successful `helm install` alone does not. See [cluster lifecycle](https://www.infrayard.eu/docs/cluster-lifecycle/).
+
+### Add users
+
+With the bundled Keycloak, users are managed in the Keycloak admin console, which is not exposed on the internet. Open it through a port forward:
+
+```bash
+kubectl port-forward -n infrayard svc/infrayard-keycloak 8080:8080
+```
+
+Go to `http://localhost:8080/auth/admin`, sign in as `admin` with the Keycloak master admin password and switch to the realm **infrayard**.
+
+- **Users → Add user**, then **Credentials → Set password** with **Temporary** on.
+- For an administrator: **Role mapping → Assign role → admin**.
+
+Users without the `admin` role can sign in, deploy clusters within their limits and see the templates allowed for their roles. To connect Infrayard to your company Keycloak instead, see [Use your own Keycloak](https://www.infrayard.eu/docs/keycloak/).
+
+### Reference: all settings
+
+```bash
+helm show values oci://registry.gitlab.com/solvialab/infrayard/charts/infrayard --version <version>
+```
+
+Every value is documented in that output. After the installation, `helm status infrayard -n infrayard` prints the portal URL and the sign-in summary again.
+
+Next: [restrict access to your VPN](https://www.infrayard.eu/docs/private-access/) and plan [upgrades and backups](https://www.infrayard.eu/docs/operations/).
+
+
+## Install on a single VM
+
+Canonical page: https://www.infrayard.eu/docs/install-vm/
+
+This guide runs Infrayard on one Linux VM with Docker Compose, without Kubernetes. It suits evaluations, demos and small teams. The VM runs five containers: PostgreSQL, Keycloak, the Infrayard API, the portal and [Caddy](https://caddyserver.com/), which provides HTTPS with an automatic Let's Encrypt certificate.
+
+Time needed: about 20 minutes, after [Prepare OCI](https://www.infrayard.eu/docs/oci-setup/).
+
+For production with high availability requirements, use [Kubernetes](https://www.infrayard.eu/docs/install-kubernetes/). You can move from the VM to Kubernetes later with a database backup and restore.
+
+### What you need
+
+- A VM with Ubuntu 24.04 LTS (other Linux distributions with Docker work the same way), x86 or Arm.
+- At least 2 CPUs, 4 GB memory and 30 GB disk; 8 GB memory is recommended. On OCI, for example `VM.Standard.A1.Flex` with 2 OCPUs and 12 GB, or `VM.Standard.E5.Flex` with 1 OCPU and 8 GB.
+- Ports 80 and 443 open from your users to the VM (OCI: security list or network security group of the subnet). Port 80 is needed for the Let's Encrypt check and redirects to HTTPS.
+- A DNS name, for example `infrayard.example.com`, with an `A` record to the VM's IP. Keycloak is served on the same name under `/auth`.
+- Outbound internet access from the VM to OCI APIs, the image registry and Let's Encrypt.
+- The values from the [OCI checklist](https://www.infrayard.eu/docs/oci-setup/#values-checklist) and the `oci_api_key.pem` file.
+- Your registry access from the onboarding e-mail: user, token, image addresses and the Infrayard version.
+
+### 1. Install Docker
+
+```bash
+sudo apt update
+sudo apt install -y docker.io docker-compose-v2
+sudo usermod -aG docker $USER
+```
+
+Log out and in again so that your user can run `docker`. Check:
+
+```bash
+docker compose version
+```
+
+### 2. Log in to the registry
+
+```bash
+docker login registry.gitlab.com -u <registry-user>
+# Password: your registry token
+```
+
+### 3. Get the Compose bundle
+
+The bundle is delivered through the same private registry as the images, in the version you install:
+
+```bash
+cd ~
+docker run --rm registry.gitlab.com/solvialab/infrayard/compose:1.4.0 | tar xz
+mv infrayard-compose infrayard && cd ~/infrayard
+ls
+```
+
+```text
+Caddyfile  README.md  docker-compose.yml  keycloak  nginx  postgres
+```
+
+It contains configuration only, and `.env.example` already names the matching image version.
+
+### 4. Configure
+
+```bash
+cp .env.example .env
+chmod 600 .env
+nano .env
+```
+
+Fill in every value. Generate each password with `openssl rand -hex 24`:
+
+```bash
+# Portal
+INFRAYARD_DOMAIN=infrayard.example.com
+INFRAYARD_API_IMAGE=registry.gitlab.com/solvialab/infrayard/api
+INFRAYARD_FRONTEND_IMAGE=registry.gitlab.com/solvialab/infrayard/frontend
+# Already set to the version of the bundle
+INFRAYARD_VERSION=1.4.0
+
+# Passwords
+DB_PASSWORD=<random>
+KEYCLOAK_ADMIN_PASSWORD=<random>
+
+# First Infrayard administrator; the password is temporary
+INFRAYARD_ADMIN_USER=admin
+INFRAYARD_ADMIN_EMAIL=admin@example.com
+INFRAYARD_ADMIN_PASSWORD=<random>
+
+# OCI (from Prepare OCI)
+OCI_TENANCY_OCID=ocid1.tenancy.oc1..aaaa...
+OCI_USER_OCID=ocid1.user.oc1..aaaa...
+OCI_FINGERPRINT=12:34:56:78:90:ab:cd:ef:12:34:56:78:90:ab:cd:ef
+OCI_REGION=eu-frankfurt-1
+OCI_NAMESPACE=frxyz1abcd
+OCI_PARENT_COMPARTMENT_OCID=ocid1.compartment.oc1..aaaa...
+TF_STATE_BUCKET=infrayard-tfstate
+TF_S3_ACCESS_KEY=<S3 access key>
+TF_S3_SECRET_KEY=<S3 secret key>
+```
+
+The optional `SMTP_*` values at the end of the file enable e-mail notifications.
+
+Copy the OCI API private key next to the file. The API container runs as user ID 1000 and must be able to read it:
+
+```bash
+cp /path/to/oci_api_key.pem ./oci_api_key.pem
+sudo chown 1000 oci_api_key.pem
+sudo chmod 400 oci_api_key.pem
+```
+
+### 5. Start
+
+Make sure the DNS record already points to the VM; Caddy requests the certificate on the first start.
+
+```bash
+docker compose up -d
+docker compose ps
+```
+
+All five services must be `Up`; `infrayard-api`, `infrayard-frontend` and `infrayard-postgresql` also show `(healthy)`.
+
+On the first start, Keycloak creates the realm `infrayard`, the portal client, the `admin` role and your first administrator. This takes about a minute. Follow it with `docker compose logs -f infrayard-keycloak` until the line `Realm 'infrayard' imported` appears.
+
+### 6. Sign in
+
+Open `https://infrayard.example.com` and sign in with `INFRAYARD_ADMIN_USER` and `INFRAYARD_ADMIN_PASSWORD`. Keycloak asks for a new password right away. `INFRAYARD_ADMIN_PASSWORD` is only used on the first start; changing it later has no effect.
+
+Then, in **Admin → Configuration**:
+
+1. Check the region and the anchor compartment.
+2. **Sync** shapes and Kubernetes versions from OCI and enable the ones your users may choose.
+3. Review the default limits and the templates.
+
+Create a small test cluster, download its kubeconfig, run `kubectl get nodes` and destroy the cluster again. This proves the OCI policies, the state bucket and the network path to the cluster API.
+
+### Add users
+
+The Keycloak admin console listens only on the VM itself (`127.0.0.1:8081`). Open it through an SSH tunnel from your workstation:
+
+```bash
+ssh -L 8081:127.0.0.1:8081 ubuntu@<vm-address>
+```
+
+Go to `http://localhost:8081/auth/admin`, sign in as `admin` with `KEYCLOAK_ADMIN_PASSWORD` and switch to the realm **infrayard**.
+
+- **Users → Add user**, then **Credentials → Set password** with **Temporary** on.
+- For an administrator: **Role mapping → Assign role → admin**.
+
+### Day-to-day commands
+
+Run them in `~/infrayard`:
+
+```bash
+docker compose ps                         # status
+docker compose logs -f infrayard-api      # API and Terraform logs
+docker compose restart infrayard-api      # restart one service
+docker compose down                       # stop (data stays in Docker volumes)
+docker compose up -d                      # start again
+```
+
+Data lives in Docker volumes: `infrayard_postgres` (Infrayard and Keycloak database), `infrayard_caddy-data` (certificates) and `infrayard_runner` (temporary Terraform work files). Terraform state itself is in the OCI bucket. Back up the database as described in [operations](https://www.infrayard.eu/docs/operations/#backups).
+
+### Variants
+
+**Own TLS certificate** (for example from a company CA, or when Let's Encrypt cannot reach the VM): put `infrayard.crt` (full chain) and `infrayard.key` into `~/infrayard/certs/`, then change the `Caddyfile`:
+
+```text
+{$INFRAYARD_DOMAIN} {
+	tls /certs/infrayard.crt /certs/infrayard.key
+	encode zstd gzip
+	reverse_proxy infrayard-frontend:8080 {
+		flush_interval -1
+	}
+}
+```
+
+and add `- ./certs:/certs:ro` to the `volumes` of the `caddy` service in `docker-compose.yml`. Then `docker compose up -d`.
+
+**Access only through VPN:** see [private access](https://www.infrayard.eu/docs/private-access/).
+
+**Your own Keycloak:** the single-VM bundle always uses its bundled Keycloak. To sign in through your company Keycloak, use the [Kubernetes installation](https://www.infrayard.eu/docs/install-kubernetes/) with [your own Keycloak](https://www.infrayard.eu/docs/keycloak/).
+
+
+## Use your own Keycloak
+
+Canonical page: https://www.infrayard.eu/docs/keycloak/
+
+By default Infrayard brings its own Keycloak with a ready realm. If your company already runs Keycloak, Infrayard can sign users in through a realm there instead, so people use their existing accounts and you manage access with roles or groups you already have.
+
+This option is available for the [Kubernetes installation](https://www.infrayard.eu/docs/install-kubernetes/). It is tested with Keycloak 22 and 26; use Keycloak 22 or newer.
+
+### How sign-in works
+
+1. The portal sends the user to your Keycloak login page (OpenID Connect, Authorization Code flow with PKCE).
+2. Keycloak returns an access token to the portal client `infrayard-portal`. It is a public client: there is no client secret to store.
+3. The Infrayard API checks the token's signature against the realm keys, its issuer and that it was issued to `infrayard-portal`.
+4. On the first sign-in Infrayard creates its own user record from the token. There is no directory sync.
+
+The token must contain `sub`, `preferred_username`, `email` and the roles or groups described below. Keycloak includes them by default.
+
+### Roles
+
+| Role | Default name | What it does |
+| --- | --- | --- |
+| Admin role | `admin` | Administration: all clusters, users, configuration, templates, requests and audit log |
+| Access role | none | When set, only users with this role (or the admin role) may use Infrayard. Others see "Your account is not allowed to use Infrayard" and are signed out |
+| Template roles | your choice, for example `testing`, `production` | Templates can require a role; only users holding it see the template |
+
+In a shared company realm, choose names that cannot clash with existing roles, such as `infrayard-admin` and `infrayard-user`, and always set the access role. Without it, every account in the realm can sign in and create clusters within the default limits.
+
+Infrayard can read these names from one of three places in the token:
+
+| Source | `rolesClaim` value | You assign |
+| --- | --- | --- |
+| Realm roles (default) | `realm_access.roles` | Realm roles, directly or through a group |
+| Client roles | `resource_access.infrayard-portal.roles` | Roles of the client `infrayard-portal` |
+| Groups | `groups` | Group membership (the group name is compared) |
+
+### 1. Set the Helm values
+
+Add these values to your `values.yaml` from the [Kubernetes guide](https://www.infrayard.eu/docs/install-kubernetes/#4-write-the-values-files):
+
+```yaml
+keycloak:
+  enabled: false                 # do not install the bundled Keycloak
+
+api:
+  oidc:
+    issuer: https://sso.example.com/realms/acme
+    clientId: infrayard-portal
+    rolesClaim: realm_access.roles
+    adminRole: infrayard-admin
+    requiredRole: infrayard-user
+```
+
+The `issuer` must be exactly the `iss` value of your tokens. Check it at `https://sso.example.com/realms/acme/.well-known/openid-configuration`. Keycloak versions before 17, and some installations, use the path `/auth/realms/acme`.
+
+The `keycloak.admin.password` and `keycloak.realmImport` values are not needed in this mode.
+
+### 2. Install and import the client
+
+Install or upgrade with Helm as in the Kubernetes guide. The chart then prepares a Keycloak import file that matches your values: the client, the admin and access roles, and for `rolesClaim: groups` the groups and the group mapper. Export it:
+
+```bash
+kubectl get configmap infrayard-oidc-client -n infrayard \
+  -o jsonpath='{.data.keycloak-partial-import\.json}' > infrayard-keycloak.json
+```
+
+In the Keycloak admin console, open your realm, then **Realm settings → Action (top right) → Partial import**. Select the file, choose **If a resource exists: Skip** and click **Import**.
+
+The imported client `infrayard-portal` is public, uses the Standard flow with PKCE (S256) and allows `https://infrayard.example.com/*` as redirect and post-logout URL.
+
+`helm status infrayard -n infrayard` prints the same instructions with your values.
+
+### 3. Give users access
+
+Assign the admin role and the access role to the right people, preferably through groups. For example, in **Groups → platform-team → Role mapping → Assign role**, add `infrayard-admin`; in **Groups → engineering**, add `infrayard-user`.
+
+Sign in at `https://infrayard.example.com` with an admin account and open **Admin**. A role change takes effect with the user's next token, at the latest after the access token lifetime of your realm (5 minutes by default). Users whose role was removed are signed out with a message; users whose Keycloak session ends are signed out as well.
+
+### Keycloak with a private CA
+
+If Keycloak's certificate comes from an internal company CA, browsers trust it through your device management, but the Infrayard API needs the CA explicitly to fetch the realm keys. Add the CA certificate:
+
+```yaml
+api:
+  oidc:
+    ca:
+      cert: |
+        -----BEGIN CERTIFICATE-----
+        MIIDdzCCAl+gAwIBAgIU...
+        -----END CERTIFICATE-----
+```
+
+Or reference an existing ConfigMap in the `infrayard` namespace, for example one managed by trust-manager:
+
+```yaml
+api:
+  oidc:
+    ca:
+      existingConfigMap: company-ca
+      key: ca.crt
+```
+
+Public CAs remain trusted in both cases.
+
+### Keycloak under another address inside the cluster
+
+Users reach Keycloak at the public issuer address. If the Infrayard API cannot use that address (split-horizon DNS, no route from the cluster to it), give it an internal address of the same realm:
+
+```yaml
+api:
+  oidc:
+    issuer: https://sso.example.com/realms/acme
+    internalUrl: http://keycloak.sso.svc.cluster.local:8080/realms/acme
+```
+
+Only the signing keys are fetched there; tokens must still carry the public issuer.
+
+### Changing the role source later
+
+The import uses **Skip** for existing objects. If you later switch to `rolesClaim: groups`, the existing client does not get the group mapper. Add a **Group membership** mapper named `groups` (token claim name `groups`, full group path off) to the client's dedicated scope, or delete the client and import the new file.
+
+### Troubleshooting
+
+| Symptom | Cause and fix |
+| --- | --- |
+| After the Keycloak login the portal does not load your data (API answers 401) | `issuer` differs from the token's `iss` (for example `/auth` in the path). Compare with the realm's `.well-known/openid-configuration` |
+| "Your account is not allowed to use Infrayard" | The user lacks the access role, or `rolesClaim` points to the wrong place. Decode a token and check the claim |
+| No **Admin** menu for an admin | The admin role is not in the claim named by `rolesClaim` |
+| API log: `Cannot fetch OIDC signing keys` | The API cannot reach Keycloak or does not trust its certificate. Set `internalUrl` or `ca` |
+| Keycloak error "Invalid parameter: redirect_uri" | The client's redirect URI does not match the Infrayard domain. Re-import, or fix the client's Valid redirect URIs |
+
+
+## Private access (VPN only)
+
+Canonical page: https://www.infrayard.eu/docs/private-access/
+
+Infrayard holds credentials that can create and delete infrastructure in your OCI tenancy. We strongly recommend that the portal is reachable only from your company network or VPN, not from the whole internet. Infrayard does not restrict network access by itself: this is part of your network setup, and this page shows the usual ways to do it.
+
+Keep in mind what still has to work:
+
+- **Inbound:** users on the VPN reach the portal on port 443. With the bundled Keycloak, sign-in runs on the same address under `/auth`, so it becomes private too.
+- **Outbound from Infrayard:** OCI APIs, the image registry, and the Kubernetes API (port 6443) of every cluster it creates. A NAT gateway or your proxy path is enough; Infrayard needs no inbound connection from the internet.
+- **Clusters:** users need a route from the VPN to the Kubernetes API of their clusters to use `kubectl`. See [Kubernetes API access](https://www.infrayard.eu/docs/networking/#kubernetes-api-endpoint-access).
+
+### Option A: private address (recommended)
+
+The portal gets an IP address inside your VCN and has no public IP at all. The VPN reaches the VCN through a dynamic routing gateway (Site-to-Site VPN or FastConnect) or through a VPN server in the VCN.
+
+**OKE with Traefik:** make the load balancer internal and place it in a private subnet:
+
+```bash
+helm upgrade traefik traefik/traefik -n traefik --reuse-values \
+  --set service.annotations."service\.beta\.kubernetes\.io/oci-load-balancer-internal"="true" \
+  --set service.annotations."service\.beta\.kubernetes\.io/oci-load-balancer-subnet1"=<private-subnet-ocid>
+```
+
+OCI does not change an existing load balancer from public to private. If Traefik is already installed with a public load balancer, uninstall and install it again with these annotations; it receives a new private IP.
+
+**Other Kubernetes distributions:** use your platform's internal load balancer, or expose the ingress controller only on the nodes' private addresses.
+
+**Single VM:** create the VM in a private subnet without a public IP. Give the subnet a NAT gateway for outbound traffic.
+
+### Option B: public address with an allowlist
+
+The portal keeps its public IP, but only your VPN's egress addresses may connect. In OCI, add an ingress rule for TCP 443 (and 80) from your VPN CIDR ranges only, in the network security group or security list of the load balancer or the VM, and remove any rule that allows `0.0.0.0/0`.
+
+This is quicker to set up but depends on the VPN's public addresses staying the same.
+
+### Certificates for a private portal
+
+Let's Encrypt's standard check (HTTP-01) connects to your portal from the internet, so it fails once the portal is private. Choose one of these:
+
+| Certificate | Kubernetes | Single VM |
+| --- | --- | --- |
+| From your company CA | `kubectl create secret tls infrayard-tls -n infrayard --cert=fullchain.pem --key=privkey.pem` and remove the `cert-manager.io/cluster-issuer` annotation from the values | Use the `tls` line in the `Caddyfile`, see [own TLS certificate](https://www.infrayard.eu/docs/install-vm/#variants) |
+| Let's Encrypt with a DNS check (DNS-01) | A cert-manager `ClusterIssuer` with a [DNS-01 solver](https://cert-manager.io/docs/configuration/acme/dns01/) for your DNS provider | Use a Caddy build with your DNS provider's module, or a company CA |
+
+A company CA certificate must be trusted on users' devices; for a public DNS-01 certificate nothing extra is needed. Renew company CA certificates before they expire: Infrayard does not do that for you.
+
+### DNS
+
+Point `infrayard.example.com` to the private IP in your internal DNS, for example a private view in OCI DNS or your company DNS that VPN clients use. A public DNS record with a private IP also works, but it publishes the internal address.
+
+### Your own Keycloak
+
+If you [use your own Keycloak](https://www.infrayard.eu/docs/keycloak/), users' browsers must reach it from the VPN, and the Infrayard API must reach it from the cluster. If the API sees Keycloak under a different internal address, set `api.oidc.internalUrl`.
+
+### Cluster API endpoints
+
+Clusters created by Infrayard can use a private Kubernetes API endpoint or a public one restricted to allowed source ranges. With a restricted public endpoint, add the VPN's egress ranges **and** Infrayard's own outbound address in **Admin → Configuration** as allowed CIDRs; Infrayard calls the cluster API to issue kubeconfigs. See [networking](https://www.infrayard.eu/docs/networking/).
+
+### Check it
+
+From a machine outside the VPN, the portal must not answer:
+
+```bash
+curl -m 10 -sS -o /dev/null https://infrayard.example.com && echo "STILL PUBLIC"
+```
+
+From the VPN, it must load and sign-in must work. Then create a test cluster and download its kubeconfig to confirm that Infrayard still reaches OCI and the cluster API.
 
 
 ## Cluster lifecycle
@@ -513,7 +1340,7 @@ The portal shows tier-specific warnings/messages for this flow.
 
 ### Expiry and cleanup
 
-A time-to-live can be set for temporary clusters. When its TTL is reached, Infrayard starts the destroy workflow. Use TTL deliberately and review its interaction with your protected-cluster policy for the supplied release. Activity includes expiry warnings at 24 hours, 4 hours and 1 hour remaining.
+A time-to-live can be set for temporary clusters. When its TTL is reached, Infrayard starts the destroy workflow. Use TTL deliberately and check how it interacts with your protected-cluster policy. Activity includes expiry warnings at 24 hours, 4 hours and 1 hour remaining.
 
 Scaling a Basic cluster to zero worker nodes can pause compute use, but does not guarantee a zero Oracle bill: retained resources and other services can still be charged.
 
@@ -526,7 +1353,7 @@ Canonical page: https://www.infrayard.eu/docs/administration/
 
 Administrators configure the approved options and operating boundaries available to each team. Review [security and access](https://www.infrayard.eu/docs/security/) for the identity and privilege model.
 
-Admin access is granted by a Keycloak role assignment (realm role, client role or group) — see customer integration docs (gated). Admins have a separate panel accessible from the top nav.
+Admin access is granted by the admin role in Keycloak (`admin` in the bundled realm; with your own Keycloak a realm role, client role or group you choose, see [roles](https://www.infrayard.eu/docs/keycloak/#roles)). Admins see an **Admin** panel in the top navigation.
 
 ### All clusters
 
@@ -596,14 +1423,14 @@ Dedicated admin page for creating and managing cluster templates — pre-configu
 | Tier default | Suggested cluster tier — Basic or Enhanced (suggestion only, not enforced) |
 | TTL | Optional time-to-live in hours — when reached, Infrayard automatically starts cluster destroy/cleanup |
 | Destroy protection | When enabled, the "Destroy" button on the user's cluster opens a "Request destroy" modal instead. Requests land in Admin → Requests (with a live count badge in the nav) where an admin approves, reviews the destroy plan, then confirms force-destroy, or denies with a note |
-| Required role | Keycloak realm role — only users with this role can see and use the template (leave empty for all users) |
+| Required role | Keycloak role (or group, depending on your role source) — only users with it can see and use the template. Leave empty for all users |
 | Sort order | Controls display position in the deploy form (lower numbers appear first) |
 
 The templates table shows estimated monthly and hourly cost per template. The add/edit modal includes a live cost preview that updates as you change pools, shape, or tier.
 
 Template modal behavior: when a VM shape is selected, the K8s dropdown is filtered to versions OCI reports as compatible for that shape in the current region (node-image-backed compatibility). If compatibility lookup is unavailable, no fallback list is shown (fail-closed). Template save/update re-validates shape+K8s compatibility and blocks incompatible combinations.
 
-**Environment-tier gating** — use `required_role` to control which teams can deploy which cluster sizes. For example, create a `DEV — Small` template visible to everyone, a `TEST — Medium` template requiring a `testing` role, a `UAT — Large` template requiring a `uat` role, and a `PROD — HA` template requiring a `production` role. Users only see the templates they have access to on the deploy form. Create the roles in Keycloak under **Realm roles** and assign them to the relevant users.
+**Environment-tier gating** — use `required_role` to control which teams can deploy which cluster sizes. For example, create a `DEV — Small` template visible to everyone, a `TEST — Medium` template requiring a `testing` role, a `UAT — Large` template requiring a `uat` role, and a `PROD — HA` template requiring a `production` role. Users only see the templates they have access to on the deploy form. Create the roles in Keycloak under **Realm roles** (or as client roles or groups, matching your [role source](https://www.infrayard.eu/docs/keycloak/#roles)) and assign them to the relevant users.
 
 Templates can be created, edited, enabled/disabled, and permanently deleted. Disabled templates no longer appear in the deploy form but remain referenced by existing clusters. Permanently deleting a template removes it from the admin panel entirely.
 
@@ -651,123 +1478,245 @@ Review the rates and included components against your contract. Networking, load
 
 Canonical page: https://www.infrayard.eu/docs/operations/
 
-The customer operates the Infrayard installation and the cloud environment around it. This page defines the operating areas to cover. Use the deployment and upgrade runbook for your supplied release for exact commands, supported versions and migration steps.
+You operate the Infrayard installation; Solvia Lab supplies releases, documentation and support. This page covers upgrades, backups and restores for both installation paths, with the commands to run.
 
 ### Responsibilities
 
-| Area | Operating responsibility |
+| Area | Who |
 | --- | --- |
-| Kubernetes host, ingress, TLS, storage and network | Customer, with deployment assistance if agreed |
-| OCI IAM and API credentials | Customer |
-| PostgreSQL and Terraform state backup | Customer |
-| Workload deployment, application backup and availability | Customer |
-| Infrayard release images, documentation and contracted support | Solvia Lab |
-| Extra rollout or incident assistance | As scoped in the support agreement |
+| Host (Kubernetes or VM), ingress, TLS, storage, network | You |
+| OCI user, policies and keys | You |
+| Backups of the database, secrets and Terraform state | You |
+| Applications on the OKE clusters | You |
+| Infrayard releases, release notes, documentation, support | Solvia Lab |
 
-### Before a platform upgrade
+### What to back up
 
-1. Record the installed image versions or digests, Helm release and customer values.
-2. Review the target release notes, compatibility requirements and any database migration guidance supplied with the release.
-3. Back up PostgreSQL, required deployment configuration and secrets using your approved tools. Preserve access to the related Terraform state in OCI Object Storage.
-4. Avoid scheduling a platform upgrade while cluster lifecycle jobs are running.
-5. Test the target release in a non-production installation where possible.
-6. Agree a maintenance window, validation plan and release-specific recovery procedure.
+| Item | Contains | How |
+| --- | --- | --- |
+| PostgreSQL database `infrayard` | Clusters, jobs, users, configuration, templates, requests, audit log, SSH keys of the worker nodes and, with the bundled Keycloak, all Keycloak users and settings | [Database backup](#backups), daily |
+| Terraform state bucket | The state of every managed cluster | Object versioning on the bucket; optionally a copy to another region |
+| Configuration | Kubernetes: `values.yaml` and `secrets.yaml`. VM: the `~/infrayard` directory with `.env` | Your secret manager or configuration repository |
+| OCI API key | `oci_api_key.pem` | Your secret manager |
 
-Use the pinned, released image references supplied for the upgrade. Customer operators consume images; they do not need the product source code or maintainer build pipelines.
+Database and state belong together: a restored database must match the clusters that actually exist in OCI. Treat backups as sensitive; they contain SSH private keys and, with the bundled Keycloak, password hashes.
 
-### Validate after an upgrade
+### Backups
 
-- Sign in as an administrator and a representative regular user.
-- Check role and template visibility, global limits and per-user overrides.
-- Confirm cluster inventory, Activity history and audit records are available.
-- Verify state-backend and OCI connectivity.
-- Validate a suitable non-production lifecycle workflow before allowing wider changes.
+The database backup is one file that contains both Infrayard and the bundled Keycloak.
 
-### Backups and recovery
+**Kubernetes:**
 
-Back up the database, relevant Helm values, necessary secrets and Terraform state under your organisation's retention and access controls. These contain different parts of the platform and need a consistent recovery plan.
+```bash
+kubectl exec -n infrayard infrayard-postgresql-0 -c postgresql -- \
+  pg_dump -U infrayard -Fc infrayard > infrayard-$(date +%F).dump
+```
 
-Define backup frequency, recovery point and recovery time requirements before production. Test restoring into an isolated environment. Do not assume that reinstalling Helm, reverting an image or recovering a single database snapshot will safely undo an infrastructure operation or database migration.
+**Single VM** (in `~/infrayard`):
 
-During recovery, reconcile the restored metadata and state with the resources actually present in OCI before starting new jobs. Do not run competing Terraform operations against the same state.
+```bash
+docker compose exec -T infrayard-postgresql \
+  pg_dump -U infrayard -Fc infrayard > infrayard-$(date +%F).dump
+```
 
-This public guide does not claim a built-in backup service, one-click rollback, or a particular recovery SLA. Any assisted recovery and response commitment is defined in your support agreement.
+To run it every night on the VM, add a cron entry with `crontab -e`:
 
-### OKE and workload operations
+```text
+30 2 * * * cd ~/infrayard && docker compose exec -T infrayard-postgresql pg_dump -U infrayard -Fc infrayard > ~/backups/infrayard-$(date +\%F).dump
+```
 
-An Infrayard platform upgrade and an OKE Kubernetes upgrade are separate changes. Worker refresh, disruption budgets, capacity, temporary scaling cost and application availability must be considered when scheduling OKE changes. See [cluster lifecycle](https://www.infrayard.eu/docs/cluster-lifecycle/).
+Copy the files off the host, for example to an Object Storage bucket with `oci os object put`, and delete old ones according to your retention policy.
+
+If you use an external PostgreSQL (`postgresql.enabled: false`), back it up with your database tooling instead.
+
+### Restore
+
+Restore into the same Infrayard version that created the backup, then upgrade if needed. Stop the services that write to the database first.
+
+**Kubernetes:**
+
+```bash
+kubectl scale deploy -n infrayard infrayard-api infrayard-keycloak --replicas=0
+kubectl exec -i -n infrayard infrayard-postgresql-0 -c postgresql -- \
+  pg_restore -U infrayard -d infrayard --clean --if-exists --no-owner < infrayard-2026-01-31.dump
+kubectl scale deploy -n infrayard infrayard-api infrayard-keycloak --replicas=1
+```
+
+Without the bundled Keycloak, leave `infrayard-keycloak` out of the commands.
+
+**Single VM:**
+
+```bash
+docker compose stop infrayard-api infrayard-keycloak
+docker compose exec -T infrayard-postgresql \
+  pg_restore -U infrayard -d infrayard --clean --if-exists --no-owner < infrayard-2026-01-31.dump
+docker compose up -d
+```
+
+**On a new host**, start only the database first, so that nothing writes to it before the restore:
+
+- Kubernetes: install with your values and `--set api.replicaCount=0 --set keycloak.replicaCount=0`, restore, then run `helm upgrade` with the same command without these two options.
+- VM: `docker compose up -d --wait infrayard-postgresql`, restore, then `docker compose up -d`.
+
+After a restore, compare the cluster list in the portal with what exists in OCI before you start new operations. A cluster created or destroyed after the backup appears in the wrong state; its Terraform state in the bucket is still correct.
+
+### Upgrade Infrayard
+
+Before you start:
+
+1. Read the release notes of the target version, especially for steps marked as required.
+2. Take a [database backup](#backups).
+3. Make sure no cluster operation is running (**Admin → All Clusters**).
+
+The API applies database changes automatically when it starts. They cannot be undone by downgrading; a rollback means restoring the backup.
+
+**Kubernetes:**
+
+```bash
+helm upgrade infrayard oci://registry.gitlab.com/solvialab/infrayard/charts/infrayard \
+  --version 1.5.0 -n infrayard -f values.yaml -f secrets.yaml
+kubectl get pods -n infrayard -w
+```
+
+The chart version selects the image version. Changed configuration or secrets restart the affected pods automatically.
+
+**Single VM:**
+
+```bash
+cd ~/infrayard
+sed -i 's/^INFRAYARD_VERSION=.*/INFRAYARD_VERSION=1.5.0/' .env
+docker compose pull
+docker compose up -d
+```
+
+If the release notes say that the Compose bundle changed, unpack the new one next to the old directory and copy over your `.env` and `oci_api_key.pem`:
+
+```bash
+cd ~ && docker run --rm registry.gitlab.com/solvialab/infrayard/compose:1.5.0 | tar xz
+cp ~/infrayard/.env ~/infrayard/oci_api_key.pem ~/infrayard-compose/
+```
+
+Set `INFRAYARD_VERSION=1.5.0` in the copied `.env`, stop the old installation with `docker compose down` in `~/infrayard`, and start the new one with `docker compose up -d` in `~/infrayard-compose`. The data stays in the Docker volumes, which both directories share because the Compose project name is `infrayard`.
+
+**After the upgrade:** sign in as an administrator and as a regular user, check the cluster list and the Activity history, and run **Sync** in **Admin → Configuration** to confirm OCI access.
+
+**Rollback** (Kubernetes): `helm rollback infrayard -n infrayard` returns the previous chart and images. If the new version had already started, also restore the backup taken before the upgrade.
+
+### PostgreSQL and Keycloak versions
+
+The chart and the bundle pin the PostgreSQL major version (currently 18) and the Keycloak version (currently 26.8). Patch releases arrive with Infrayard upgrades.
+
+A new PostgreSQL major version cannot read the old data directory. When a release moves to a new major version, its notes say so, and the upgrade needs a dump and restore:
+
+1. Take a [database backup](#backups).
+2. Stop everything and delete the database volume:
+   - Kubernetes: `kubectl scale deploy -n infrayard infrayard-api infrayard-keycloak --replicas=0`, then `kubectl delete statefulset infrayard-postgresql -n infrayard` and `kubectl delete pvc data-infrayard-postgresql-0 -n infrayard`.
+   - VM: `docker compose down`, then `docker volume rm infrayard_postgres`.
+3. Start the new version with only the database running:
+   - Kubernetes: the `helm upgrade` command from above with `--set api.replicaCount=0 --set keycloak.replicaCount=0`.
+   - VM: set the new version in `.env`, then `docker compose pull` and `docker compose up -d --wait infrayard-postgresql`.
+4. [Restore](#restore) the backup with the `pg_restore` command.
+5. Start everything: the same `helm upgrade` without the two `--set` options, or `docker compose up -d`.
+
+Keycloak updates its schema by itself on the first start of a new version.
+
+### OKE clusters are a separate topic
+
+Upgrading Infrayard does not touch your OKE clusters. Kubernetes upgrades of the clusters are done per cluster in the portal; see [cluster lifecycle](https://www.infrayard.eu/docs/cluster-lifecycle/). Plan them with worker refresh, disruption budgets and temporary extra capacity in mind.
 
 ### Ending a subscription
 
-Arrange the supported handover of required configuration, access and state before the commercial access period ends. Ending a software subscription does not stop Oracle Cloud billing for resources left running. Subscription entitlements and the offboarding procedure are governed by your agreement; see [billing and licensing](https://www.infrayard.eu/docs/subscription/#cancellation-and-offboarding).
+Ending the subscription does not stop or delete anything in OCI, and Oracle keeps billing running clusters. Before access ends, destroy the clusters you no longer need, or keep the Terraform state bucket so that they can still be managed. Details are in your agreement; see [billing and licensing](https://www.infrayard.eu/docs/subscription/#cancellation-and-offboarding).
 
 
 ## Troubleshooting and support
 
 Canonical page: https://www.infrayard.eu/docs/troubleshooting/
 
-Start with the failing operation's execution logs and the affected cluster's detail page. Preserve the error and operation time before retrying. Confirm the actual OCI resource state before attempting a second infrastructure operation.
+Start with the logs. For a failed cluster operation, open the operation's Terraform log in the portal. For the installation itself:
+
+```bash
+# Kubernetes
+kubectl get pods -n infrayard
+kubectl describe pod -n infrayard <pod>
+kubectl logs -n infrayard deploy/infrayard-api --tail=200
+
+# Single VM (in ~/infrayard)
+docker compose ps
+docker compose logs --tail=200 infrayard-api
+```
+
+Note the time and the exact error before you retry, and check what actually exists in OCI before starting a second operation on the same cluster.
+
+### Installation
+
+| Symptom | Cause and fix |
+| --- | --- |
+| `infrayard-api` pod stays in `Init` or `ContainerCreating`; events mention `infrayard-oci-key` | The OCI key secret is missing or in another namespace. Create it as in [step 3](https://www.infrayard.eu/docs/install-kubernetes/#3-create-the-namespace-and-secrets) |
+| `ImagePullBackOff` or `docker compose pull` fails with `unauthorized` | Registry login or `regcred` secret is missing or the token has expired. Check `global.imagePullSecrets` and the image addresses; ask support for a new token |
+| `helm install` fails with `... is required` | A required value is missing, for example `postgresql.auth.password` or `keycloak.admin.password`. Add it to `secrets.yaml` |
+| Certificate stays `READY False` | DNS does not point to the ingress yet, or port 80 is not reachable from the internet. Check `kubectl describe certificate -n infrayard infrayard-tls` and `kubectl get challenges -A` |
+| VM: browser shows a certificate error | Caddy could not get a certificate. Check `docker compose logs caddy`; DNS and ports 80/443 must reach the VM |
+| Sign-in shows `502 Bad Gateway` or a Keycloak error page | Keycloak is still starting (about a minute on the first start) or the realm import failed. Check the Keycloak logs for `Realm 'infrayard' imported` |
+| Keycloak does not start, log shows `password authentication failed` | The database password changed after the first start. The database keeps the password it was created with; set the original value again |
+
+### Sign-in and roles
+
+| Symptom | Cause and fix |
+| --- | --- |
+| "Your account is not allowed to use Infrayard" | The user lacks the access role (`requiredRole`). Assign it in Keycloak; it takes effect at the next sign-in |
+| No **Admin** menu | The user lacks the admin role, or `rolesClaim` points to the wrong claim |
+| Sign-in works but data does not load | The issuer setting does not match the token. See [Keycloak troubleshooting](https://www.infrayard.eu/docs/keycloak/#troubleshooting) |
+| A template is missing for a user | The template requires a role the user does not hold |
+| A role change has no effect | Roles are read from the token; the user gets the change with the next token, within the token lifetime (5 minutes by default) |
 
 ### Missing versions or shapes
 
-In **Admin → Configuration**, sync shapes and Kubernetes versions from OCI for the configured region. Newly discovered Kubernetes versions must be enabled by an administrator. The selected VM shape needs a compatible OKE node image.
+In **Admin → Configuration**, sync shapes and Kubernetes versions from OCI for the configured region. Newly found Kubernetes versions must be enabled by an administrator. A version is only offered when OCI has a node image for it and the selected shape.
 
-Compatibility lookup fails closed: an unavailable lookup can block deployment even if a version is enabled. Check runner credentials, OCI policies and API connectivity. If shape sync is unavailable, existing shape configuration remains in place for manual review.
-
-An administrator with an appropriately configured OCI CLI can inspect the current options:
+If the check with OCI fails, deployment is blocked on purpose. Then check the OCI user's policies and the API's outbound access. With the OCI CLI configured for the same user, this shows what OCI offers:
 
 ```bash
-oci ce node-pool-options get --node-pool-option-id all --profile <PROFILE>
+oci ce node-pool-options get --node-pool-option-id all --region eu-frankfurt-1
 ```
-
-Use region-appropriate results; do not copy a stale shape or image allowlist from another tenancy.
 
 ### Existing-network validation fails
 
-- An existing subnet requires an existing VCN reference.
-- The selected compartment must be within the installation's anchor scope.
-- Reusing a compartment alone does not discover its VCN or subnets.
-- Existing network resources need prepared routing and permissions.
-- Restricted public endpoint mode is not supported with every read-only BYON combination.
+- An existing subnet also needs its VCN OCID.
+- The compartment must be the anchor or below it.
+- A compartment alone does not reuse its VCN; Infrayard creates a new one.
+- With the **public endpoint with allowlist** mode, existing VCNs and subnets are rejected.
 
-Review the [networking combinations and ownership rules](https://www.infrayard.eu/docs/networking/) before changing permissions or resources.
+See [networking](https://www.infrayard.eu/docs/networking/#bringing-your-own-network).
 
-### Workers do not become ready
+### Worker nodes do not become ready
 
-Inspect the OCI and Terraform error output, tenancy quotas, regional capacity and shape/image compatibility. For BYON private worker subnets, confirm the required egress path to OCI services. Network resources supplied by the customer are not automatically repaired by Infrayard.
+Look at the Terraform log and the node pool in the OCI Console. Common causes: service limits or quotas, no capacity for the shape in the availability domain, or a shape without a matching image. With your own subnet, the subnet needs a NAT gateway route and a service gateway route; without them nodes cannot register.
 
-### Kubeconfig downloads but kubectl cannot connect
+### kubectl cannot connect
 
-The kubeconfig supplies authentication, not routing. Check VPN or private-network access, endpoint mode and the configured TCP/6443 allowlist. Both the runner and relevant client networks need reachability. A downloaded file does not bypass a private endpoint or firewall.
+The kubeconfig only authenticates; it does not open a network path. Check that you are on the VPN, that the cluster's endpoint mode fits your network, and that your egress range is in the allowlist (**Admin → Configuration → Kubernetes API Access**). Infrayard's own outbound address must be in the allowlist as well, otherwise the kubeconfig download fails.
 
-### A limit prevents a request
+### A limit blocks a request
 
-Check the global default, per-user override and selected template. Submit a limit-increase request where offered; administrators can grant or adjust the values in the Requests queue. Approved templates can define pre-approved resource values that exceed a user's custom-configuration limits.
+Check the global default, the user's own limit and the template. Users can request more in the portal; administrators approve or adjust it in **Requests**. Templates may allow more than a user's limit for custom configurations.
 
-### Login or role visibility is incorrect
+### A cluster operation fails
 
-Check the configured OIDC issuer, redirect addresses and role claims for the supplied release. Confirm admin and template role mapping. A user without a required template role will not see that template. Changes to limits are reflected on the next relevant load; a role change can require a fresh identity session.
+Read the Terraform log, then check the resources in OCI. A failed deployment offers a cleanup action that removes partial resources; check what it will remove first. For Basic clusters, changes to nodes or a Kubernetes upgrade need a rolling worker refresh.
 
-### Images cannot be pulled
-
-Verify the released image references, registry entitlement, `imagePullSecrets` and network access to the approved registry or mirror. Contact support if a supplied registry credential has expired. Do not publish registry tokens in logs or screenshots.
-
-### A lifecycle operation fails
-
-Inspect the run output and OCI state. Failed deployments can expose a cleanup action for partial resources. Confirm what exists and what the action will remove before using it. For Basic clusters, review the required worker refresh after per-node changes or Kubernetes upgrades.
-
-Avoid manual edits to Infrayard-managed resources as a routine repair: the next Terraform apply can overwrite them. Where incident intervention is necessary, coordinate state reconciliation before running further jobs.
+Do not repair Infrayard-managed resources by hand in the OCI Console as a routine fix; the next Terraform run overwrites the changes. If you must intervene, contact support before running further operations on that cluster.
 
 ### Contact support
 
-Email [support@infrayard.eu](mailto:support@infrayard.eu) or [open the support form](https://www.infrayard.eu/?enquiry=support#demo). Include:
+Write to [support@infrayard.eu](mailto:support@infrayard.eu) or use the [support form](https://www.infrayard.eu/?enquiry=support#demo). Include:
 
-- The installed Infrayard release and deployment option.
-- The affected operation, approximate timestamp and region.
-- The observed result and a sanitised error excerpt.
-- Relevant recent changes and steps already attempted.
+- The Infrayard version and the installation path (OKE, other Kubernetes, single VM).
+- What you did, the approximate time and the region.
+- The error message and the relevant log lines.
+- Recent changes and what you have already tried.
 
-Remove private keys, access tokens, passwords, customer data and unnecessary identifiers before sharing diagnostics. Response targets, support hours and escalation arrangements are defined by your subscription agreement. For additional support requirements, [discuss Enterprise](https://www.infrayard.eu/?enquiry=enterprise#demo).
+Remove private keys, tokens, passwords and personal data before you send logs. Response times and support hours are part of your subscription; see [Enterprise](https://www.infrayard.eu/?enquiry=enterprise#demo) for extended support.
 
 
 ## Subscription, billing and licensing
@@ -834,7 +1783,7 @@ Agree offboarding before access ends, including required configuration, operatio
 
 ### Licence and delivery
 
-The commercial agreement governs production rights, deployment scope and restrictions. Standard delivery includes released images, registry access, Helm deployment assets and documentation. Product source code and release automation are not included unless separately agreed. Managed-service resale and redistribution require explicit written permission.
+The commercial agreement governs production rights, deployment scope and restrictions. Standard delivery includes released images, registry access, the Helm chart, the Docker Compose bundle and documentation. Product source code and release automation are not included unless separately agreed. Managed-service resale and redistribution require explicit written permission.
 
 This public website and documentation do not grant an open-source or Business Source License to the commercial product and do not change rights granted under any separately issued licence. See the [website legal notice](https://www.infrayard.eu/legal/terms.html) and your commercial agreement.
 
@@ -860,15 +1809,16 @@ Choose Infrayard based on capabilities available in the release delivered to you
 - Download Kubernetes access files without requiring local OCI CLI setup in the default access workflow.
 - Review cost estimates, Activity notifications and audit history.
 - Sync available shapes and Kubernetes versions with compatibility filtering.
-- Use customer-managed identity and a Helm-based customer installation.
+- Sign in through the bundled Keycloak or your existing Keycloak.
+- Install with Helm on Kubernetes (OKE, k3s and others) or with Docker Compose on a single VM.
 
 Operational behaviour depends on cluster tier and network design; see [requirements](https://www.infrayard.eu/docs/requirements/) and [cluster lifecycle](https://www.infrayard.eu/docs/cluster-lifecycle/).
 
 ### Versioned delivery
 
-Customers receive released container images, pinned references, deployment values and applicable release guidance. Images can be pulled from the approved delivery registry or an agreed mirror. Source code and maintainer CI are not required for customer deployment.
+Each release has a version number such as `1.4.0`. The Helm chart and the images of a release share that version and are published together in the private registry you receive access to; chart `1.4.0` runs images `1.4.0`, and the Compose bundle `compose:1.4.0` starts the same images.
 
-Use the version and upgrade notes included with your supplied release. This public page does not assign invented release dates or release numbers to the current build. Track the exact image versions or digests running in your installation.
+Release notes list changes and any required upgrade steps. Follow [Upgrade Infrayard](https://www.infrayard.eu/docs/operations/#upgrade-infrayard) and run `helm list -n infrayard` (or check `.env` on a VM) to see which version you run. Source code and build pipelines are not needed to install or operate Infrayard.
 
 ### Planned work
 

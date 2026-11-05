@@ -1,64 +1,86 @@
 # Troubleshooting and support
 
-Start with the failing operation's execution logs and the affected cluster's detail page. Preserve the error and operation time before retrying. Confirm the actual OCI resource state before attempting a second infrastructure operation.
+Start with the logs. For a failed cluster operation, open the operation's Terraform log in the portal. For the installation itself:
+
+```bash
+# Kubernetes
+kubectl get pods -n infrayard
+kubectl describe pod -n infrayard <pod>
+kubectl logs -n infrayard deploy/infrayard-api --tail=200
+
+# Single VM (in ~/infrayard)
+docker compose ps
+docker compose logs --tail=200 infrayard-api
+```
+
+Note the time and the exact error before you retry, and check what actually exists in OCI before starting a second operation on the same cluster.
+
+## Installation
+
+| Symptom | Cause and fix |
+| --- | --- |
+| `infrayard-api` pod stays in `Init` or `ContainerCreating`; events mention `infrayard-oci-key` | The OCI key secret is missing or in another namespace. Create it as in [step 3](/docs/install-kubernetes/#3-create-the-namespace-and-secrets) |
+| `ImagePullBackOff` or `docker compose pull` fails with `unauthorized` | Registry login or `regcred` secret is missing or the token has expired. Check `global.imagePullSecrets` and the image addresses; ask support for a new token |
+| `helm install` fails with `... is required` | A required value is missing, for example `postgresql.auth.password` or `keycloak.admin.password`. Add it to `secrets.yaml` |
+| Certificate stays `READY False` | DNS does not point to the ingress yet, or port 80 is not reachable from the internet. Check `kubectl describe certificate -n infrayard infrayard-tls` and `kubectl get challenges -A` |
+| VM: browser shows a certificate error | Caddy could not get a certificate. Check `docker compose logs caddy`; DNS and ports 80/443 must reach the VM |
+| Sign-in shows `502 Bad Gateway` or a Keycloak error page | Keycloak is still starting (about a minute on the first start) or the realm import failed. Check the Keycloak logs for `Realm 'infrayard' imported` |
+| Keycloak does not start, log shows `password authentication failed` | The database password changed after the first start. The database keeps the password it was created with; set the original value again |
+
+## Sign-in and roles
+
+| Symptom | Cause and fix |
+| --- | --- |
+| "Your account is not allowed to use Infrayard" | The user lacks the access role (`requiredRole`). Assign it in Keycloak; it takes effect at the next sign-in |
+| No **Admin** menu | The user lacks the admin role, or `rolesClaim` points to the wrong claim |
+| Sign-in works but data does not load | The issuer setting does not match the token. See [Keycloak troubleshooting](/docs/keycloak/#troubleshooting) |
+| A template is missing for a user | The template requires a role the user does not hold |
+| A role change has no effect | Roles are read from the token; the user gets the change with the next token, within the token lifetime (5 minutes by default) |
 
 ## Missing versions or shapes
 
-In **Admin → Configuration**, sync shapes and Kubernetes versions from OCI for the configured region. Newly discovered Kubernetes versions must be enabled by an administrator. The selected VM shape needs a compatible OKE node image.
+In **Admin → Configuration**, sync shapes and Kubernetes versions from OCI for the configured region. Newly found Kubernetes versions must be enabled by an administrator. A version is only offered when OCI has a node image for it and the selected shape.
 
-Compatibility lookup fails closed: an unavailable lookup can block deployment even if a version is enabled. Check runner credentials, OCI policies and API connectivity. If shape sync is unavailable, existing shape configuration remains in place for manual review.
-
-An administrator with an appropriately configured OCI CLI can inspect the current options:
+If the check with OCI fails, deployment is blocked on purpose. Then check the OCI user's policies and the API's outbound access. With the OCI CLI configured for the same user, this shows what OCI offers:
 
 ```bash
-oci ce node-pool-options get --node-pool-option-id all --profile <PROFILE>
+oci ce node-pool-options get --node-pool-option-id all --region eu-frankfurt-1
 ```
-
-Use region-appropriate results; do not copy a stale shape or image allowlist from another tenancy.
 
 ## Existing-network validation fails
 
-- An existing subnet requires an existing VCN reference.
-- The selected compartment must be within the installation's anchor scope.
-- Reusing a compartment alone does not discover its VCN or subnets.
-- Existing network resources need prepared routing and permissions.
-- Restricted public endpoint mode is not supported with every read-only BYON combination.
+- An existing subnet also needs its VCN OCID.
+- The compartment must be the anchor or below it.
+- A compartment alone does not reuse its VCN; Infrayard creates a new one.
+- With the **public endpoint with allowlist** mode, existing VCNs and subnets are rejected.
 
-Review the [networking combinations and ownership rules](/docs/networking/) before changing permissions or resources.
+See [networking](/docs/networking/#bringing-your-own-network).
 
-## Workers do not become ready
+## Worker nodes do not become ready
 
-Inspect the OCI and Terraform error output, tenancy quotas, regional capacity and shape/image compatibility. For BYON private worker subnets, confirm the required egress path to OCI services. Network resources supplied by the customer are not automatically repaired by Infrayard.
+Look at the Terraform log and the node pool in the OCI Console. Common causes: service limits or quotas, no capacity for the shape in the availability domain, or a shape without a matching image. With your own subnet, the subnet needs a NAT gateway route and a service gateway route; without them nodes cannot register.
 
-## Kubeconfig downloads but kubectl cannot connect
+## kubectl cannot connect
 
-The kubeconfig supplies authentication, not routing. Check VPN or private-network access, endpoint mode and the configured TCP/6443 allowlist. Both the runner and relevant client networks need reachability. A downloaded file does not bypass a private endpoint or firewall.
+The kubeconfig only authenticates; it does not open a network path. Check that you are on the VPN, that the cluster's endpoint mode fits your network, and that your egress range is in the allowlist (**Admin → Configuration → Kubernetes API Access**). Infrayard's own outbound address must be in the allowlist as well, otherwise the kubeconfig download fails.
 
-## A limit prevents a request
+## A limit blocks a request
 
-Check the global default, per-user override and selected template. Submit a limit-increase request where offered; administrators can grant or adjust the values in the Requests queue. Approved templates can define pre-approved resource values that exceed a user's custom-configuration limits.
+Check the global default, the user's own limit and the template. Users can request more in the portal; administrators approve or adjust it in **Requests**. Templates may allow more than a user's limit for custom configurations.
 
-## Login or role visibility is incorrect
+## A cluster operation fails
 
-Check the configured OIDC issuer, redirect addresses and role claims for the supplied release. Confirm admin and template role mapping. A user without a required template role will not see that template. Changes to limits are reflected on the next relevant load; a role change can require a fresh identity session.
+Read the Terraform log, then check the resources in OCI. A failed deployment offers a cleanup action that removes partial resources; check what it will remove first. For Basic clusters, changes to nodes or a Kubernetes upgrade need a rolling worker refresh.
 
-## Images cannot be pulled
-
-Verify the released image references, registry entitlement, `imagePullSecrets` and network access to the approved registry or mirror. Contact support if a supplied registry credential has expired. Do not publish registry tokens in logs or screenshots.
-
-## A lifecycle operation fails
-
-Inspect the run output and OCI state. Failed deployments can expose a cleanup action for partial resources. Confirm what exists and what the action will remove before using it. For Basic clusters, review the required worker refresh after per-node changes or Kubernetes upgrades.
-
-Avoid manual edits to Infrayard-managed resources as a routine repair: the next Terraform apply can overwrite them. Where incident intervention is necessary, coordinate state reconciliation before running further jobs.
+Do not repair Infrayard-managed resources by hand in the OCI Console as a routine fix; the next Terraform run overwrites the changes. If you must intervene, contact support before running further operations on that cluster.
 
 ## Contact support
 
-Email [support@infrayard.eu](mailto:support@infrayard.eu) or [open the support form](/?enquiry=support#demo). Include:
+Write to [support@infrayard.eu](mailto:support@infrayard.eu) or use the [support form](/?enquiry=support#demo). Include:
 
-- The installed Infrayard release and deployment option.
-- The affected operation, approximate timestamp and region.
-- The observed result and a sanitised error excerpt.
-- Relevant recent changes and steps already attempted.
+- The Infrayard version and the installation path (OKE, other Kubernetes, single VM).
+- What you did, the approximate time and the region.
+- The error message and the relevant log lines.
+- Recent changes and what you have already tried.
 
-Remove private keys, access tokens, passwords, customer data and unnecessary identifiers before sharing diagnostics. Response targets, support hours and escalation arrangements are defined by your subscription agreement. For additional support requirements, [discuss Enterprise](/?enquiry=enterprise#demo).
+Remove private keys, tokens, passwords and personal data before you send logs. Response times and support hours are part of your subscription; see [Enterprise](/?enquiry=enterprise#demo) for extended support.

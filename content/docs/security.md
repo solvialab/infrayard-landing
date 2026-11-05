@@ -1,52 +1,78 @@
 # Security and access
 
-Infrayard runs in the customer environment. OCI credentials, Terraform state, platform metadata and operational records are managed within that environment; a Solvia-hosted SaaS control plane is not required.
+Infrayard runs entirely in your environment. OCI credentials, Terraform state, the database and logs stay with you; there is no Solvia Lab cloud service in the path, and Infrayard sends no data to Solvia Lab.
 
 ## Identity and roles
 
-Authentication uses OpenID Connect with the Authorization Code flow and PKCE. The browser does not store a confidential OIDC client secret. Sign-in is handled by Keycloak: either the Keycloak bundled with Infrayard, or a realm in your organisation's existing Keycloak.
+Sign-in uses OpenID Connect with the Authorization Code flow and PKCE, handled by Keycloak: the one bundled with Infrayard or a realm in your existing Keycloak. The portal is a public client, so no client secret is stored in the browser. The API checks the signature, issuer and audience of every token.
 
-Users are created on first login from their identity claim. An admin role grants access to the administration panel. Template role requirements can restrict which approved configurations a user sees. Roles come from Keycloak realm roles, client roles or groups; an optional access role limits who can sign in at all.
+Infrayard creates a user record on the first sign-in. Access is controlled by Keycloak roles or groups:
 
-Changing template visibility or resource limits is not a substitute for reviewing OCI permissions and Kubernetes access rights. Review each layer against your organisation's access policy.
+- **Admin role**: the administration area, all clusters, users, configuration, templates, requests and audit log.
+- **Access role** (optional): only users with it may sign in. Use it with a shared company realm.
+- **Template roles**: a template can require a role, so only some users see it.
+
+When a role is removed or the Keycloak session ends, the user is signed out within a few minutes. Details: [Use your own Keycloak](/docs/keycloak/#roles).
 
 ## OCI credentials
 
-The runner needs an OCI service identity with permissions for the resources it manages. Scope that identity to your selected anchor compartment and required resource families. A tenancy-root anchor needs correspondingly broader permissions.
+Infrayard acts in OCI as one service user with an API key. Its policies are scoped to the anchor compartment; read access covers the tenancy so that regions, shapes and networks can be listed. See [Prepare OCI](/docs/oci-setup/#3-add-the-policies).
 
-The exact policy statements and secret provisioning are part of the customer deployment runbook. Keep API keys, signing keys, database passwords and registry tokens in your approved secret-management process. Do not send them through website forms or include them in support attachments.
+Where the credentials are stored:
+
+| Secret | Kubernetes | Single VM |
+| --- | --- | --- |
+| OCI API private key | Secret `infrayard-oci-key`, mounted read-only into the API | `oci_api_key.pem`, readable only by the API container user |
+| S3 key for the state bucket, database and Keycloak passwords | Secrets created by the chart from your values | `.env` file, mode 600 |
+
+Keep these in your secret manager. Never send them in support requests.
+
+Rotating the API key: add a new key to the OCI user, update the secret (or file) and the fingerprint, roll out, then delete the old key in OCI.
 
 ## Kubernetes access
 
-Authorised users can download a kubeconfig from a running cluster's detail page. The documented default uses a per-user Kubernetes ServiceAccount token, allowing `kubectl` access without local OCI CLI configuration. An explicit OCI-exec fallback is available for users who use OCI CLI authentication.
+Users download a kubeconfig from a running cluster's detail page. It works with plain `kubectl`, without the OCI CLI:
 
 ```bash
-export KUBECONFIG=~/oke-my-cluster-kubeconfig.yaml
+export KUBECONFIG=~/Downloads/oke-my-cluster-kubeconfig.yaml
 kubectl get nodes
 ```
 
-Authentication does not establish a network route. The user's machine and runner must reach the OKE API endpoint. See [networking and connectivity](/docs/networking/#kubernetes-api-endpoint-access).
+How it works:
 
-During security review, confirm the Kubernetes permissions, token lifetime, revocation procedure and downloaded credential handling for your supplied release. Website documentation is not a guarantee of a particular token expiry or a replacement for that review.
+- Each Infrayard user gets their own ServiceAccount in the namespace `infrayard-system` of the cluster, so Kubernetes audit logs show the actual person.
+- The ServiceAccount is bound to **`cluster-admin`**. Everyone who may download a kubeconfig for a cluster has full rights on it.
+- The embedded token is valid for up to 30 days; the cluster may shorten that. Download a new kubeconfig when it expires.
+- To revoke a user's access to a cluster at once, delete their ServiceAccount: `kubectl delete serviceaccount <user> -n infrayard-system`.
 
-Administrators can download access files for other users' clusters from **All Clusters → Details**. Include this privilege in your role review.
+Users with an OCI CLI setup can download an alternative kubeconfig that authenticates through the OCI CLI.
+
+Cluster owners download access for their clusters; administrators can download it for every cluster in **All Clusters → Details**. Include this in your access review.
+
+The kubeconfig does not create a network path. Users need a route to the cluster's API endpoint; see [networking](/docs/networking/#kubernetes-api-endpoint-access).
 
 ## SSH access
 
-Terraform-generated worker-node SSH keys are available through the documented cluster detail workflow. Treat downloaded private keys as credentials and retain them in your approved secure store. Confirm retrieval and rotation behaviour for your release; do not assume a later download will be available.
+Terraform generates an SSH key pair for each cluster's worker nodes. The private key is stored in the Infrayard database and can be downloaded from the cluster's detail page. Treat it as a credential, and treat database backups as sensitive for this reason.
 
 ## Audit and approvals
 
-Lifecycle operations record actor, action, cluster, outcome and duration. Protected destroy requests and limit-increase requests record submission and review decisions. Administrators retain a privileged force-destroy path for incident response.
+Every lifecycle operation records who did what, on which cluster, the result and the duration. Destroy requests and limit-increase requests record the submission and the decision. Administrators can force-destroy a cluster for incident response; this is recorded too.
 
-The Activity inbox also records lifecycle events, request outcomes and limit changes. Optional SMTP notifications can send event details to configured recipients. Account for those emails when reviewing information flows and retention.
+The Activity inbox shows lifecycle events, request outcomes and limit changes. Optional e-mail notifications send event details to the configured recipients through your SMTP server.
 
-## Network and delivery boundary
+## Network exposure
 
-The installation still needs access to OCI APIs, its identity endpoints, required OKE endpoints and the approved registry delivery path. Optional SMTP and customer-selected integrations have their own destinations. Mirroring container images alone does not establish disconnected operation.
+The portal is the only inbound endpoint. The Keycloak admin console is not exposed: on Kubernetes it is reached with `kubectl port-forward`, on the single VM through an SSH tunnel. We recommend making the portal reachable [only from your VPN](/docs/private-access/).
 
-Private endpoints and restricted public endpoints have different routing prerequisites. A future access agent is listed separately on the [roadmap](/docs/releases/#planned-work).
+Outbound, Infrayard needs OCI APIs, the image registry and the cluster APIs; see [requirements](/docs/requirements/#network).
 
-## Customer security review
+## Hardening built in
 
-Review TLS, ingress exposure, IAM scope, Kubernetes roles, secrets, database access, state storage, backups, log access and operational access before production. Security questionnaires and additional evidence requirements can be scoped through [Enterprise](/?enquiry=enterprise#demo).
+- On Kubernetes, the Infrayard, Keycloak and PostgreSQL containers run as non-root users and drop all Linux capabilities; the API and the portal also use read-only root file systems. On the single VM, the API runs as a non-root user and the portal container is read-only.
+- The portal sends security headers (`X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`) and redirects HTTP to HTTPS.
+- Configuration or secret changes roll the affected pods automatically on `helm upgrade`.
+
+## Your security review
+
+Before production, review TLS and exposure, OCI policy scope, who holds the admin role, kubeconfig rights, secret storage, database and state backups, and log access. Security questionnaires and additional evidence can be arranged through [Enterprise](/?enquiry=enterprise#demo).

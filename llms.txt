@@ -2,7 +2,7 @@
 
 > Infrayard by Solvia Lab is a commercial self-service portal for creating and operating Oracle Kubernetes Engine clusters inside the customer's OCI tenancy. Platform teams define templates, roles and limits. Engineers use the portal for supported cluster lifecycle workflows. No Solvia-hosted SaaS control plane is required.
 
-Last substantive website update: 2026-10-17.
+Last substantive website update: 2026-11-05.
 
 ## Pricing
 
@@ -12,18 +12,23 @@ Business: EUR 3000 per month, billed monthly with a monthly commitment, or EUR 3
 
 - [Product](https://www.infrayard.eu/)
 - [Recorded product demo](https://www.infrayard.eu/demo/)
-- [Overview](https://www.infrayard.eu/docs/): Evaluate, deploy and operate Infrayard in your OCI environment.
-- [Architecture](https://www.infrayard.eu/docs/architecture/): Components, Terraform execution, state storage and the customer tenancy boundary.
-- [Requirements and compatibility](https://www.infrayard.eu/docs/requirements/): Deployment prerequisites, supported cluster tiers and product scope.
-- [Security and access](https://www.infrayard.eu/docs/security/): Identity, roles, OCI credentials, Kubernetes access and data boundaries.
-- [Networking and existing infrastructure](https://www.infrayard.eu/docs/networking/): Private and restricted public endpoints, BYON combinations, routing and ownership.
-- [Installation](https://www.infrayard.eu/docs/installation/): Prepare your OCI environment, install with Helm and verify your first workflow.
+- [Overview](https://www.infrayard.eu/docs/): What Infrayard does and where to find each topic.
+- [Architecture](https://www.infrayard.eu/docs/architecture/): Components, the request flow, state storage and network connections.
+- [Requirements and compatibility](https://www.infrayard.eu/docs/requirements/): Hosts, OCI, network ports, identity, OKE tiers and product scope.
+- [Security and access](https://www.infrayard.eu/docs/security/): Keycloak roles, OCI credentials, kubeconfig rights, SSH keys and audit records.
+- [Networking and existing infrastructure](https://www.infrayard.eu/docs/networking/): Kubernetes API access modes, existing VCNs, subnets and compartments, and the anchor compartment.
+- [Installation](https://www.infrayard.eu/docs/installation/): Choose between Kubernetes and a single VM, and what you need for each.
+- [Prepare OCI](https://www.infrayard.eu/docs/oci-setup/): Create the OCI user, policies, API key, Terraform state bucket and S3 key.
+- [Install on Kubernetes](https://www.infrayard.eu/docs/install-kubernetes/): Install Infrayard with Helm on an existing OKE, k3s or other Kubernetes cluster.
+- [Install on a single VM](https://www.infrayard.eu/docs/install-vm/): Run Infrayard with Docker Compose and automatic HTTPS on one Linux VM.
+- [Use your own Keycloak](https://www.infrayard.eu/docs/keycloak/): Sign users in through a realm of your existing Keycloak, with roles or groups.
+- [Private access (VPN only)](https://www.infrayard.eu/docs/private-access/): Make the portal reachable only from your VPN or company network.
 - [Cluster lifecycle](https://www.infrayard.eu/docs/cluster-lifecycle/): Create, access, scale, upgrade and clean up OKE clusters.
 - [Administration](https://www.infrayard.eu/docs/administration/): Configure templates, roles, resource limits, approvals, cost estimates and audit records.
-- [Operations, upgrades and recovery](https://www.infrayard.eu/docs/operations/): Plan platform upgrades, backups and recovery with clear operating responsibilities.
-- [Troubleshooting and support](https://www.infrayard.eu/docs/troubleshooting/): Diagnose deployment, connectivity, identity and lifecycle issues.
+- [Operations, upgrades and recovery](https://www.infrayard.eu/docs/operations/): Upgrade Infrayard, back up and restore the database, and plan responsibilities.
+- [Troubleshooting and support](https://www.infrayard.eu/docs/troubleshooting/): Fix installation, sign-in, network and cluster operation problems.
 - [Subscription, billing and licensing](https://www.infrayard.eu/docs/subscription/): Monthly and annual Business plans, founding pricing, evaluation and commercial access.
-- [Releases and roadmap](https://www.infrayard.eu/docs/releases/): Available capabilities, versioned delivery and separately identified roadmap items.
+- [Releases and roadmap](https://www.infrayard.eu/docs/releases/): Available capabilities, versioning and separately identified roadmap items.
 
 ## Technical guides
 
