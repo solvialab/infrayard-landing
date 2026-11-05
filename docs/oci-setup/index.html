@@ -130,6 +130,7 @@ Allow service OKE to manage all-resources in tenancy
 <li>Name: <code>infrayard-tfstate</code>. Keep the default <strong>Standard</strong> tier and enable <strong>Object versioning</strong>. Versioning keeps earlier state versions if something goes wrong.</li>
 <li>Note the <strong>namespace</strong> shown on the bucket page (also: <code>oci os ns get</code>).</li>
 </ol>
+<p>Use a separate bucket for every Infrayard installation, for example for a test and a production portal. Infrayard stores each cluster&#39;s state as <code>&lt;user name&gt;/&lt;cluster name&gt;.tfstate</code>, so two installations that share a bucket can overwrite each other&#39;s state.</p>
 <p>Use the same region as the one in the API key preview.</p>
 <h2 id="6-create-the-s3-key-for-the-bucket">6. Create the S3 key for the bucket<a class="heading-link" href="#6-create-the-s3-key-for-the-bucket" aria-label="Link to 6. Create the S3 key for the bucket">#</a></h2>
 <p>Terraform reaches the bucket through the S3-compatible API, which needs its own key.</p>

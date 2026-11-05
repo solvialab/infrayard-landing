@@ -49,16 +49,17 @@
 <p class="docs-nav-group">Operate</p><a class="docs-nav-link" href="/docs/operations/">Operations, upgrades and recovery</a>
 <a class="docs-nav-link" href="/docs/troubleshooting/">Troubleshooting and support</a>
 <p class="docs-nav-group">Reference</p><a class="docs-nav-link" href="/docs/subscription/">Subscription, billing and licensing</a>
-<a class="docs-nav-link" href="/docs/releases/">Releases and roadmap</a></nav></aside><main class="docs-main" id="main"><div class="docs-layout"><div><nav class="docs-breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><a href="/docs/">Documentation</a><span aria-hidden="true">/</span><span aria-current="page">Install on Kubernetes</span></nav><article class="docs-article"><h1>Install on Kubernetes</h1><p class="docs-summary">Install Infrayard with Helm on an existing OKE, k3s or other Kubernetes cluster.</p><p class="docs-maintained">Maintained by Solvia Lab s.r.o. · Updated <time datetime="2026-11-05">2026-11-05</time></p><details class="docs-mobile-toc"><summary>On this page</summary><nav aria-label="Page contents"><a href="#what-you-need">What you need</a><a href="#1-ingress-controller-and-certificates">1. Ingress controller and certificates</a><a href="#2-log-in-to-the-registry">2. Log in to the registry</a><a href="#3-create-the-namespace-and-secrets">3. Create the namespace and secrets</a><a href="#4-write-the-values-files">4. Write the values files</a><a href="#5-install">5. Install</a><a href="#6-point-dns-to-the-cluster">6. Point DNS to the cluster</a><a href="#7-sign-in">7. Sign in</a><a href="#add-users">Add users</a><a href="#reference-all-settings">Reference: all settings</a></nav></details><div class="docs-content"><p>This guide installs Infrayard with Helm into a Kubernetes cluster you already run: an OKE cluster, k3s or another distribution. The steps are the same everywhere; where OKE and k3s differ, both variants are shown. Infrayard is tested on k3s with Traefik and cert-manager.</p>
+<a class="docs-nav-link" href="/docs/releases/">Releases and roadmap</a></nav></aside><main class="docs-main" id="main"><div class="docs-layout"><div><nav class="docs-breadcrumb" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><a href="/docs/">Documentation</a><span aria-hidden="true">/</span><span aria-current="page">Install on Kubernetes</span></nav><article class="docs-article"><h1>Install on Kubernetes</h1><p class="docs-summary">Install Infrayard with Helm on an existing OKE, k3s or other Kubernetes cluster.</p><p class="docs-maintained">Maintained by Solvia Lab s.r.o. · Updated <time datetime="2026-11-05">2026-11-05</time></p><details class="docs-mobile-toc"><summary>On this page</summary><nav aria-label="Page contents"><a href="#what-you-need">What you need</a><a href="#1-ingress-controller-and-certificates">1. Ingress controller and certificates</a><a href="#2-log-in-to-the-registry">2. Log in to the registry</a><a href="#3-create-the-namespace-and-secrets">3. Create the namespace and secrets</a><a href="#4-write-the-values-files">4. Write the values files</a><a href="#5-install">5. Install</a><a href="#6-point-dns-to-the-cluster">6. Point DNS to the cluster</a><a href="#7-sign-in">7. Sign in</a><a href="#add-users">Add users</a><a href="#reference-all-settings">Reference: all settings</a></nav></details><div class="docs-content"><p>This guide installs Infrayard with Helm into a Kubernetes cluster you already run: an OKE cluster, k3s or another distribution. The steps are the same everywhere; where OKE and k3s differ, both variants are shown. Infrayard is tested with this guide on OKE (Kubernetes 1.36, one <code>VM.Standard.E4.Flex</code> worker with 1 OCPU and 8 GB) and on k3s, both with Traefik and cert-manager.</p>
 <p>Time needed: about 30 minutes, after <a href="/docs/oci-setup/">Prepare OCI</a>.</p>
 <h2 id="what-you-need">What you need<a class="heading-link" href="#what-you-need" aria-label="Link to What you need">#</a></h2>
 <ul>
-<li>A Kubernetes cluster and <code>kubectl</code> access with rights to create a namespace.</li>
+<li>A Kubernetes cluster and <code>kubectl</code> access. Step 1 installs cluster-wide resources (cert-manager and its CRDs, the Let&#39;s Encrypt issuer) and needs cluster-admin rights; the Infrayard chart itself creates only namespaced resources.</li>
 <li><a href="https://helm.sh/docs/intro/install/">Helm</a> 3.8 or newer on your workstation.</li>
 <li>An ingress controller. OKE has none by default; k3s ships Traefik.</li>
 <li><a href="https://cert-manager.io/">cert-manager</a> for Let&#39;s Encrypt certificates, or your own TLS certificate.</li>
-<li>A default StorageClass for one 10 GiB volume (PostgreSQL). OKE: <code>oci-bv</code>. k3s: <code>local-path</code>.</li>
+<li>A StorageClass for the PostgreSQL volume. The chart requests 10 GiB. OKE: <code>oci-bv</code>, which creates a 50 GB block volume, the OCI minimum. k3s: <code>local-path</code>.</li>
 <li>Free capacity of about 1 CPU and 2 GiB memory. Limits allow peaks up to 4.7 CPU and 3.2 GiB.</li>
+<li>Outbound internet access from the pods. Each cluster deployment downloads the Terraform providers from <code>registry.terraform.io</code>, <code>releases.hashicorp.com</code> and GitHub releases. On OKE with private worker nodes, this traffic goes through the VCN&#39;s NAT gateway; a service gateway alone is not enough.</li>
 <li>A DNS name for the portal, for example <code>infrayard.example.com</code>. Keycloak is served on the same name under <code>/auth</code>, so one name is enough.</li>
 <li>The values from the <a href="/docs/oci-setup/#values-checklist">OCI checklist</a>.</li>
 <li>Your registry access from the onboarding e-mail: user, token, registry address and the Infrayard version (for example <code>1.4.0</code>; use it wherever <code>&lt;version&gt;</code> appears below).</li>
@@ -69,10 +70,12 @@
 <p><strong>OKE: install Traefik.</strong> It creates an OCI flexible load balancer with a public IP:</p>
 <pre><code class="language-bash">helm repo add traefik https://traefik.github.io/charts
 helm install traefik traefik/traefik -n traefik --create-namespace \
-  --set service.annotations.&quot;service\.beta\.kubernetes\.io/oci-load-balancer-shape&quot;=flexible \
-  --set service.annotations.&quot;service\.beta\.kubernetes\.io/oci-load-balancer-shape-flex-min&quot;=10 \
-  --set service.annotations.&quot;service\.beta\.kubernetes\.io/oci-load-balancer-shape-flex-max&quot;=100
+  --set-string service.annotations.&quot;service\.beta\.kubernetes\.io/oci-load-balancer-shape&quot;=flexible \
+  --set-string service.annotations.&quot;service\.beta\.kubernetes\.io/oci-load-balancer-shape-flex-min&quot;=10 \
+  --set-string service.annotations.&quot;service\.beta\.kubernetes\.io/oci-load-balancer-shape-flex-max&quot;=100
 </code></pre>
+<p>Use <code>--set-string</code>: annotations must be strings, and with <code>--set</code> Helm reads <code>10</code> and <code>100</code> as numbers and the install fails. The load balancer gets its public IP within about a minute; <code>kubectl get svc -n traefik traefik</code> shows it as <code>EXTERNAL-IP</code>.</p>
+<p>The load balancer subnet must allow TCP 80 and 443 from the internet in its security list or network security group: 80 for Let&#39;s Encrypt, 443 for users. Clusters created by Infrayard have these rules. OKE opens the node ports from the load balancer to the worker nodes on its own.</p>
 <p>For a portal reachable only from your VPN, use an internal load balancer instead; see <a href="/docs/private-access/">private access</a>.</p>
 <p><strong>k3s:</strong> Traefik is already running in <code>kube-system</code>.</p>
 <p><strong>cert-manager</strong> (both):</p>
@@ -222,11 +225,19 @@ kubectl get svc -n kube-system traefik    # k3s
 <p>Open <code>https://infrayard.example.com</code> and sign in with the first admin&#39;s user name and temporary password. Keycloak asks for a new password right away.</p>
 <p>Then, in <strong>Admin → Configuration</strong>:</p>
 <ol>
-<li>Check the region and the anchor compartment.</li>
-<li><strong>Sync</strong> shapes and Kubernetes versions from OCI and enable the ones your users may choose. New versions start disabled.</li>
-<li>Review the default limits and the templates.</li>
+<li><p>Check the region and the anchor compartment.</p>
+</li>
+<li><p><strong>Sync</strong> shapes and Kubernetes versions from OCI and enable the ones your users may choose. New versions start disabled.</p>
+</li>
+<li><p>Set <strong>Kubernetes API Access</strong>. Infrayard calls the API of every new cluster on port 6443 to issue kubeconfigs, so it needs a network path to it. The default is a private endpoint, reachable only from networks routed into the cluster&#39;s VCN. With <strong>Public endpoint with allowlist</strong>, add your VPN or office ranges and Infrayard&#39;s own outbound address. On OKE with private worker nodes, that address is the public IP of the NAT gateway in the VCN of the cluster that runs Infrayard:</p>
+<pre><code class="language-bash">oci network nat-gateway list -c &lt;compartment of that VCN&gt; --query &#39;data[].&quot;nat-ip&quot;&#39;
+</code></pre>
+<p>On k3s or a VM with a public IP, it is that IP. The setting applies to clusters created afterwards.</p>
+</li>
+<li><p>Review the default limits and the templates.</p>
+</li>
 </ol>
-<p>Create a small test cluster and watch the Terraform log. When it reaches <strong>Running</strong>, download the kubeconfig and run <code>kubectl get nodes</code>. Destroy the test cluster afterwards. This run proves the OCI policies, the state bucket and the network path to the cluster API; a successful <code>helm install</code> alone does not. See <a href="/docs/cluster-lifecycle/">cluster lifecycle</a>.</p>
+<p>Create a small test cluster and watch the Terraform log. It ends with <code>OK Cluster ready for kubeconfig downloads</code>; if it reports <code>Cluster API endpoint … not reachable from Infrayard</code> instead, fix the API access from step 3. When the cluster reaches <strong>Running</strong>, download the kubeconfig and run <code>kubectl get nodes</code>. Destroy the test cluster afterwards. This run proves the OCI policies, the state bucket and the network path to the cluster API; a successful <code>helm install</code> alone does not. See <a href="/docs/cluster-lifecycle/">cluster lifecycle</a>.</p>
 <h2 id="add-users">Add users<a class="heading-link" href="#add-users" aria-label="Link to Add users">#</a></h2>
 <p>With the bundled Keycloak, users are managed in the Keycloak admin console, which is not exposed on the internet. Open it through a port forward:</p>
 <pre><code class="language-bash">kubectl port-forward -n infrayard svc/infrayard-keycloak 8080:8080

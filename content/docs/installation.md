@@ -9,7 +9,7 @@ Infrayard runs in your environment: on a Kubernetes cluster you already operate,
 | Good for | Production | Production or evaluation | Evaluation, demos, small teams |
 | Installed with | Helm chart | Helm chart | Docker Compose |
 | Ingress and TLS | Your ingress controller (e.g. Traefik) and cert-manager | Same; k3s ships Traefik | Caddy with automatic Let's Encrypt, included |
-| Database storage | OCI Block Volume (`oci-bv`) | Your StorageClass (k3s: `local-path`) | Docker volume on the VM |
+| Database storage | OCI Block Volume (`oci-bv`), 50 GB | Your StorageClass (k3s: `local-path`) | Docker volume on the VM |
 | Keycloak | Bundled or your own | Bundled or your own | Bundled |
 | Guide | [Install on Kubernetes](/docs/install-kubernetes/) | [Install on Kubernetes](/docs/install-kubernetes/) | [Install on a single VM](/docs/install-vm/) |
 

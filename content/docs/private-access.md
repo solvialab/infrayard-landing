@@ -12,15 +12,18 @@ Keep in mind what still has to work:
 
 The portal gets an IP address inside your VCN and has no public IP at all. The VPN reaches the VCN through a dynamic routing gateway (Site-to-Site VPN or FastConnect) or through a VPN server in the VCN.
 
-**OKE with Traefik:** make the load balancer internal and place it in a private subnet:
+**OKE with Traefik:** install Traefik with an internal load balancer in a private subnet. OCI does not change an existing load balancer from public to private: if Traefik already runs with a public one, remove it first with `helm uninstall traefik -n traefik`. The new load balancer receives a private IP.
 
 ```bash
-helm upgrade traefik traefik/traefik -n traefik --reuse-values \
-  --set service.annotations."service\.beta\.kubernetes\.io/oci-load-balancer-internal"="true" \
-  --set service.annotations."service\.beta\.kubernetes\.io/oci-load-balancer-subnet1"=<private-subnet-ocid>
+helm install traefik traefik/traefik -n traefik --create-namespace \
+  --set-string service.annotations."service\.beta\.kubernetes\.io/oci-load-balancer-internal"=true \
+  --set-string service.annotations."service\.beta\.kubernetes\.io/oci-load-balancer-subnet1"=<private-subnet-ocid> \
+  --set-string service.annotations."service\.beta\.kubernetes\.io/oci-load-balancer-shape"=flexible \
+  --set-string service.annotations."service\.beta\.kubernetes\.io/oci-load-balancer-shape-flex-min"=10 \
+  --set-string service.annotations."service\.beta\.kubernetes\.io/oci-load-balancer-shape-flex-max"=100
 ```
 
-OCI does not change an existing load balancer from public to private. If Traefik is already installed with a public load balancer, uninstall and install it again with these annotations; it receives a new private IP.
+Annotations must be strings; with `--set`, Helm reads `true` and the numbers as other types and the install fails.
 
 **Other Kubernetes distributions:** use your platform's internal load balancer, or expose the ingress controller only on the nodes' private addresses.
 

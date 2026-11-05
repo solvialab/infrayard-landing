@@ -10,18 +10,18 @@ Use this page to check whether Infrayard fits your environment before you instal
 | Tooling | `kubectl`, Helm 3.8+ | `kubectl`, Helm 3.8+ | Docker with Compose v2 |
 | Ingress | An ingress controller you install, e.g. Traefik with an OCI load balancer | Your ingress controller; k3s ships Traefik | Caddy, included |
 | TLS | cert-manager or your own certificate | cert-manager or your own certificate | Automatic Let's Encrypt or your own certificate |
-| Storage | 10 GiB volume, `oci-bv` | 10 GiB volume from your StorageClass | Docker volume, 30 GB disk |
+| Storage | 50 GB block volume, `oci-bv` (the OCI minimum; the chart requests 10 GiB) | 10 GiB volume from your StorageClass | Docker volume, 30 GB disk |
 | Capacity | About 1 CPU and 2 GiB free (limits up to 4.7 CPU, 3.2 GiB) | Same | 2 CPUs, 4 GB memory minimum, 8 GB recommended |
 | Keycloak | Bundled or your own | Bundled or your own | Bundled |
 
-Infrayard is tested on k3s 1.36 with Traefik and cert-manager, and with the Docker Compose bundle. The images are built for x86 (`amd64`) and Arm (`arm64`).
+Infrayard is tested on OKE 1.36 and k3s 1.36, both with Traefik and cert-manager, and with the Docker Compose bundle. The images are built for x86 (`amd64`) and Arm (`arm64`).
 
 ## OCI
 
 - A tenancy and a region where you create OKE clusters.
 - An **anchor compartment** under which Infrayard creates clusters. See [choosing the anchor](/docs/networking/#choosing-the-anchor-compartment).
 - An OCI user with the [Infrayard policies](/docs/oci-setup/#3-add-the-policies), an API key and a customer secret key.
-- An Object Storage bucket for Terraform state.
+- An Object Storage bucket for Terraform state, one per Infrayard installation.
 - Service limits and quotas for the clusters you plan: OKE clusters, compute cores of the worker shapes, VCNs and load balancers.
 
 ## Network
@@ -31,6 +31,7 @@ Infrayard is tested on k3s 1.36 with Traefik and cert-manager, and with the Dock
 | Inbound | Users → portal | 443, and 80 for redirects and Let's Encrypt |
 | Outbound | Infrayard → OCI APIs and Object Storage (`*.oraclecloud.com`) | 443 |
 | Outbound | Infrayard → image registry | 443 |
+| Outbound | Infrayard → Terraform providers: `registry.terraform.io`, `releases.hashicorp.com`, GitHub releases | 443 |
 | Outbound | Infrayard → Kubernetes API of each managed cluster | 6443 |
 | Outbound | Users → Kubernetes API of their clusters, for `kubectl` | 6443 |
 | Outbound, optional | Infrayard → your SMTP server | 587 or your port |
@@ -44,7 +45,7 @@ Sign-in uses Keycloak: either the Keycloak bundled with Infrayard (realm, client
 
 ## Costs outside the subscription
 
-The subscription covers the Infrayard software. Your Oracle Cloud bill covers the OKE clusters and their nodes, load balancers and storage, and the host that runs Infrayard: a VM, or capacity and one 10 GiB block volume in your cluster, plus a load balancer for the ingress.
+The subscription covers the Infrayard software. Your Oracle Cloud bill covers the OKE clusters and their nodes, load balancers and storage, and the host that runs Infrayard: a VM, or capacity and one block volume in your cluster (50 GB on OKE, the OCI minimum), plus a load balancer for the ingress.
 
 ## OKE versions, shapes and images
 

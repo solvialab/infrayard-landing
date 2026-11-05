@@ -73,6 +73,8 @@ The private key is the most sensitive item of the installation. Store it in your
 2. Name: `infrayard-tfstate`. Keep the default **Standard** tier and enable **Object versioning**. Versioning keeps earlier state versions if something goes wrong.
 3. Note the **namespace** shown on the bucket page (also: `oci os ns get`).
 
+Use a separate bucket for every Infrayard installation, for example for a test and a production portal. Infrayard stores each cluster's state as `<user name>/<cluster name>.tfstate`, so two installations that share a bucket can overwrite each other's state.
+
 Use the same region as the one in the API key preview.
 
 ## 6. Create the S3 key for the bucket

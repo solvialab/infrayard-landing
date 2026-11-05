@@ -58,12 +58,15 @@
 </ul>
 <h2 id="option-a-private-address-recommended">Option A: private address (recommended)<a class="heading-link" href="#option-a-private-address-recommended" aria-label="Link to Option A: private address (recommended)">#</a></h2>
 <p>The portal gets an IP address inside your VCN and has no public IP at all. The VPN reaches the VCN through a dynamic routing gateway (Site-to-Site VPN or FastConnect) or through a VPN server in the VCN.</p>
-<p><strong>OKE with Traefik:</strong> make the load balancer internal and place it in a private subnet:</p>
-<pre><code class="language-bash">helm upgrade traefik traefik/traefik -n traefik --reuse-values \
-  --set service.annotations.&quot;service\.beta\.kubernetes\.io/oci-load-balancer-internal&quot;=&quot;true&quot; \
-  --set service.annotations.&quot;service\.beta\.kubernetes\.io/oci-load-balancer-subnet1&quot;=&lt;private-subnet-ocid&gt;
+<p><strong>OKE with Traefik:</strong> install Traefik with an internal load balancer in a private subnet. OCI does not change an existing load balancer from public to private: if Traefik already runs with a public one, remove it first with <code>helm uninstall traefik -n traefik</code>. The new load balancer receives a private IP.</p>
+<pre><code class="language-bash">helm install traefik traefik/traefik -n traefik --create-namespace \
+  --set-string service.annotations.&quot;service\.beta\.kubernetes\.io/oci-load-balancer-internal&quot;=true \
+  --set-string service.annotations.&quot;service\.beta\.kubernetes\.io/oci-load-balancer-subnet1&quot;=&lt;private-subnet-ocid&gt; \
+  --set-string service.annotations.&quot;service\.beta\.kubernetes\.io/oci-load-balancer-shape&quot;=flexible \
+  --set-string service.annotations.&quot;service\.beta\.kubernetes\.io/oci-load-balancer-shape-flex-min&quot;=10 \
+  --set-string service.annotations.&quot;service\.beta\.kubernetes\.io/oci-load-balancer-shape-flex-max&quot;=100
 </code></pre>
-<p>OCI does not change an existing load balancer from public to private. If Traefik is already installed with a public load balancer, uninstall and install it again with these annotations; it receives a new private IP.</p>
+<p>Annotations must be strings; with <code>--set</code>, Helm reads <code>true</code> and the numbers as other types and the install fails.</p>
 <p><strong>Other Kubernetes distributions:</strong> use your platform&#39;s internal load balancer, or expose the ingress controller only on the nodes&#39; private addresses.</p>
 <p><strong>Single VM:</strong> create the VM in a private subnet without a public IP. Give the subnet a NAT gateway for outbound traffic.</p>
 <h2 id="option-b-public-address-with-an-allowlist">Option B: public address with an allowlist<a class="heading-link" href="#option-b-public-address-with-an-allowlist" aria-label="Link to Option B: public address with an allowlist">#</a></h2>

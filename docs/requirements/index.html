@@ -86,7 +86,7 @@
 </tr>
 <tr>
 <td>Storage</td>
-<td>10 GiB volume, <code>oci-bv</code></td>
+<td>50 GB block volume, <code>oci-bv</code> (the OCI minimum; the chart requests 10 GiB)</td>
 <td>10 GiB volume from your StorageClass</td>
 <td>Docker volume, 30 GB disk</td>
 </tr>
@@ -103,13 +103,13 @@
 <td>Bundled</td>
 </tr>
 </tbody></table></div>
-<p>Infrayard is tested on k3s 1.36 with Traefik and cert-manager, and with the Docker Compose bundle. The images are built for x86 (<code>amd64</code>) and Arm (<code>arm64</code>).</p>
+<p>Infrayard is tested on OKE 1.36 and k3s 1.36, both with Traefik and cert-manager, and with the Docker Compose bundle. The images are built for x86 (<code>amd64</code>) and Arm (<code>arm64</code>).</p>
 <h2 id="oci">OCI<a class="heading-link" href="#oci" aria-label="Link to OCI">#</a></h2>
 <ul>
 <li>A tenancy and a region where you create OKE clusters.</li>
 <li>An <strong>anchor compartment</strong> under which Infrayard creates clusters. See <a href="/docs/networking/#choosing-the-anchor-compartment">choosing the anchor</a>.</li>
 <li>An OCI user with the <a href="/docs/oci-setup/#3-add-the-policies">Infrayard policies</a>, an API key and a customer secret key.</li>
-<li>An Object Storage bucket for Terraform state.</li>
+<li>An Object Storage bucket for Terraform state, one per Infrayard installation.</li>
 <li>Service limits and quotas for the clusters you plan: OKE clusters, compute cores of the worker shapes, VCNs and load balancers.</li>
 </ul>
 <h2 id="network">Network<a class="heading-link" href="#network" aria-label="Link to Network">#</a></h2>
@@ -138,6 +138,11 @@
 </tr>
 <tr>
 <td>Outbound</td>
+<td>Infrayard → Terraform providers: <code>registry.terraform.io</code>, <code>releases.hashicorp.com</code>, GitHub releases</td>
+<td>443</td>
+</tr>
+<tr>
+<td>Outbound</td>
 <td>Infrayard → Kubernetes API of each managed cluster</td>
 <td>6443</td>
 </tr>
@@ -161,7 +166,7 @@
 <h2 id="identity">Identity<a class="heading-link" href="#identity" aria-label="Link to Identity">#</a></h2>
 <p>Sign-in uses Keycloak: either the Keycloak bundled with Infrayard (realm, client and admin role are created automatically) or a realm in your existing Keycloak 22 or newer. See <a href="/docs/keycloak/">Use your own Keycloak</a>.</p>
 <h2 id="costs-outside-the-subscription">Costs outside the subscription<a class="heading-link" href="#costs-outside-the-subscription" aria-label="Link to Costs outside the subscription">#</a></h2>
-<p>The subscription covers the Infrayard software. Your Oracle Cloud bill covers the OKE clusters and their nodes, load balancers and storage, and the host that runs Infrayard: a VM, or capacity and one 10 GiB block volume in your cluster, plus a load balancer for the ingress.</p>
+<p>The subscription covers the Infrayard software. Your Oracle Cloud bill covers the OKE clusters and their nodes, load balancers and storage, and the host that runs Infrayard: a VM, or capacity and one block volume in your cluster (50 GB on OKE, the OCI minimum), plus a load balancer for the ingress.</p>
 <h2 id="oke-versions-shapes-and-images">OKE versions, shapes and images<a class="heading-link" href="#oke-versions-shapes-and-images" aria-label="Link to OKE versions, shapes and images">#</a></h2>
 <p>Which Kubernetes versions, shapes and node images exist depends on your region and tenancy. Administrators sync them from OCI in <strong>Admin → Configuration</strong> and enable what users may choose. Newly synced Kubernetes versions stay disabled until an administrator enables them.</p>
 <p>The deploy and template forms only offer Kubernetes versions that have a node image for the selected shape. If Infrayard cannot check this with OCI, deployment is blocked rather than allowing an unverified combination. See <a href="/docs/troubleshooting/#missing-versions-or-shapes">troubleshooting</a>.</p>

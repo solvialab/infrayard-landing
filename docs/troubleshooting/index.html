@@ -85,6 +85,18 @@ docker compose logs --tail=200 infrayard-api
 <td>A policy statement is missing or names the wrong group or compartment. Compare with <a href="/docs/oci-setup/#3-add-the-policies">Prepare OCI</a></td>
 </tr>
 <tr>
+<td>Traefik install on OKE fails with <code>cannot unmarshal number into Go struct field ObjectMeta.metadata.annotations of type string</code></td>
+<td>The load balancer annotations were passed with <code>--set</code>, which turns <code>10</code> and <code>100</code> into numbers. Use <code>--set-string</code> as in <a href="/docs/install-kubernetes/#1-ingress-controller-and-certificates">step 1</a></td>
+</tr>
+<tr>
+<td>Pod stays in <code>Init:ImageInspectError</code>; events show <code>short name mode is enforcing</code></td>
+<td>OKE nodes run CRI-O, which accepts only fully qualified image names. An image override such as <code>postgres:18-alpine</code> must name its registry: <code>docker.io/library/postgres:18-alpine</code></td>
+</tr>
+<tr>
+<td>After a <code>helm upgrade</code> that fixes an image or setting, <code>infrayard-postgresql-0</code> keeps its old error</td>
+<td>A StatefulSet does not replace a pod that never became ready. Delete it with <code>kubectl delete pod -n infrayard infrayard-postgresql-0</code>; it starts again with the new settings and keeps its volume</td>
+</tr>
+<tr>
 <td><code>helm install</code> fails with <code>... is required</code></td>
 <td>A required value is missing, for example <code>postgresql.auth.password</code> or <code>keycloak.admin.password</code>. Add it to <code>secrets.yaml</code></td>
 </tr>
@@ -150,7 +162,7 @@ docker compose logs --tail=200 infrayard-api
 <h2 id="worker-nodes-do-not-become-ready">Worker nodes do not become ready<a class="heading-link" href="#worker-nodes-do-not-become-ready" aria-label="Link to Worker nodes do not become ready">#</a></h2>
 <p>Look at the Terraform log and the node pool in the OCI Console. Common causes: service limits or quotas, no capacity for the shape in the availability domain, or a shape without a matching image. With your own subnet, the subnet needs a NAT gateway route and a service gateway route; without them nodes cannot register.</p>
 <h2 id="kubectl-cannot-connect">kubectl cannot connect<a class="heading-link" href="#kubectl-cannot-connect" aria-label="Link to kubectl cannot connect">#</a></h2>
-<p>The kubeconfig only authenticates; it does not open a network path. Check that you are on the VPN, that the cluster&#39;s endpoint mode fits your network, and that your egress range is in the allowlist (<strong>Admin → Configuration → Kubernetes API Access</strong>). Infrayard&#39;s own outbound address must be in the allowlist as well, otherwise the kubeconfig download fails.</p>
+<p>The kubeconfig only authenticates; it does not open a network path. Check that you are on the VPN, that the cluster&#39;s endpoint mode fits your network, and that your egress range is in the allowlist (<strong>Admin → Configuration → Kubernetes API Access</strong>). Infrayard&#39;s own outbound address must be in the allowlist as well, otherwise the kubeconfig download fails; the deploy log then ends with <code>Cluster API endpoint … not reachable from Infrayard</code>. See <a href="/docs/install-kubernetes/#7-sign-in">step 7 of the Kubernetes guide</a> for how to find that address.</p>
 <h2 id="a-limit-blocks-a-request">A limit blocks a request<a class="heading-link" href="#a-limit-blocks-a-request" aria-label="Link to A limit blocks a request">#</a></h2>
 <p>Check the global default, the user&#39;s own limit and the template. Users can request more in the portal; administrators approve or adjust it in <strong>Requests</strong>. Templates may allow more than a user&#39;s limit for custom configurations.</p>
 <h2 id="a-cluster-operation-fails">A cluster operation fails<a class="heading-link" href="#a-cluster-operation-fails" aria-label="Link to A cluster operation fails">#</a></h2>

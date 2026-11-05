@@ -183,18 +183,18 @@ Use this page to check whether Infrayard fits your environment before you instal
 | Tooling | `kubectl`, Helm 3.8+ | `kubectl`, Helm 3.8+ | Docker with Compose v2 |
 | Ingress | An ingress controller you install, e.g. Traefik with an OCI load balancer | Your ingress controller; k3s ships Traefik | Caddy, included |
 | TLS | cert-manager or your own certificate | cert-manager or your own certificate | Automatic Let's Encrypt or your own certificate |
-| Storage | 10 GiB volume, `oci-bv` | 10 GiB volume from your StorageClass | Docker volume, 30 GB disk |
+| Storage | 50 GB block volume, `oci-bv` (the OCI minimum; the chart requests 10 GiB) | 10 GiB volume from your StorageClass | Docker volume, 30 GB disk |
 | Capacity | About 1 CPU and 2 GiB free (limits up to 4.7 CPU, 3.2 GiB) | Same | 2 CPUs, 4 GB memory minimum, 8 GB recommended |
 | Keycloak | Bundled or your own | Bundled or your own | Bundled |
 
-Infrayard is tested on k3s 1.36 with Traefik and cert-manager, and with the Docker Compose bundle. The images are built for x86 (`amd64`) and Arm (`arm64`).
+Infrayard is tested on OKE 1.36 and k3s 1.36, both with Traefik and cert-manager, and with the Docker Compose bundle. The images are built for x86 (`amd64`) and Arm (`arm64`).
 
 ### OCI
 
 - A tenancy and a region where you create OKE clusters.
 - An **anchor compartment** under which Infrayard creates clusters. See [choosing the anchor](https://www.infrayard.eu/docs/networking/#choosing-the-anchor-compartment).
 - An OCI user with the [Infrayard policies](https://www.infrayard.eu/docs/oci-setup/#3-add-the-policies), an API key and a customer secret key.
-- An Object Storage bucket for Terraform state.
+- An Object Storage bucket for Terraform state, one per Infrayard installation.
 - Service limits and quotas for the clusters you plan: OKE clusters, compute cores of the worker shapes, VCNs and load balancers.
 
 ### Network
@@ -204,6 +204,7 @@ Infrayard is tested on k3s 1.36 with Traefik and cert-manager, and with the Dock
 | Inbound | Users → portal | 443, and 80 for redirects and Let's Encrypt |
 | Outbound | Infrayard → OCI APIs and Object Storage (`*.oraclecloud.com`) | 443 |
 | Outbound | Infrayard → image registry | 443 |
+| Outbound | Infrayard → Terraform providers: `registry.terraform.io`, `releases.hashicorp.com`, GitHub releases | 443 |
 | Outbound | Infrayard → Kubernetes API of each managed cluster | 6443 |
 | Outbound | Users → Kubernetes API of their clusters, for `kubectl` | 6443 |
 | Outbound, optional | Infrayard → your SMTP server | 587 or your port |
@@ -217,7 +218,7 @@ Sign-in uses Keycloak: either the Keycloak bundled with Infrayard (realm, client
 
 ### Costs outside the subscription
 
-The subscription covers the Infrayard software. Your Oracle Cloud bill covers the OKE clusters and their nodes, load balancers and storage, and the host that runs Infrayard: a VM, or capacity and one 10 GiB block volume in your cluster, plus a load balancer for the ingress.
+The subscription covers the Infrayard software. Your Oracle Cloud bill covers the OKE clusters and their nodes, load balancers and storage, and the host that runs Infrayard: a VM, or capacity and one block volume in your cluster (50 GB on OKE, the OCI minimum), plus a load balancer for the ingress.
 
 ### OKE versions, shapes and images
 
@@ -438,7 +439,7 @@ Infrayard runs in your environment: on a Kubernetes cluster you already operate,
 | Good for | Production | Production or evaluation | Evaluation, demos, small teams |
 | Installed with | Helm chart | Helm chart | Docker Compose |
 | Ingress and TLS | Your ingress controller (e.g. Traefik) and cert-manager | Same; k3s ships Traefik | Caddy with automatic Let's Encrypt, included |
-| Database storage | OCI Block Volume (`oci-bv`) | Your StorageClass (k3s: `local-path`) | Docker volume on the VM |
+| Database storage | OCI Block Volume (`oci-bv`), 50 GB | Your StorageClass (k3s: `local-path`) | Docker volume on the VM |
 | Keycloak | Bundled or your own | Bundled or your own | Bundled |
 | Guide | [Install on Kubernetes](https://www.infrayard.eu/docs/install-kubernetes/) | [Install on Kubernetes](https://www.infrayard.eu/docs/install-kubernetes/) | [Install on a single VM](https://www.infrayard.eu/docs/install-vm/) |
 
@@ -558,6 +559,8 @@ The private key is the most sensitive item of the installation. Store it in your
 2. Name: `infrayard-tfstate`. Keep the default **Standard** tier and enable **Object versioning**. Versioning keeps earlier state versions if something goes wrong.
 3. Note the **namespace** shown on the bucket page (also: `oci os ns get`).
 
+Use a separate bucket for every Infrayard installation, for example for a test and a production portal. Infrayard stores each cluster's state as `<user name>/<cluster name>.tfstate`, so two installations that share a bucket can overwrite each other's state.
+
 Use the same region as the one in the API key preview.
 
 ### 6. Create the S3 key for the bucket
@@ -663,18 +666,19 @@ Continue with your installation path: [Kubernetes](https://www.infrayard.eu/docs
 
 Canonical page: https://www.infrayard.eu/docs/install-kubernetes/
 
-This guide installs Infrayard with Helm into a Kubernetes cluster you already run: an OKE cluster, k3s or another distribution. The steps are the same everywhere; where OKE and k3s differ, both variants are shown. Infrayard is tested on k3s with Traefik and cert-manager.
+This guide installs Infrayard with Helm into a Kubernetes cluster you already run: an OKE cluster, k3s or another distribution. The steps are the same everywhere; where OKE and k3s differ, both variants are shown. Infrayard is tested with this guide on OKE (Kubernetes 1.36, one `VM.Standard.E4.Flex` worker with 1 OCPU and 8 GB) and on k3s, both with Traefik and cert-manager.
 
 Time needed: about 30 minutes, after [Prepare OCI](https://www.infrayard.eu/docs/oci-setup/).
 
 ### What you need
 
-- A Kubernetes cluster and `kubectl` access with rights to create a namespace.
+- A Kubernetes cluster and `kubectl` access. Step 1 installs cluster-wide resources (cert-manager and its CRDs, the Let's Encrypt issuer) and needs cluster-admin rights; the Infrayard chart itself creates only namespaced resources.
 - [Helm](https://helm.sh/docs/intro/install/) 3.8 or newer on your workstation.
 - An ingress controller. OKE has none by default; k3s ships Traefik.
 - [cert-manager](https://cert-manager.io/) for Let's Encrypt certificates, or your own TLS certificate.
-- A default StorageClass for one 10 GiB volume (PostgreSQL). OKE: `oci-bv`. k3s: `local-path`.
+- A StorageClass for the PostgreSQL volume. The chart requests 10 GiB. OKE: `oci-bv`, which creates a 50 GB block volume, the OCI minimum. k3s: `local-path`.
 - Free capacity of about 1 CPU and 2 GiB memory. Limits allow peaks up to 4.7 CPU and 3.2 GiB.
+- Outbound internet access from the pods. Each cluster deployment downloads the Terraform providers from `registry.terraform.io`, `releases.hashicorp.com` and GitHub releases. On OKE with private worker nodes, this traffic goes through the VCN's NAT gateway; a service gateway alone is not enough.
 - A DNS name for the portal, for example `infrayard.example.com`. Keycloak is served on the same name under `/auth`, so one name is enough.
 - The values from the [OCI checklist](https://www.infrayard.eu/docs/oci-setup/#values-checklist).
 - Your registry access from the onboarding e-mail: user, token, registry address and the Infrayard version (for example `1.4.0`; use it wherever `<version>` appears below).
@@ -690,10 +694,14 @@ Skip this step if your cluster already has an ingress controller and cert-manage
 ```bash
 helm repo add traefik https://traefik.github.io/charts
 helm install traefik traefik/traefik -n traefik --create-namespace \
-  --set service.annotations."service\.beta\.kubernetes\.io/oci-load-balancer-shape"=flexible \
-  --set service.annotations."service\.beta\.kubernetes\.io/oci-load-balancer-shape-flex-min"=10 \
-  --set service.annotations."service\.beta\.kubernetes\.io/oci-load-balancer-shape-flex-max"=100
+  --set-string service.annotations."service\.beta\.kubernetes\.io/oci-load-balancer-shape"=flexible \
+  --set-string service.annotations."service\.beta\.kubernetes\.io/oci-load-balancer-shape-flex-min"=10 \
+  --set-string service.annotations."service\.beta\.kubernetes\.io/oci-load-balancer-shape-flex-max"=100
 ```
+
+Use `--set-string`: annotations must be strings, and with `--set` Helm reads `10` and `100` as numbers and the install fails. The load balancer gets its public IP within about a minute; `kubectl get svc -n traefik traefik` shows it as `EXTERNAL-IP`.
+
+The load balancer subnet must allow TCP 80 and 443 from the internet in its security list or network security group: 80 for Let's Encrypt, 443 for users. Clusters created by Infrayard have these rules. OKE opens the node ports from the load balancer to the worker nodes on its own.
 
 For a portal reachable only from your VPN, use an internal load balancer instead; see [private access](https://www.infrayard.eu/docs/private-access/).
 
@@ -899,9 +907,16 @@ Then, in **Admin → Configuration**:
 
 1. Check the region and the anchor compartment.
 2. **Sync** shapes and Kubernetes versions from OCI and enable the ones your users may choose. New versions start disabled.
-3. Review the default limits and the templates.
+3. Set **Kubernetes API Access**. Infrayard calls the API of every new cluster on port 6443 to issue kubeconfigs, so it needs a network path to it. The default is a private endpoint, reachable only from networks routed into the cluster's VCN. With **Public endpoint with allowlist**, add your VPN or office ranges and Infrayard's own outbound address. On OKE with private worker nodes, that address is the public IP of the NAT gateway in the VCN of the cluster that runs Infrayard:
 
-Create a small test cluster and watch the Terraform log. When it reaches **Running**, download the kubeconfig and run `kubectl get nodes`. Destroy the test cluster afterwards. This run proves the OCI policies, the state bucket and the network path to the cluster API; a successful `helm install` alone does not. See [cluster lifecycle](https://www.infrayard.eu/docs/cluster-lifecycle/).
+   ```bash
+   oci network nat-gateway list -c <compartment of that VCN> --query 'data[]."nat-ip"'
+   ```
+
+   On k3s or a VM with a public IP, it is that IP. The setting applies to clusters created afterwards.
+4. Review the default limits and the templates.
+
+Create a small test cluster and watch the Terraform log. It ends with `OK Cluster ready for kubeconfig downloads`; if it reports `Cluster API endpoint … not reachable from Infrayard` instead, fix the API access from step 3. When the cluster reaches **Running**, download the kubeconfig and run `kubectl get nodes`. Destroy the test cluster afterwards. This run proves the OCI policies, the state bucket and the network path to the cluster API; a successful `helm install` alone does not. See [cluster lifecycle](https://www.infrayard.eu/docs/cluster-lifecycle/).
 
 ### Add users
 
@@ -1256,15 +1271,18 @@ Keep in mind what still has to work:
 
 The portal gets an IP address inside your VCN and has no public IP at all. The VPN reaches the VCN through a dynamic routing gateway (Site-to-Site VPN or FastConnect) or through a VPN server in the VCN.
 
-**OKE with Traefik:** make the load balancer internal and place it in a private subnet:
+**OKE with Traefik:** install Traefik with an internal load balancer in a private subnet. OCI does not change an existing load balancer from public to private: if Traefik already runs with a public one, remove it first with `helm uninstall traefik -n traefik`. The new load balancer receives a private IP.
 
 ```bash
-helm upgrade traefik traefik/traefik -n traefik --reuse-values \
-  --set service.annotations."service\.beta\.kubernetes\.io/oci-load-balancer-internal"="true" \
-  --set service.annotations."service\.beta\.kubernetes\.io/oci-load-balancer-subnet1"=<private-subnet-ocid>
+helm install traefik traefik/traefik -n traefik --create-namespace \
+  --set-string service.annotations."service\.beta\.kubernetes\.io/oci-load-balancer-internal"=true \
+  --set-string service.annotations."service\.beta\.kubernetes\.io/oci-load-balancer-subnet1"=<private-subnet-ocid> \
+  --set-string service.annotations."service\.beta\.kubernetes\.io/oci-load-balancer-shape"=flexible \
+  --set-string service.annotations."service\.beta\.kubernetes\.io/oci-load-balancer-shape-flex-min"=10 \
+  --set-string service.annotations."service\.beta\.kubernetes\.io/oci-load-balancer-shape-flex-max"=100
 ```
 
-OCI does not change an existing load balancer from public to private. If Traefik is already installed with a public load balancer, uninstall and install it again with these annotations; it receives a new private IP.
+Annotations must be strings; with `--set`, Helm reads `true` and the numbers as other types and the install fails.
 
 **Other Kubernetes distributions:** use your platform's internal load balancer, or expose the ingress controller only on the nodes' private addresses.
 
@@ -1733,6 +1751,9 @@ Note the time and the exact error before you retry, and check what actually exis
 | `ImagePullBackOff`, `docker compose pull` or `helm show chart` fails with `401`, `403`, `unauthorized` or `denied` | The registry login or the `regcred` secret is missing, has a typo, or the token has expired. Check `global.imagePullSecrets` and the image addresses. If the login succeeds but pulling still fails, the token lacks read access to the registry; ask support for a new token |
 | API log or `oci` CLI shows `401 NotAuthenticated` right after the OCI user or API key was created | OCI needs a few minutes to activate a new user and key in every service. Wait five minutes and retry. If it persists, compare the fingerprint, user OCID and tenancy OCID with the API key page |
 | API log shows `404 NotAuthorizedOrNotFound` for OCI calls | A policy statement is missing or names the wrong group or compartment. Compare with [Prepare OCI](https://www.infrayard.eu/docs/oci-setup/#3-add-the-policies) |
+| Traefik install on OKE fails with `cannot unmarshal number into Go struct field ObjectMeta.metadata.annotations of type string` | The load balancer annotations were passed with `--set`, which turns `10` and `100` into numbers. Use `--set-string` as in [step 1](https://www.infrayard.eu/docs/install-kubernetes/#1-ingress-controller-and-certificates) |
+| Pod stays in `Init:ImageInspectError`; events show `short name mode is enforcing` | OKE nodes run CRI-O, which accepts only fully qualified image names. An image override such as `postgres:18-alpine` must name its registry: `docker.io/library/postgres:18-alpine` |
+| After a `helm upgrade` that fixes an image or setting, `infrayard-postgresql-0` keeps its old error | A StatefulSet does not replace a pod that never became ready. Delete it with `kubectl delete pod -n infrayard infrayard-postgresql-0`; it starts again with the new settings and keeps its volume |
 | `helm install` fails with `... is required` | A required value is missing, for example `postgresql.auth.password` or `keycloak.admin.password`. Add it to `secrets.yaml` |
 | Certificate stays `READY False` | DNS does not point to the ingress yet, or port 80 is not reachable from the internet. Check `kubectl describe certificate -n infrayard infrayard-tls` and `kubectl get challenges -A` |
 | VM: browser shows a certificate error | Caddy could not get a certificate. Check `docker compose logs caddy`; DNS and ports 80/443 must reach the VM |
@@ -1774,7 +1795,7 @@ Look at the Terraform log and the node pool in the OCI Console. Common causes: s
 
 ### kubectl cannot connect
 
-The kubeconfig only authenticates; it does not open a network path. Check that you are on the VPN, that the cluster's endpoint mode fits your network, and that your egress range is in the allowlist (**Admin → Configuration → Kubernetes API Access**). Infrayard's own outbound address must be in the allowlist as well, otherwise the kubeconfig download fails.
+The kubeconfig only authenticates; it does not open a network path. Check that you are on the VPN, that the cluster's endpoint mode fits your network, and that your egress range is in the allowlist (**Admin → Configuration → Kubernetes API Access**). Infrayard's own outbound address must be in the allowlist as well, otherwise the kubeconfig download fails; the deploy log then ends with `Cluster API endpoint … not reachable from Infrayard`. See [step 7 of the Kubernetes guide](https://www.infrayard.eu/docs/install-kubernetes/#7-sign-in) for how to find that address.
 
 ### A limit blocks a request
 
