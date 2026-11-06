@@ -442,7 +442,9 @@ Canonical page: https://www.infrayard.eu/docs/installation/
 
 Infrayard runs on Kubernetes in your environment. Use an existing OKE cluster for production or k3s on a single VM for an evaluation. Both use the same Helm chart, images and values.
 
-Once you have registry access and OCI permissions, use these planning estimates to first sign-in. Both include OCI preparation and portal setup. Provisioning a cluster through the portal is a separate OCI operation.
+### Time to first sign-in
+
+Once you have registry access and OCI permissions, use these estimates to plan for OCI preparation and portal setup through first sign-in. Provisioning a new OKE cluster through the portal is a separate step.
 
 - **Existing OKE cluster · 45–90 minutes.** For an engineer familiar with OCI and Helm deploying to an OKE cluster that is already running.
 - **New k3s VM · 2–4 hours.** For a first-time evaluation that includes preparing OCI networking and a single VM with k3s.

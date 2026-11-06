@@ -567,35 +567,6 @@ svg {
   font-size:1rem
 }
 
-.control-list {
-  list-style:none;
-  padding:0;
-  margin:0;
-  display:grid;
-  gap:25px
-}
-
-.control-list li {
-  padding-bottom:23px;
-  border-bottom:1px solid var(--line)
-}
-
-.control-list li:last-child {
-  padding-bottom:0;
-  border-bottom:0
-}
-
-.control-list h3 {
-  font-size:1.06rem;
-  margin-bottom:8px
-}
-
-.control-list p {
-  margin:0;
-  color:var(--muted);
-  font-size:.9rem
-}
-
 .control-links {
   display:flex;
   flex-wrap:wrap;
@@ -639,13 +610,6 @@ svg {
 }
 
 .comparison-featured dt {
-  color:var(--brand)
-}
-
-.setup-time {
-  display:block;
-  margin-top:5px;
-  font-size:1.55rem;
   color:var(--brand)
 }
 
@@ -1301,24 +1265,6 @@ dialog::backdrop {
   max-width:650px
 }
 
-.control-list {
-  grid-template-columns:repeat(2,minmax(0,1fr));
-  gap:22px
-}
-
-.control-list li {
-  border:0;
-  padding:0
-}
-
-.control-list p {
-  font-size:.83rem
-}
-
-.control-list h3 {
-  font-size:.98rem
-}
-
 .pricing-intro {
   align-items:start;
   flex-direction:column;
@@ -1435,7 +1381,7 @@ dialog::backdrop {
   font-size:.72rem
 }
 
-.benefits-grid,.workflow-grid,.control-list,.pricing-grid {
+.benefits-grid,.workflow-grid,.pricing-grid {
   grid-template-columns:1fr
 }
 
@@ -1476,27 +1422,10 @@ dialog::backdrop {
   font-size:.87rem
 }
 
-.control-list {
-  gap:22px
-}
-
 .deployment-comparison dl>div {
   grid-template-columns:5.65rem minmax(0,1fr);
   gap:8px;
   padding-inline:12px
-}
-
-.control-list li {
-  border-bottom:1px solid var(--line);
-  padding-bottom:20px
-}
-
-.control-list h3 {
-  font-size:1.07rem
-}
-
-.control-list p {
-  font-size:.9rem
 }
 
 .plan-description,.price-note {
