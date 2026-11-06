@@ -365,12 +365,6 @@ svg {
   margin-block:28px 12px
 }
 
-.hero-note {
-  font-size:.77rem;
-  color:var(--muted);
-  max-width:380px
-}
-
 .hero-points {
   list-style:none;
   margin:25px 0 0;
@@ -609,16 +603,50 @@ svg {
   margin-top:25px
 }
 
-.founder-note {
-  margin-top:30px;
-  padding-top:24px;
-  border-top:1px solid var(--line);
-  color:var(--muted);
-  font-size:.8rem
+.deployment-comparison dl {
+  margin:0 0 12px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:var(--surface);
+  overflow:hidden
 }
 
-.founder-note strong {
-  color:var(--ink)
+.deployment-comparison dl>div {
+  display:grid;
+  grid-template-columns:6.5rem minmax(0,1fr);
+  gap:12px;
+  padding:12px 14px;
+  border-bottom:1px solid var(--line);
+  font-size:.85rem;
+  line-height:1.5
+}
+
+.deployment-comparison dl>div:last-child {
+  border-bottom:0
+}
+
+.deployment-comparison dt {
+  font-weight:700
+}
+
+.deployment-comparison dd {
+  margin:0;
+  color:var(--muted)
+}
+
+.deployment-comparison .comparison-featured {
+  background:var(--tint)
+}
+
+.comparison-featured dt {
+  color:var(--brand)
+}
+
+.setup-time {
+  display:block;
+  margin-top:5px;
+  font-size:1.55rem;
+  color:var(--brand)
 }
 
 .pricing-intro {
@@ -1228,10 +1256,6 @@ dialog::backdrop {
   margin-top:20px
 }
 
-.hero-note {
-  max-width:none
-}
-
 .video-card {
   max-width:660px
 }
@@ -1278,7 +1302,7 @@ dialog::backdrop {
 }
 
 .control-list {
-  grid-template-columns:repeat(3,1fr);
+  grid-template-columns:repeat(2,minmax(0,1fr));
   gap:22px
 }
 
@@ -1293,10 +1317,6 @@ dialog::backdrop {
 
 .control-list h3 {
   font-size:.98rem
-}
-
-.founder-note {
-  max-width:650px
 }
 
 .pricing-intro {
@@ -1373,12 +1393,6 @@ dialog::backdrop {
 }
 
 
-}
-
-@media(min-width:521px) and (max-width:780px) {
-  #deployment-time .control-list {
-    grid-template-columns:repeat(2,minmax(0,1fr))
-  }
 }
 
 @media(max-width:520px) {
@@ -1464,6 +1478,12 @@ dialog::backdrop {
 
 .control-list {
   gap:22px
+}
+
+.deployment-comparison dl>div {
+  grid-template-columns:5.65rem minmax(0,1fr);
+  gap:8px;
+  padding-inline:12px
 }
 
 .control-list li {

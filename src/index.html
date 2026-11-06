@@ -20,9 +20,8 @@
         <div>
           <p class="eyebrow">Customer-hosted platform for Oracle Kubernetes Engine</p>
           <h1 id="hero-title">Self-service OKE.<br><span>Platform data stays in your OCI tenancy.</span></h1>
-          <p class="lede">Give engineers a portal for creating and operating OKE clusters. You host it in your OCI tenancy and keep credentials, Terraform state and audit records under your control.</p>
-          <div class="hero-actions"><button class="button" data-contact="demo">Request a demo <span aria-hidden="true">↗</span></button><a class="text-link" href="#deployment-time">About an hour on existing Kubernetes <span aria-hidden="true">↓</span></a></div>
-          <p class="hero-note">A 30-minute product walkthrough, with time for your OCI environment.</p>
+          <p class="lede">Provision OKE clusters from approved templates, then scale, upgrade and retire them in the same portal.</p>
+          <div class="hero-actions"><button class="button" data-contact="demo">Request a demo <span aria-hidden="true">↗</span></button><a class="text-link" href="#deployment-time">45–90 min on existing OKE <span aria-hidden="true">↓</span></a></div>
           <ul class="hero-points"><li>Approved templates</li><li>Cost estimates before deployment</li><li>Role-based access</li></ul>
         </div>
         <div class="video-card">
@@ -40,17 +39,22 @@
     <section class="section section-soft" aria-labelledby="control-title">
       <div class="container control-layout">
         <div class="control-copy">
-          <p class="eyebrow">Customer-hosted deployment</p>
-          <h2 id="control-title">Run the portal where you already operate OKE.</h2>
-          <p class="lede">For banks, financial institutions, healthcare organisations and other teams with strict controls over where infrastructure data lives and who can access it.</p>
-          <div class="control-links"><a class="text-link" href="/docs/architecture/">Review the architecture →</a><a class="text-link" href="/docs/security/">Security and access →</a><a class="text-link" href="/docs/requirements/#compare-deployment-models">Compare deployment models →</a></div>
-          <p class="founder-note">Solvia Lab supplies the software through a commercial subscription and handles onboarding and support. Your team deploys and operates the portal, API and database.</p>
+          <p class="eyebrow">Customer-hosted software</p>
+          <h2 id="control-title">The whole OKE portal runs in your tenancy.</h2>
+          <p class="lede">You run the portal and API. Credentials, Terraform state and audit records stay in your environment.</p>
+          <p>Built for banks, financial institutions, healthcare organisations and other teams with strict data controls.</p>
+          <div class="control-links"><a class="text-link" href="/docs/security/">See where data is stored →</a></div>
         </div>
-        <ul class="control-list">
-          <li><h3>Use your OCI account and storage.</h3><p>The portal provisions through your scoped OCI service user. Terraform state goes in your Object Storage bucket.</p></li>
-          <li><h3>Store records in your own database.</h3><p>Your PostgreSQL instance holds cluster records, configuration, templates, requests and audit history.</p></li>
-          <li><h3>Control how users reach the portal.</h3><p>Choose bundled or existing Keycloak, assign roles and use private access through your VPN when required.</p></li>
-        </ul>
+        <div class="deployment-comparison">
+          <h3>How it compares</h3>
+          <dl>
+            <div class="comparison-featured"><dt>Infrayard</dt><dd>Built-in OKE provisioning and upgrades. Portal and data stay in your OCI tenancy.</dd></div>
+            <div><dt>Quali Torque</dt><dd>Infrastructure environments from blueprints. SaaS or self-hosted control plane.</dd></div>
+            <div><dt>Rafay</dt><dd>Kubernetes fleet operations. SaaS or self-hosted controller.</dd></div>
+            <div><dt>Backstage</dt><dd>Self-hostable developer portal framework. Assemble workflows with templates and integrations.</dd></div>
+          </dl>
+          <a class="text-link" href="/docs/requirements/#compare-deployment-models">Deployment models and sources →</a>
+        </div>
       </div>
     </section>
 
@@ -58,13 +62,13 @@
       <div class="container control-layout">
         <div class="control-copy">
           <p class="eyebrow">Time to first use</p>
-          <h2 id="deployment-time-title">From registry access to a working portal.</h2>
-          <p class="lede">With your registry credentials and OCI permissions in hand, deploy Infrayard with Helm, sign in and verify the OCI connection. Your team can then publish approved templates and start requesting OKE clusters. Oracle Cloud provisions those clusters separately.</p>
+          <h2 id="deployment-time-title">Two ways to install Infrayard.</h2>
+          <p class="lede">Estimates cover setup to first sign-in once you have registry access and OCI permissions. Cluster provisioning follows separately.</p>
           <div class="control-links"><a class="text-link" href="/docs/installation/">Read the installation guide →</a></div>
         </div>
         <ul class="control-list" aria-label="Estimated setup times">
-          <li><h3>45–90 minutes with a Kubernetes host ready</h3><p>For an engineer familiar with OCI and Helm. This estimate includes the OCI service user and state bucket, Helm installation and first sign-in with the bundled Keycloak.</p></li>
-          <li><h3>2–4 hours for a first-time k3s evaluation</h3><p>For an engineer new to the setup. Allow time to configure OCI networking and prepare a single VM with k3s. We verified the guide with a clean install on an Arm VM.</p></li>
+          <li><h3>Existing OKE cluster <span class="setup-time">45–90 min</span></h3><p>For engineers familiar with OCI and Helm.</p></li>
+          <li><h3>New k3s VM <span class="setup-time">2–4 hours</span></h3><p>For a first-time setup, including OCI networking and VM preparation.</p></li>
         </ul>
       </div>
     </section>
