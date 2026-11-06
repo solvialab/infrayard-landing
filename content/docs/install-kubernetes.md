@@ -77,7 +77,7 @@ Let's Encrypt must reach the portal on port 80 from the internet. If it cannot, 
 The chart and the images are in the same private registry. Use the same Bash shell for the remaining steps so they can read the variables you set here. When prompted, enter the registry credentials from your onboarding e-mail.
 
 ```bash
-VERSION=1.0.0  # Replace with the version from your onboarding e-mail.
+VERSION=1.0.1  # Replace with the version from your onboarding e-mail.
 read -r -p 'Registry user: ' REGISTRY_USER
 read -rs -p 'Registry token: ' REGISTRY_TOKEN
 printf '\n'
@@ -190,7 +190,7 @@ Notes:
 - **Own certificate instead of Let's Encrypt:** create the secret with `kubectl create secret tls infrayard-tls -n infrayard --cert=fullchain.pem --key=privkey.pem` and remove the `cert-manager.io/cluster-issuer` annotation.
 - **ingress-nginx:** set `className: nginx` and add the annotations `nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"` and `nginx.ingress.kubernetes.io/proxy-buffering: "off"`, so that live Terraform logs are not cut off.
 - **Your own Keycloak** instead of the bundled one: see [Use your own Keycloak](/docs/keycloak/) before installing.
-- **E-mail notifications** (optional): set `api.email.enabled: true`, `api.email.adminEmails` and the `api.email.smtp` block, with the SMTP password in `secrets.yaml`.
+- **E-mail notifications** (optional): set `api.email.enabled: true`, `api.email.adminEmails` and the `api.email.smtp` block, with the SMTP password in `secrets.yaml`. Infrayard connects with STARTTLS, usually on port 587, and checks the server certificate. Implicit TLS, usually on port 465, is not supported. If a company CA signed the certificate, put the PEM in `api.email.smtp.ca.cert`, or name a ConfigMap in `api.email.smtp.ca.existingConfigMap`. `api.email.smtp.tlsVerify: false` turns the check off, so anyone on the network path could read the SMTP password and the mail. Use it for tests only.
 - **Test or demo installation:** `frontend.robots.noindex: true` asks search engines not to index the portal.
 - **Single-node clusters:** the chart tolerates the control-plane taint by default, so all pods can run on one k3s node.
 

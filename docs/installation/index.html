@@ -147,7 +147,7 @@
 </tr>
 <tr>
 <td>Version to install</td>
-<td>A number such as <code>1.0.0</code>; chart and images share it</td>
+<td>A number such as <code>1.0.1</code>; chart and images share it</td>
 </tr>
 <tr>
 <td>Support</td>
@@ -270,6 +270,7 @@ sudo firewall-cmd --permanent --zone=trusted --add-source=10.43.0.0/16
 sudo firewall-cmd --reload
 
 curl -sfL https://get.k3s.io | sudo sh -
+until sudo /usr/local/bin/k3s kubectl get nodes 2&gt;/dev/null | grep -q Ready; do sleep 3; done
 sudo /usr/local/bin/k3s kubectl wait --for=condition=Ready node --all --timeout=180s
 sudo /usr/local/bin/k3s kubectl wait --for=create deployment/traefik -n kube-system --timeout=180s
 sudo /usr/local/bin/k3s kubectl rollout status deployment/traefik -n kube-system --timeout=180s

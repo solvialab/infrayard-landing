@@ -126,7 +126,7 @@ kubectl wait --for=condition=Ready clusterissuer/letsencrypt --timeout=120s
 <p>Let&#39;s Encrypt must reach the portal on port 80 from the internet. If it cannot, use your own certificate (step 4).</p>
 <h2 id="2-log-in-to-the-registry">2. Log in to the registry<a class="heading-link" href="#2-log-in-to-the-registry" aria-label="Link to 2. Log in to the registry">#</a></h2>
 <p>The chart and the images are in the same private registry. Use the same Bash shell for the remaining steps so they can read the variables you set here. When prompted, enter the registry credentials from your onboarding e-mail.</p>
-<pre><code class="language-bash">VERSION=1.0.0  # Replace with the version from your onboarding e-mail.
+<pre><code class="language-bash">VERSION=1.0.1  # Replace with the version from your onboarding e-mail.
 read -r -p &#39;Registry user: &#39; REGISTRY_USER
 read -rs -p &#39;Registry token: &#39; REGISTRY_TOKEN
 printf &#39;\n&#39;
@@ -219,7 +219,7 @@ api:
 <li><strong>Own certificate instead of Let&#39;s Encrypt:</strong> create the secret with <code>kubectl create secret tls infrayard-tls -n infrayard --cert=fullchain.pem --key=privkey.pem</code> and remove the <code>cert-manager.io/cluster-issuer</code> annotation.</li>
 <li><strong>ingress-nginx:</strong> set <code>className: nginx</code> and add the annotations <code>nginx.ingress.kubernetes.io/proxy-read-timeout: &quot;3600&quot;</code> and <code>nginx.ingress.kubernetes.io/proxy-buffering: &quot;off&quot;</code>, so that live Terraform logs are not cut off.</li>
 <li><strong>Your own Keycloak</strong> instead of the bundled one: see <a href="/docs/keycloak/">Use your own Keycloak</a> before installing.</li>
-<li><strong>E-mail notifications</strong> (optional): set <code>api.email.enabled: true</code>, <code>api.email.adminEmails</code> and the <code>api.email.smtp</code> block, with the SMTP password in <code>secrets.yaml</code>.</li>
+<li><strong>E-mail notifications</strong> (optional): set <code>api.email.enabled: true</code>, <code>api.email.adminEmails</code> and the <code>api.email.smtp</code> block, with the SMTP password in <code>secrets.yaml</code>. Infrayard connects with STARTTLS, usually on port 587, and checks the server certificate. Implicit TLS, usually on port 465, is not supported. If a company CA signed the certificate, put the PEM in <code>api.email.smtp.ca.cert</code>, or name a ConfigMap in <code>api.email.smtp.ca.existingConfigMap</code>. <code>api.email.smtp.tlsVerify: false</code> turns the check off, so anyone on the network path could read the SMTP password and the mail. Use it for tests only.</li>
 <li><strong>Test or demo installation:</strong> <code>frontend.robots.noindex: true</code> asks search engines not to index the portal.</li>
 <li><strong>Single-node clusters:</strong> the chart tolerates the control-plane taint by default, so all pods can run on one k3s node.</li>
 </ul>

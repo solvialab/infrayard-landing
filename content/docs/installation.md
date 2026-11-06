@@ -34,7 +34,7 @@ When your order is accepted and the first invoice is paid, or when your evaluati
 | Registry | `registry.gitlab.com` |
 | Helm chart | `oci://registry.gitlab.com/solvialab/infrayard/charts/infrayard` |
 | Images | `registry.gitlab.com/solvialab/infrayard/api` and `registry.gitlab.com/solvialab/infrayard/frontend` |
-| Version to install | A number such as `1.0.0`; chart and images share it |
+| Version to install | A number such as `1.0.1`; chart and images share it |
 | Support | [support@infrayard.eu](mailto:support@infrayard.eu) |
 
 The guides on this site are written so that your team can install Infrayard with these values on its own. Nothing is downloaded from a public website: the chart and the images come only from this registry.
@@ -150,6 +150,7 @@ sudo firewall-cmd --permanent --zone=trusted --add-source=10.43.0.0/16
 sudo firewall-cmd --reload
 
 curl -sfL https://get.k3s.io | sudo sh -
+until sudo /usr/local/bin/k3s kubectl get nodes 2>/dev/null | grep -q Ready; do sleep 3; done
 sudo /usr/local/bin/k3s kubectl wait --for=condition=Ready node --all --timeout=180s
 sudo /usr/local/bin/k3s kubectl wait --for=create deployment/traefik -n kube-system --timeout=180s
 sudo /usr/local/bin/k3s kubectl rollout status deployment/traefik -n kube-system --timeout=180s

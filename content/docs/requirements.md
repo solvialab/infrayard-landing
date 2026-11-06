@@ -45,7 +45,7 @@ When evaluating a platform for sensitive infrastructure, check who runs the cont
 | Outbound | Infrayard → Terraform providers: `registry.terraform.io`, `releases.hashicorp.com`, GitHub releases | 443 |
 | Outbound | Infrayard → Kubernetes API of each managed cluster | 6443 |
 | Outbound | Users → Kubernetes API of their clusters, for `kubectl` | 6443 |
-| Outbound, optional | Infrayard → your SMTP server | 587 or your port |
+| Outbound, optional | Infrayard → your SMTP server, with STARTTLS | 587 or your port. Implicit TLS is not supported |
 | Outbound, optional | Infrayard → your own Keycloak | 443 |
 
 The portal needs no inbound connection from the internet if users come through a VPN; see [private access](/docs/private-access/).

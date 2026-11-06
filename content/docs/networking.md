@@ -41,7 +41,7 @@ In the deploy form, the **Advanced** tab accepts existing OCIDs. Infrayard then 
 | --- | --- |
 | Existing Compartment OCID | Resources go into this compartment instead of a new one |
 | Existing VCN OCID | Uses your VCN; Infrayard creates only the cluster subnets and their security lists inside it |
-| Existing Subnet OCID | Worker nodes go into your subnet; requires the VCN OCID as well |
+| Existing Subnet OCID | Worker nodes and the Kubernetes API endpoint go into your subnet; requires the VCN OCID as well |
 
 Supported combinations:
 
@@ -50,7 +50,7 @@ Supported combinations:
 | Nothing | Compartment, VCN, subnets, gateways, route tables, security lists, cluster |
 | Compartment | VCN and the complete network inside that compartment, cluster |
 | VCN (optionally compartment) | Subnets and security lists in your VCN, cluster. Your gateways and route tables are used as they are |
-| VCN and subnet (optionally compartment) | Only the cluster and node pools. Your network is used read-only |
+| VCN and subnet (optionally compartment) | Only the cluster and node pools. Infrayard creates and changes nothing in your network |
 | Subnet without VCN | Rejected before Terraform starts |
 
 Rules:
@@ -60,8 +60,29 @@ Rules:
 - **Routing must be ready.** With your own VCN or subnet, the worker subnet needs a route `0.0.0.0/0` to a NAT gateway (or your egress path) and a route for `all-<region>-services-in-oracle-services-network` to a service gateway. Otherwise nodes cannot register.
 - **Public endpoint restricted by CIDR allowlist** needs an Infrayard-managed VCN. While this mode is on, deployments with an existing VCN or subnet are rejected; an existing compartment is fine.
 - **Sharing a compartment:** to place several clusters in one compartment, create a compartment for them and supply it to each cluster. Do not reuse a compartment that Infrayard created for another cluster.
+- **A network path to the API.** The Kubernetes API of a cluster in your network has a private address. Infrayard needs a route to it to issue kubeconfigs, for example by running in the same VCN or in a network connected to it.
 
 The OCID fields check the OCID type and offer autocomplete lists of the compartments, VCNs and subnets Infrayard can see.
+
+### When you supply only a VCN
+
+- The VCN needs a **DNS label** and a **free /24 inside its address range**, entered as the cluster CIDR. Infrayard rejects anything else before Terraform starts.
+- Inside that /24, Infrayard creates a private subnet for workers and the API endpoint (the lower /25) and a public subnet for load balancers (the last /28). The VCN can be small (a /20 was tested), and several clusters can share one VCN, each with its own /24.
+- The new subnets use the **default route table of your VCN**, so that table needs the routes above. With `0.0.0.0/0` pointing to a NAT gateway, a public load balancer cannot be reached from the internet. Use an internal load balancer instead, as in [private access](/docs/private-access/).
+
+### When you supply a VCN and a subnet
+
+- The subnet needs a **free address for the API endpoint and every worker node**, plus rules that let them talk to each other. This set was tested: all traffic from the subnet itself, TCP 6443 from the VCN, ICMP type 3 code 4, and all egress.
+- The cluster has **no default subnet for load balancers**, because OKE does not allow the node subnet in that role. A `Service` of type `LoadBalancer` stays pending with the event `a subnet must be specified for creating a load balancer` until it names a subnet. The node subnet works too:
+
+  ```yaml
+  metadata:
+    annotations:
+      service.beta.kubernetes.io/oci-load-balancer-internal: "true"
+      service.beta.kubernetes.io/oci-load-balancer-subnet1: <subnet OCID>
+  ```
+
+- **Load balancers change the security list.** While such a load balancer exists, OKE adds the rules it needs to the security list of your subnet and removes them when the load balancer is deleted. Infrayard does not do this. To keep the list unchanged, see the Oracle documentation for the annotation `service.beta.kubernetes.io/oci-load-balancer-security-list-management-mode`.
 
 ## Choosing the anchor compartment
 
@@ -78,7 +99,7 @@ One installation cannot span several unrelated compartment trees. Use the tenanc
 ## Who owns what
 
 - Resources Infrayard creates are managed by the cluster's Terraform state. Manual changes in the OCI Console are overwritten by the next scale or upgrade.
-- Resources you supply (compartment, VCN, subnet) are only referenced, never changed or deleted.
+- Infrayard only references the resources you supply (compartment, VCN, subnet) and never changes or deletes them. OKE itself can add security rules for load balancers, as described above.
 
 ## Custom security rules
 
