@@ -63,7 +63,11 @@ kubectl get configmap infrayard-oidc-client -n infrayard \
 
 In the Keycloak admin console, open your realm, then **Realm settings → Action (top right) → Partial import**. Select the file, choose **If a resource exists: Skip** and click **Import**.
 
-The imported client `infrayard-portal` is public, uses the Standard flow with PKCE (S256) and allows `https://infrayard.example.com/*` as redirect and post-logout URL.
+The imported client `infrayard-portal` is public and uses the Standard flow with PKCE (S256). It accepts exactly `https://infrayard.example.com/` as redirect URL and `https://infrayard.example.com` and `https://infrayard.example.com/` as post-logout URLs; no other address of the domain is accepted.
+
+A client imported for Infrayard `1.0.1` or earlier allows `https://infrayard.example.com/*`. Change it to the exact values in **Clients → infrayard-portal → Settings**: **Valid redirect URIs** `https://infrayard.example.com/`, **Valid post logout redirect URIs** `https://infrayard.example.com` and `https://infrayard.example.com/`. With a wildcard, a link to another page of the domain could receive the sign-in code.
+
+Security settings of the realm are yours to choose in your Keycloak; Infrayard changes nothing there. We recommend what the bundled Keycloak uses: a password policy (**Authentication → Policies → Password policy**), brute force detection (**Realm settings → Security defenses → Brute force detection**) and event logging (**Realm settings → Events**). The values are listed under [hardening built in](/docs/security/#hardening-built-in).
 
 `helm status infrayard -n infrayard` prints the same instructions with your values.
 

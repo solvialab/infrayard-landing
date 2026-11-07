@@ -34,7 +34,7 @@ When your order is accepted and the first invoice is paid, or when your evaluati
 | Registry | `registry.gitlab.com` |
 | Helm chart | `oci://registry.gitlab.com/solvialab/infrayard/charts/infrayard` |
 | Images | `registry.gitlab.com/solvialab/infrayard/api` and `registry.gitlab.com/solvialab/infrayard/frontend` |
-| Version to install | A number such as `1.0.1`; chart and images share it |
+| Version to install | A number such as `1.0.2`; chart and images share it |
 | Support | [support@infrayard.eu](mailto:support@infrayard.eu) |
 
 The guides on this site are written so that your team can install Infrayard with these values on its own. Nothing is downloaded from a public website: the chart and the images come only from this registry.

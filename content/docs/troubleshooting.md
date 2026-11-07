@@ -26,6 +26,7 @@ Note the time and the exact error before you retry, and check what actually exis
 | Certificate stays `READY False` | DNS does not point to the ingress yet, or port 80 is not reachable from the internet. Check `kubectl describe certificate -n infrayard infrayard-tls` and `kubectl get challenges -A` |
 | Sign-in shows `502 Bad Gateway` or a Keycloak error page | Keycloak is still starting (about a minute on the first start) or the realm import failed. Check the Keycloak logs for `Realm 'infrayard' imported` |
 | Keycloak does not start, log shows `password authentication failed` | The database password changed after the first start. The database keeps the password it was created with; set the original value again |
+| `kubectl logs -n infrayard job/infrayard-keycloak-hardening` says the bootstrap admin cannot sign in | The Keycloak master `admin` was replaced, or its password was changed in Keycloak and not in `secrets.yaml`. The job changed nothing and the release is fine. Check the settings by hand; see [security](/docs/security/#hardening-built-in) |
 
 ## Sign-in and roles
 
@@ -36,6 +37,11 @@ Note the time and the exact error before you retry, and check what actually exis
 | Sign-in works but data does not load | The issuer setting does not match the token. See [Keycloak troubleshooting](/docs/keycloak/#troubleshooting) |
 | A template is missing for a user | The template requires a role the user does not hold |
 | A role change has no effect | Roles are read from the token; the user gets the change with the next token, within the token lifetime (5 minutes by default) |
+| "Invalid username or password" although the password is right | After 5 failed sign-ins the bundled Keycloak locks the account for a minute or longer and shows the same message meanwhile. To unlock it at once, open the user in the Keycloak admin console and turn off **Temporarily locked** |
+| Keycloak refuses a new password | Passwords need at least 12 characters and must differ from the user name, the e-mail and the last five passwords |
+| The portal answers `429 Too Many Requests` | [Rate limiting](/docs/security/#rate-limiting) is on, and the portal sees one address for many users. Check the addresses in the frontend log, or turn it off |
+| `https://infrayard.example.com/auth/admin` answers `404` | Expected: the Keycloak admin console is not public. Open it through a [port forward](/docs/install-kubernetes/#add-users), or on a VPN-only portal see [private access](/docs/private-access/#keycloak-admin-console-on-a-private-portal) |
+| Keycloak shows "Invalid parameter: redirect_uri" | The portal was opened under an address other than `global.domain`. With your own Keycloak, check the client's **Valid redirect URIs**; see [Use your own Keycloak](/docs/keycloak/#2-install-and-import-the-client) |
 
 ## Missing versions or shapes
 

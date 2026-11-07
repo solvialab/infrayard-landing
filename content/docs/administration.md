@@ -39,7 +39,7 @@ Platform-wide settings manageable at runtime — no redeployment needed:
 | Nodes per pool | Max nodes per pool |
 | OCPU / RAM / Storage | Max compute per node |
 | CIDR pool | Add, remove, and enable/disable /24 ranges available for cluster allocation |
-| VM shapes | Sync from OCI, plus add/remove/enable/disable shapes in the deploy form |
+| VM shapes | Sync from OCI, plus add/remove/enable/disable shapes in the deploy form. Regular users can deploy only enabled shapes; while none is enabled, only administrators can deploy |
 | K8s versions | Add, remove, and enable/disable Kubernetes versions |
 | Node images | Add, remove, and enable/disable OCI compute images for worker node pools |
 

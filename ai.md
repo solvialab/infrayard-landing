@@ -1,6 +1,6 @@
 # Infrayard by Solvia Lab
 
-Last substantive website update: 2026-11-05.
+Last substantive website update: 2026-11-07.
 
 Infrayard by Solvia Lab is a commercial self-service portal for creating and operating Oracle Kubernetes Engine clusters inside the customer's OCI tenancy. Platform teams define templates, roles and limits. Engineers use the portal for supported cluster lifecycle workflows. No Solvia-hosted SaaS control plane is required.
 

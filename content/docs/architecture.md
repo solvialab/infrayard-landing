@@ -16,7 +16,7 @@ Infrayard runs in an environment you control: an OKE cluster, or k3s on a single
 
 The Helm chart installs these services. An ingress controller in your cluster, such as Traefik, terminates HTTPS in front of the portal.
 
-The portal and the bundled Keycloak share one address: the portal at `https://infrayard.example.com`, Keycloak at `https://infrayard.example.com/auth`. The portal forwards `/api` to the API and `/auth` to Keycloak; the Keycloak admin console is not reachable this way.
+The portal and the bundled Keycloak share one address: the portal at `https://infrayard.example.com`, Keycloak at `https://infrayard.example.com/auth`. The portal forwards `/api` to the API and the sign-in pages of the `infrayard` realm to Keycloak; the master realm and the Keycloak admin console are not reachable this way.
 
 ## What happens when a user creates a cluster
 

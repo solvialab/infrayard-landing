@@ -14,7 +14,7 @@ Infrayard signs you in through Keycloak — the bundled instance or your organis
 4. Choose a **CIDR range** from the available pool — each cluster gets its own /24
 5. Select a **Kubernetes version**, **VM shape**, and **Node image** (locked if the template defines them; otherwise user-selectable — image defaults to auto-select if none configured)
 6. If using "Custom" mode, configure one or more **Node pools** — each pool has a name, node count, OCPU, RAM, and storage, constrained by your account's effective limits
-7. *(Optional)* Use the **Advanced tab** to bring existing OCI infrastructure — your own VCN, compartment, or subnet
+7. *(Optional)* Use the **Advanced tab** to bring existing OCI infrastructure — your own VCN, compartment, or subnet. For a regular user, an existing VCN or subnet must be in the anchor compartment or below it; a network elsewhere in the tenancy needs an administrator to deploy the cluster
 8. Review the **Deployment Summary** — shows all resources that will be created, plus live estimated monthly and hourly cost
 9. Click **Deploy**
 

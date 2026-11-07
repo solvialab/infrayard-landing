@@ -1,4 +1,4 @@
 Contact: mailto:support@infrayard.eu
-Expires: 2027-11-05T00:00:00+01:00
+Expires: 2027-11-07T00:00:00+01:00
 Preferred-Languages: en, sk
 Canonical: https://www.infrayard.eu/.well-known/security.txt

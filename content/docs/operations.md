@@ -80,9 +80,24 @@ kubectl get pods -n infrayard -w
 
 The chart version selects the image version. Changed configuration or secrets restart the affected pods automatically.
 
-**After the upgrade:** sign in as an administrator and as a regular user, check the cluster list and the Activity history, and run **Sync** in **Admin → Configuration** to confirm OCI access.
+**After the upgrade:** sign in as an administrator and as a regular user, check the cluster list and the Activity history, and run **Sync** in **Admin → Configuration** to confirm OCI access. With the bundled Keycloak, `kubectl logs -n infrayard job/infrayard-keycloak-hardening` shows which security settings the upgrade applied; see [security](/docs/security/#hardening-built-in).
 
 **Rollback:** `helm rollback infrayard -n infrayard` returns the previous chart and images. If the new version had already started, also restore the backup taken before the upgrade.
+
+### From 1.0.1 or earlier
+
+- **Kubeconfigs downloaded before the upgrade** can contain a token that never expires. Infrayard now issues only tokens that expire after 30 days at most. To revoke the old tokens, run this on every cluster Infrayard manages, for example with a kubeconfig downloaded after the upgrade. The old tokens stop working within seconds, and users download a new kubeconfig:
+
+  ```bash
+  kubectl delete secret -n infrayard-system \
+    -l app.kubernetes.io/managed-by=infrayard \
+    --field-selector type=kubernetes.io/service-account-token
+  ```
+
+- **`ingress.tls.enabled` now defaults to `true`.** If TLS ends in front of the ingress, for example on your own load balancer, set it to `false` in `values.yaml`.
+- **Network policies are on.** Only the portal accepts connections from other pods. If another workload connects to the API, Keycloak or PostgreSQL directly, such as a monitoring agent, allow it with your own NetworkPolicy or set `networkPolicy.enabled: false`. Backups with `kubectl exec` are not affected.
+- **The Keycloak master realm answers `404` on the portal address.** Open the admin console through `kubectl port-forward`; see [add users](/docs/install-kubernetes/#add-users).
+- **Your own Keycloak:** change the portal client's redirect URLs to the exact portal address; see [Use your own Keycloak](/docs/keycloak/#2-install-and-import-the-client). With the bundled Keycloak, the upgrade changes them for you.
 
 ## PostgreSQL and Keycloak versions
 

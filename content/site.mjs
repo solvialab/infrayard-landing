@@ -5,7 +5,7 @@ export const site = {
   company: 'Solvia Lab s.r.o.',
   email: 'hello@infrayard.eu',
   supportEmail: 'support@infrayard.eu',
-  updated: '2026-11-05',
+  updated: '2026-11-07',
   title: 'Infrayard | OKE Self-service Platform for Oracle Cloud',
   description: 'Run a self-service portal for Oracle Kubernetes Engine in your own OCI tenancy. Keep OCI credentials, Terraform state and audit records in your environment.',
 };

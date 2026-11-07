@@ -50,6 +50,17 @@ A company CA certificate must be trusted on users' devices; for a public DNS-01 
 
 Point `infrayard.example.com` to the private IP in your internal DNS, for example a private view in OCI DNS or your company DNS that VPN clients use. A public DNS record with a private IP also works, but it publishes the internal address.
 
+## Keycloak admin console on a private portal
+
+The bundled Keycloak's admin console and master realm answer `404` on the portal address, so administrators open them with `kubectl port-forward`. When the portal is reachable only from your VPN, you can serve the console on the portal address instead:
+
+```yaml
+keycloak:
+  exposeAdminConsole: true
+```
+
+After `helm upgrade`, the console is at `https://infrayard.example.com/auth/admin/`. Sign in as `admin` with the Keycloak master admin password from `secrets.yaml`. Leave the value `false` for a portal that is reachable from the internet: the master realm would then accept password guesses for the account that controls all of Keycloak.
+
 ## Your own Keycloak
 
 If you [use your own Keycloak](/docs/keycloak/), users' browsers must reach it from the VPN, and the Infrayard API must reach it from the cluster. If the API sees Keycloak under a different internal address, set `api.oidc.internalUrl`.
