@@ -11,6 +11,8 @@
     { "source": "/docs/:section/index.html", "destination": "/docs/:section/", "permanent": true },
     { "source": "/resources/index.html", "destination": "/resources/", "permanent": true },
     { "source": "/demo/index.html", "destination": "/demo/", "permanent": true },
+    { "source": "/sk/index.html", "destination": "/sk/", "permanent": true },
+    { "source": "/sk/demo/index.html", "destination": "/sk/demo/", "permanent": true },
     { "source": "/docs/install-vm/", "destination": "/docs/install-kubernetes/", "permanent": true }
   ],
   "headers": [

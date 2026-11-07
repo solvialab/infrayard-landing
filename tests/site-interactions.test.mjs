@@ -7,7 +7,7 @@ import { pricing } from '../content/site.mjs';
 const source = (await readFile(new URL('../assets/site.js', import.meta.url), 'utf8')).replace(/^import[^\n]+\n/, '');
 
 // A small DOM adapter exercises the actual event handlers without a browser or network.
-function fixture({ hostname = 'www.infrayard.eu', sender = async () => ({ success: true }) } = {}) {
+function fixture({ hostname = 'www.infrayard.eu', sender = async () => ({ success: true }), lang = 'en' } = {}) {
   class Element {
     constructor() { this.dataset = {}; this.attributes = {}; this.listeners = {}; this.hidden = false; this.checked = false; this.value = ''; this.textContent = ''; this.classList = { toggle() {}, remove() {} }; }
     addEventListener(type, listener) { (this.listeners[type] ??= []).push(listener); }
@@ -41,7 +41,7 @@ function fixture({ hostname = 'www.infrayard.eu', sender = async () => ({ succes
     get(name) { return this.values.get(name); }
   }
   const document = {
-    documentElement: new Element(), activeElement: new Element(),
+    documentElement: Object.assign(new Element(), { lang }), activeElement: new Element(),
     getElementById: id => ids.get(id) || null,
     querySelector: () => null,
     querySelectorAll: selector => selector === '[data-billing]' ? billing : selector === '[data-contact]' ? Object.values(contacts) : [],
@@ -115,4 +115,31 @@ test('support uses its own destination and excludes hidden sales fields', async 
   assert.equal(sent.email, 'support@infrayard.eu');
   assert.equal(sent.values.get('company'), undefined);
   assert.equal(sent.values.get('selected_subscription'), undefined);
+});
+
+test('the Slovak page shows Slovak prices and texts and marks the enquiry', async () => {
+  let sent;
+  const ui = fixture({ lang: 'sk', sender: async (email, values) => { sent = { email, values }; } });
+  assert.match(ui.ids.get('business-price').textContent, /^3\s000\s€$/u);
+  assert.equal(ui.ids.get('business-unit').textContent, '/mesiac');
+  await ui.billing[1].fire('click');
+  assert.match(ui.ids.get('business-price').textContent, /^2\s500\s€$/u);
+  assert.match(ui.ids.get('business-billing-note').textContent, /30\s000\s€ vopred za 12 mesiacov/u);
+  await ui.contacts.business.fire('click');
+  assert.equal(ui.ids.get('contact-title').textContent, 'Začnite s Business');
+  assert.equal(ui.submit.textContent, 'Mám záujem o Business');
+  await ui.form.fire('submit');
+  assert.equal(sent.values.get('_subject'), 'Infrayard Business enquiry [SK]');
+  assert.equal(sent.values.get('language'), 'sk');
+  assert.match(sent.values.get('selected_subscription'), /^Business · 30\s000\s€ ročne, vopred$/u);
+  assert.match(ui.ids.get('form-status').textContent, /Vašu požiadavku sme prijali/);
+});
+
+test('the English page keeps English subjects without a language mark', async () => {
+  let sent;
+  const ui = fixture({ sender: async (email, values) => { sent = { email, values }; } });
+  await ui.contacts.demo.fire('click');
+  await ui.form.fire('submit');
+  assert.equal(sent.values.get('_subject'), 'Infrayard demo request');
+  assert.equal(sent.values.get('language'), 'en');
 });

@@ -45,4 +45,5 @@ export const docs = [
   { slug: 'releases', file: 'releases', title: 'Releases and roadmap', group: 'Reference', description: 'Available capabilities, versioning and separately identified roadmap items.' },
 ];
 
-export const money = value => new Intl.NumberFormat('en-IE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(value);
+// English pages show €3,000; Slovak pages show 3 000 €.
+export const money = (value, lang = 'en') => new Intl.NumberFormat(lang === 'sk' ? 'sk-SK' : 'en-IE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(value);

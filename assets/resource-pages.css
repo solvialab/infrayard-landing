@@ -73,3 +73,9 @@ h1 { max-width: 880px; margin: 20px 0 16px; font-size: clamp(36px, 6vw, 64px); l
   .site-footer { background: #0f172a; border-color: #26344a; }
   a { color: #7ccbe6; }
 }
+
+/* EN/SK language switch; the guides exist only in English. */
+.lang-switch { display: inline-flex; align-items: center; gap: 2px; padding: 2px; border: 1px solid currentColor; border-radius: 8px; font-size: 12px; font-weight: 700; letter-spacing: .03em; line-height: 1; opacity: .85; }
+.lang-switch > a, .lang-switch > span { display: inline-flex; align-items: center; justify-content: center; min-width: 28px; min-height: 28px; padding: 0 6px; border-radius: 6px; }
+.lang-switch > a:hover { text-decoration: none; opacity: .7; }
+.lang-switch > [aria-current] { background: rgba(127, 127, 127, .18); }

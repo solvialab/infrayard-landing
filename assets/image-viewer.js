@@ -10,6 +10,8 @@
   const original = document.getElementById('screenshot-original');
   const zoom = document.getElementById('screenshot-zoom');
   const status = document.getElementById('screenshot-status');
+  // Slovak pages put their labels on the dialog: data-actual, data-fit and data-count.
+  const labels = { actual: dialog.dataset?.actual || 'Actual size', fit: dialog.dataset?.fit || 'Fit to screen', count: dialog.dataset?.count || 'SCREENSHOT' };
   let index = 0;
   let zoomed = false;
   let opener;
@@ -18,7 +20,7 @@
     zoomed = value;
     dialog.classList.toggle('is-zoomed', value);
     zoom.setAttribute('aria-pressed', String(value));
-    zoom.textContent = value ? 'Fit to screen' : 'Actual size';
+    zoom.textContent = value ? labels.fit : labels.actual;
     stage.scrollTop = 0;
     stage.scrollLeft = 0;
   };
@@ -30,7 +32,7 @@
     image.alt = link.querySelector('img').alt;
     image.src = link.href;
     title.textContent = link.dataset.title;
-    count.textContent = `SCREENSHOT ${index + 1} / ${links.length}`;
+    count.textContent = `${labels.count} ${index + 1} / ${links.length}`;
     original.href = link.href;
   };
   links.forEach((link, linkIndex) => link.addEventListener('click', event => {

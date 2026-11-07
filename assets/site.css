@@ -1500,3 +1500,92 @@ dialog {
 
 
 }
+
+/* EN/SK language switch. On narrow screens the header copy moves into the menu. */
+.lang-switch {
+  display:inline-flex;
+  align-items:center;
+  flex:none;
+  gap:2px;
+  padding:2px;
+  border:1px solid var(--line);
+  border-radius:8px;
+  font-size:.74rem;
+  font-weight:650;
+  letter-spacing:.03em;
+  line-height:1
+}
+
+.lang-switch>a,.lang-switch>span {
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:30px;
+  min-height:30px;
+  padding:0 7px;
+  border-radius:6px;
+  color:var(--muted)
+}
+
+.lang-switch>a:hover {
+  color:var(--ink);
+  background:var(--soft);
+  text-decoration:none
+}
+
+.lang-switch>[aria-current] {
+  background:var(--tint);
+  color:var(--ink)
+}
+
+.nav-links .lang-switch-menu {
+  display:none
+}
+
+.lang-tag {
+  display:inline-block;
+  margin-left:2px;
+  padding:1px 4px;
+  border:1px solid var(--line);
+  border-radius:4px;
+  font-size:.62rem;
+  font-weight:650;
+  letter-spacing:.04em;
+  line-height:1.2;
+  color:var(--muted);
+  vertical-align:middle
+}
+
+/* Legal pages have no menu button: keep their few links in the header row on tablets. */
+@media(max-width:780px) {
+  .legal-header .nav-links {
+    position:static;
+    flex-direction:row;
+    align-items:center;
+    gap:16px;
+    padding:0;
+    border:0;
+    background:none
+  }
+
+  .legal-header .nav-links>a {
+    padding:0
+  }
+}
+
+@media(max-width:520px) {
+  .header-actions>.lang-switch {
+    display:none
+  }
+
+  .nav-links .lang-switch-menu {
+    display:inline-flex;
+    align-self:flex-start;
+    margin:10px 4px 2px
+  }
+
+  /* Legal pages have no menu: keep the switch and drop the text links on phones. */
+  .legal-header .nav-links>a {
+    display:none
+  }
+}

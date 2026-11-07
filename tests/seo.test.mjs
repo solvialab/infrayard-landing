@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { graph, head } from '../scripts/seo.mjs';
 import { demo } from '../content/seo.mjs';
+import { alternatesFor } from '../content/sk.mjs';
 
 test('an unpublished demo has no invented public upload date; a released demo has complete metadata', () => {
   const previous = demo.publishedAt;
@@ -30,4 +31,22 @@ test('editorial text cannot break out of metadata attributes or JSON-LD scripts'
   assert.equal((html.match(/<\/script>/g) || []).length, 1);
   const data = JSON.parse(html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
   assert.equal(data['@graph'].find(node => node['@type'] === 'WebPage').name, injected);
+});
+
+test('a translated page names both language versions and English as the default', () => {
+  const options = { path: '/sk/', title: 'Slovenský test', description: 'Popis slovenskej stránky na test', lang: 'sk' };
+  const html = head({ ...options, data: graph(options), alternates: alternatesFor('/sk/') });
+  assert.ok(html.includes('<link rel="alternate" hreflang="en" href="https://www.infrayard.eu/">'));
+  assert.ok(html.includes('<link rel="alternate" hreflang="sk" href="https://www.infrayard.eu/sk/">'));
+  assert.ok(html.includes('<link rel="alternate" hreflang="x-default" href="https://www.infrayard.eu/">'));
+  assert.ok(html.includes('<meta property="og:locale" content="sk_SK">'));
+  assert.ok(html.includes('<meta property="og:locale:alternate" content="en_GB">'));
+  assert.equal(graph(options)['@graph'].find(node => node['@type'] === 'WebPage').inLanguage, 'sk');
+});
+
+test('an English-only page declares no language versions', () => {
+  const options = { path: '/docs/', title: 'Docs test', description: 'English documentation page used in a test' };
+  const html = head({ ...options, data: graph(options), alternates: alternatesFor('/docs/') });
+  assert.equal(html.includes('hreflang'), false);
+  assert.equal(html.includes('og:locale:alternate'), false);
 });

@@ -2,6 +2,7 @@ import { readFile, stat } from 'node:fs/promises';
 import { resolve, relative } from 'node:path';
 import { site, docs } from '../content/site.mjs';
 import { demo, robotsRules } from '../content/seo.mjs';
+import { translatedPages, languageOf } from '../content/sk.mjs';
 
 export async function checkSEO(htmlByPath, root) {
   const errors = [];
@@ -10,7 +11,8 @@ export async function checkSEO(htmlByPath, root) {
   const unescape = value => value.replaceAll('&amp;', '&').replaceAll('&quot;', '"').replaceAll('&#39;', "'").replaceAll('&lt;', '<').replaceAll('&gt;', '>');
   const metas = html => new Map([...html.matchAll(/<meta\s+(?:name|property)="([^"]+)"\s+content="([^"]*)"/g)].map(match => [match[1], unescape(match[2])]));
   const urls = new Map(), titles = new Set(), descriptions = new Set();
-  const edges = new Map();
+  const edges = new Map(), languageLinks = new Map();
+  const homes = ['/', '/sk/'];
   for (const [path, html] of htmlByPath) {
     const file = relative(root, path).replaceAll('\\', '/');
     const route = '/' + file.replace(/(?:^|\/)index\.html$/, match => match.startsWith('/') ? '/' : '');
@@ -21,7 +23,10 @@ export async function checkSEO(htmlByPath, root) {
     if (titles.has(title)) errors.push(`${file}: duplicate search title`);
     if (descriptions.has(description)) errors.push(`${file}: duplicate search description`);
     titles.add(title); descriptions.add(description);
-    if (!/<html\b[^>]*\slang="en"[^>]*>/.test(html)) errors.push(`${file}: missing document language`);
+    const lang = languageOf(route);
+    if (!new RegExp(`<html\\b[^>]*\\slang="${lang}"[^>]*>`).test(html)) errors.push(`${file}: document language must be ${lang}`);
+    if (metadata.get('og:locale') !== (lang === 'sk' ? 'sk_SK' : 'en_GB')) errors.push(`${file}: social locale differs from the page language`);
+    languageLinks.set(canonical, new Map([...html.matchAll(/<link rel="alternate" hreflang="([^"]+)" href="([^"]+)">/g)].map(match => [match[1], match[2]])));
     if (!description || description.length < 50 || description.length > 170) errors.push(`${file}: search description must be 50-170 characters (now ${description?.length ?? 0})`);
     if (!html.includes(`<link rel="canonical" href="${canonical}">`)) errors.push(`${file}: canonical must match the public route ${route}`);
     if (metadata.get('og:url') !== canonical || metadata.get('og:title') !== title || metadata.get('twitter:title') !== title) errors.push(`${file}: inconsistent canonical/social title`);
@@ -32,10 +37,10 @@ export async function checkSEO(htmlByPath, root) {
     const graphs = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map(match => JSON.parse(match[1]));
     const nodes = graphs.flatMap(data => data['@graph'] || [data]);
     const page = nodes.find(node => ['WebPage', 'CollectionPage'].includes(node['@type']));
-    if (!page || page.url !== canonical || page.dateModified !== site.updated) errors.push(`${file}: missing or inconsistent WebPage identity/date`);
+    if (!page || page.url !== canonical || page.dateModified !== site.updated || page.inLanguage !== lang) errors.push(`${file}: missing or inconsistent WebPage identity/date/language`);
     if (!nodes.some(node => node['@type'] === 'Organization' && node['@id'] === `${site.origin}/#organization`)) errors.push(`${file}: missing publisher identity`);
     const crumbs = nodes.find(node => node['@type'] === 'BreadcrumbList');
-    if (route !== '/' && (!crumbs || crumbs.itemListElement.at(-1).item !== canonical || !html.includes('aria-label="Breadcrumb"'))) errors.push(`${file}: missing matching visible and structured breadcrumbs`);
+    if (!homes.includes(route) && (!crumbs || crumbs.itemListElement.at(-1).item !== canonical || !/aria-label="(?:Breadcrumb|Navigačná cesta)"/.test(html))) errors.push(`${file}: missing matching visible and structured breadcrumbs`);
     for (const node of nodes) {
       if (node.datePublished && node.datePublished > node.dateModified) errors.push(`${file}: publication is after modification`);
       if (['Article', 'TechArticle'].includes(node['@type']) && (!node.headline || !node.author || !node.mainEntityOfPage)) errors.push(`${file}: incomplete article identity`);
@@ -49,14 +54,26 @@ export async function checkSEO(htmlByPath, root) {
     urls.set(canonical, { path, html, page });
     edges.set(canonical, [...html.matchAll(/\bhref="([^"]+)"/g)].map(match => new URL(unescape(match[1]), canonical).href.split('#')[0].split('?')[0]).filter(url => url.startsWith(site.origin)));
   }
+  // Translated pages: both versions name each other and English as x-default, and nothing else does.
+  const translated = new Map(translatedPages.flatMap(([en, sk]) => [[site.origin + en, { en: site.origin + en, sk: site.origin + sk }], [site.origin + sk, { en: site.origin + en, sk: site.origin + sk }]]));
+  for (const [url, links] of languageLinks) {
+    const expected = translated.get(url);
+    if (!expected) { if (links.size) errors.push(`Page exists only in English but declares language versions: ${url}`); continue; }
+    if (links.size !== 3 || links.get('en') !== expected.en || links.get('sk') !== expected.sk || links.get('x-default') !== expected.en) errors.push(`Incomplete or wrong hreflang links: ${url}`);
+    for (const target of [expected.en, expected.sk]) if (!urls.has(target)) errors.push(`hreflang target is not a public page: ${target}`);
+  }
+  for (const url of urls.keys()) if (url.startsWith(site.origin + '/sk/') && !translated.has(url)) errors.push(`Slovak page has no English version: ${url}`);
   const sitemap = await text('sitemap.xml');
   const entries = [...sitemap.matchAll(/<url><loc>([^<]+)<\/loc><lastmod>([^<]+)<\/lastmod>([\s\S]*?)<\/url>/g)];
   const sitemapURLs = entries.map(match => unescape(match[1]));
   if (new Set(sitemapURLs).size !== sitemapURLs.length || sitemapURLs.length !== urls.size) errors.push('Sitemap must contain every canonical HTML page exactly once');
-  for (const [, rawURL, modified] of entries) {
+  for (const [, rawURL, modified, details] of entries) {
     const url = unescape(rawURL);
     if (!urls.has(url) || url.includes('#') || url.includes('?')) errors.push(`Invalid/non-canonical sitemap URL: ${url}`);
     if (modified !== urls.get(url)?.page?.dateModified) errors.push(`Sitemap lastmod differs from page metadata: ${url}`);
+    const alternates = [...details.matchAll(/<xhtml:link rel="alternate" hreflang="([^"]+)" href="([^"]+)"\/>/g)].map(match => `${match[1]}=${match[2]}`).sort().join(' ');
+    const pageAlternates = [...(languageLinks.get(url) || new Map())].map(([code, href]) => `${code}=${href}`).sort().join(' ');
+    if (alternates !== pageAlternates) errors.push(`Sitemap language versions differ from the page: ${url}`);
   }
   for (const url of urls.keys()) if (!sitemapURLs.includes(url)) errors.push(`Public page missing from sitemap: ${url}`);
   const seen = new Set(), queue = [`${site.origin}/`];

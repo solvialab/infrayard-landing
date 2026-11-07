@@ -21,8 +21,11 @@ The optional preview serves only on `http://127.0.0.1:4173/`. Localhost contact 
 
 | Source | Purpose |
 | --- | --- |
-| `src/index.html` | Landing structure and English copy |
+| `src/index.html`, `src/demo.html` | Landing and demo structure with English copy |
+| `src/sk/index.html`, `src/sk/demo.html` | Slovak landing and demo page, served under `/sk/` |
 | `content/site.mjs` | Shared prices, metadata, FAQ and docs navigation |
+| `content/sk.mjs` | Slovak metadata, FAQ and offers, and the list of pages that exist in both languages (hreflang, sitemap, EN/SK switch) |
+| `legal/*.html`, `sk/legal/*.html` | English and Slovak legal pages; the build regenerates their head, header, footer and breadcrumbs |
 | `content/docs/*.md` | Documentation; subscription copy is generated from shared prices |
 | `scripts/build.mjs` | Generates landing HTML, 12 static docs pages, section search, AI summaries and sitemap |
 | `content/seo.mjs`, `scripts/seo.mjs` | Shared search metadata, breadcrumbs, resource titles and demo publication metadata |
@@ -34,6 +37,8 @@ The optional preview serves only on `http://127.0.0.1:4173/`. Localhost contact 
 | `resources/*.html` | Educational articles |
 
 Run the build after changing source content. Commit generated pages and data with the source. Do not edit generated HTML directly. The landing page and docs have no remote CSS or client-side Markdown dependency.
+
+The landing, demo and legal pages exist in English and Slovak. When you change English copy in one of them, change the Slovak version too. The documentation and the resource guides are English only; their SK link leads to the Slovak landing page, and Slovak pages mark links to them with an `EN` tag.
 
 Resource and legal bodies remain editable HTML. The build refreshes their common search metadata and preserves the original resource publication dates. Edit resource search titles in `content/seo.mjs`. Update `site.updated` only for a substantive editorial change; it is not generated from the build time.
 

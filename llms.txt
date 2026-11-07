@@ -48,5 +48,6 @@ Business (one production and one test installation): EUR 3000 per month, billed 
 - [Product facts](https://www.infrayard.eu/ai.md)
 - [Privacy](https://www.infrayard.eu/legal/privacy.html)
 - [Legal notice](https://www.infrayard.eu/legal/terms.html)
+- [Slovak product page (Slovenská verzia)](https://www.infrayard.eu/sk/)
 
 Contact: hello@infrayard.eu
