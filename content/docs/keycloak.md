@@ -19,7 +19,7 @@ The token must contain `sub`, `preferred_username`, `email` and the roles or gro
 | --- | --- | --- |
 | Admin role | `admin` | Administration: all clusters, users, configuration, templates, requests and audit log |
 | Access role | none | When set, only users with this role (or the admin role) may use Infrayard. Others see "Your account is not allowed to use Infrayard" and are signed out |
-| Template roles | your choice, for example `testing`, `production` | Templates can require a role; only users holding it see the template |
+| Template roles | your choice, for example `testing`, `production` | Templates can require a role; only users holding it see the template. The name is typed by hand in the template and must match exactly; see [required role names](/docs/administration/#required-role-names) |
 
 In a shared company realm, choose names that cannot clash with existing roles, such as `infrayard-admin` and `infrayard-user`, and always set the access role. Without it, every account in the realm can sign in and create clusters within the default limits.
 

@@ -187,7 +187,7 @@
 </tr>
 <tr>
 <td>Required role</td>
-<td>Keycloak role (or group, depending on your role source) — only users with it can see and use the template. Leave empty for all users</td>
+<td>Keycloak role (or group, depending on your role source), typed by hand — only users with it can see and use the template. Leave empty for all users. See <a href="#required-role-names">required role names</a></td>
 </tr>
 <tr>
 <td>Sort order</td>
@@ -198,6 +198,15 @@
 <p>Template modal behavior: when a VM shape is selected, the K8s dropdown is filtered to versions OCI reports as compatible for that shape in the current region (node-image-backed compatibility). If compatibility lookup is unavailable, no fallback list is shown (fail-closed). Template save/update re-validates shape+K8s compatibility and blocks incompatible combinations.</p>
 <p><strong>Environment-tier gating</strong> — use <code>required_role</code> to control which teams can deploy which cluster sizes. For example, create a <code>DEV — Small</code> template visible to everyone, a <code>TEST — Medium</code> template requiring a <code>testing</code> role, a <code>UAT — Large</code> template requiring a <code>uat</code> role, and a <code>PROD — HA</code> template requiring a <code>production</code> role. Users only see the templates they have access to on the deploy form. Create the roles in Keycloak under <strong>Realm roles</strong> (or as client roles or groups, matching your <a href="/docs/keycloak/#roles">role source</a>) and assign them to the relevant users.</p>
 <p>Templates can be created, edited, enabled/disabled, and permanently deleted. Disabled templates no longer appear in the deploy form but remain referenced by existing clusters. Permanently deleting a template removes it from the admin panel entirely.</p>
+<h3 id="required-role-names">Required role names<a class="heading-link" href="#required-role-names" aria-label="Link to Required role names">#</a></h3>
+<p>Infrayard does not read the list of roles from Keycloak, so the template form has no role picker: you type the name.</p>
+<ul>
+<li>Type it exactly as it appears in Keycloak. Names are case-sensitive: <code>Production</code> and <code>production</code> are different roles.</li>
+<li>Infrayard saves any name without checking that the role exists. A misspelt name, or a role renamed later in Keycloak, hides the template from everyone, with no error message. If a template is missing, compare the two names first.</li>
+<li>A template takes one role. To show it to several teams, give them a shared role or group.</li>
+<li><strong>Admin → Templates</strong> lists every template. The deploy form shows administrators, like everyone else, only the templates whose role they hold. To check a template&#39;s visibility, sign in as a user with the role, or assign the role to yourself.</li>
+<li>A role assigned in Keycloak reaches the user with their next token, within a few minutes, or at once after they sign in again.</li>
+</ul>
 <h2 id="requests">Requests<a class="heading-link" href="#requests" aria-label="Link to Requests">#</a></h2>
 <p>Approval queue for user-submitted destroy requests on protection-enabled clusters and limit-increase requests for per-user overrides. The admin nav shows live request count badges that refresh every 5 seconds (hidden when zero pending). Filter by Pending / Approved / Denied / All. Each pending row has a <strong>Review</strong> action. When SMTP is configured, request submit/review events also send info-only email pings: admins get submit notifications, and users get submit/approve/deny notifications.</p>
 <p>For destroy requests, the review modal lets the admin:</p>

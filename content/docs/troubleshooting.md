@@ -35,7 +35,7 @@ Note the time and the exact error before you retry, and check what actually exis
 | "Your account is not allowed to use Infrayard" | The user lacks the access role (`requiredRole`). Assign it in Keycloak; it takes effect at the next sign-in |
 | No **Admin** menu | The user lacks the admin role, or `rolesClaim` points to the wrong claim |
 | Sign-in works but data does not load | The issuer setting does not match the token. See [Keycloak troubleshooting](/docs/keycloak/#troubleshooting) |
-| A template is missing for a user | The template requires a role the user does not hold |
+| A template is missing for a user | The template requires a role the user does not hold, or its role name differs from the one in Keycloak. Names are case-sensitive and are not checked when the template is saved. The deploy form hides such templates from administrators too. See [required role names](/docs/administration/#required-role-names) |
 | A role change has no effect | Roles are read from the token; the user gets the change with the next token, within the token lifetime (5 minutes by default) |
 | "Invalid username or password" although the password is right | After 5 failed sign-ins the bundled Keycloak locks the account for a minute or longer and shows the same message meanwhile. To unlock it at once, open the user in the Keycloak admin console and turn off **Temporarily locked** |
 | Keycloak refuses a new password | Passwords need at least 12 characters and must differ from the user name, the e-mail and the last five passwords |

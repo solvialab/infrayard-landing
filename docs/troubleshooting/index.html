@@ -156,7 +156,7 @@ kubectl logs -n infrayard deploy/infrayard-api --tail=200
 </tr>
 <tr>
 <td>A template is missing for a user</td>
-<td>The template requires a role the user does not hold</td>
+<td>The template requires a role the user does not hold, or its role name differs from the one in Keycloak. Names are case-sensitive and are not checked when the template is saved. The deploy form hides such templates from administrators too. See <a href="/docs/administration/#required-role-names">required role names</a></td>
 </tr>
 <tr>
 <td>A role change has no effect</td>

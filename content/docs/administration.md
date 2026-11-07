@@ -72,7 +72,7 @@ Dedicated admin page for creating and managing cluster templates — pre-configu
 | Tier default | Suggested cluster tier — Basic or Enhanced (suggestion only, not enforced) |
 | TTL | Optional time-to-live in hours — when reached, Infrayard automatically starts cluster destroy/cleanup |
 | Destroy protection | When enabled, the "Destroy" button on the user's cluster opens a "Request destroy" modal instead. Requests land in Admin → Requests (with a live count badge in the nav) where an admin approves, reviews the destroy plan, then confirms force-destroy, or denies with a note |
-| Required role | Keycloak role (or group, depending on your role source) — only users with it can see and use the template. Leave empty for all users |
+| Required role | Keycloak role (or group, depending on your role source), typed by hand — only users with it can see and use the template. Leave empty for all users. See [required role names](#required-role-names) |
 | Sort order | Controls display position in the deploy form (lower numbers appear first) |
 
 The templates table shows estimated monthly and hourly cost per template. The add/edit modal includes a live cost preview that updates as you change pools, shape, or tier.
@@ -82,6 +82,16 @@ Template modal behavior: when a VM shape is selected, the K8s dropdown is filter
 **Environment-tier gating** — use `required_role` to control which teams can deploy which cluster sizes. For example, create a `DEV — Small` template visible to everyone, a `TEST — Medium` template requiring a `testing` role, a `UAT — Large` template requiring a `uat` role, and a `PROD — HA` template requiring a `production` role. Users only see the templates they have access to on the deploy form. Create the roles in Keycloak under **Realm roles** (or as client roles or groups, matching your [role source](/docs/keycloak/#roles)) and assign them to the relevant users.
 
 Templates can be created, edited, enabled/disabled, and permanently deleted. Disabled templates no longer appear in the deploy form but remain referenced by existing clusters. Permanently deleting a template removes it from the admin panel entirely.
+
+### Required role names
+
+Infrayard does not read the list of roles from Keycloak, so the template form has no role picker: you type the name.
+
+- Type it exactly as it appears in Keycloak. Names are case-sensitive: `Production` and `production` are different roles.
+- Infrayard saves any name without checking that the role exists. A misspelt name, or a role renamed later in Keycloak, hides the template from everyone, with no error message. If a template is missing, compare the two names first.
+- A template takes one role. To show it to several teams, give them a shared role or group.
+- **Admin → Templates** lists every template. The deploy form shows administrators, like everyone else, only the templates whose role they hold. To check a template's visibility, sign in as a user with the role, or assign the role to yourself.
+- A role assigned in Keycloak reaches the user with their next token, within a few minutes, or at once after they sign in again.
 
 ## Requests
 
