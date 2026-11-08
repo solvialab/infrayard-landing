@@ -1,6 +1,7 @@
 (() => {
   // Preserve links from the previous two-page, hash-routed documentation.
-  const hash = decodeURIComponent(location.hash.slice(1));
+  // section-links.js has already taken the hash out of the address.
+  const hash = window.__initialSection ?? decodeURIComponent(location.hash.slice(1));
   if (!hash) return;
   const parts = hash.split('/');
   const page = parts[0];

@@ -7,7 +7,7 @@ import { checkSEO } from './check-seo.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const errors = [];
-for (const script of ['assets/site.js', 'assets/image-viewer.js', 'assets/docs.js', 'assets/docs-legacy.js', 'assets/theme.js', 'assets/contact-request.js', 'scripts/build.mjs', 'scripts/templates.mjs', 'scripts/preview.mjs', 'scripts/seo.mjs', 'scripts/check-seo.mjs', 'scripts/export.mjs', 'scripts/indexnow.mjs']) {
+for (const script of ['assets/site.js', 'assets/image-viewer.js', 'assets/docs.js', 'assets/docs-legacy.js', 'assets/theme.js', 'assets/section-links.js', 'assets/contact-request.js', 'scripts/build.mjs', 'scripts/templates.mjs', 'scripts/preview.mjs', 'scripts/seo.mjs', 'scripts/check-seo.mjs', 'scripts/export.mjs', 'scripts/indexnow.mjs']) {
   const result = spawnSync(process.execPath, ['--check', resolve(root, script)], { encoding: 'utf8' });
   if (result.status !== 0) errors.push(`JavaScript syntax error in ${script}: ${result.stderr}`);
 }

@@ -201,7 +201,7 @@ for (let pageIndex = 0; pageIndex < docs.length; pageIndex++) {
   const articleData = graph({ path: url, title, description, crumbs, article: { type: 'TechArticle', headline: page.slug ? page.title : 'Infrayard documentation' } });
   pageRecords.push({ path: url, modified: site.updated });
   const output = `${generated}<!doctype html>
-<html lang="en" class="docs-root"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">${head({ path: url, title, description, type: 'article', data: articleData })}<script src="/assets/theme.js"></script><link rel="stylesheet" href="/assets/site.css"><link rel="stylesheet" href="/assets/docs.css"><script type="module" src="/assets/site.js"></script><script defer src="/assets/docs.js"></script>${page.slug === '' ? '<script defer src="/assets/docs-legacy.js"></script>' : ''}</head>
+<html lang="en" class="docs-root"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">${head({ path: url, title, description, type: 'article', data: articleData })}<script src="/assets/section-links.js"></script><script src="/assets/theme.js"></script><link rel="stylesheet" href="/assets/site.css"><link rel="stylesheet" href="/assets/docs.css"><script type="module" src="/assets/site.js"></script><script defer src="/assets/docs.js"></script>${page.slug === '' ? '<script defer src="/assets/docs-legacy.js"></script>' : ''}</head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
   ${docsHeader}
