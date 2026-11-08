@@ -65,7 +65,7 @@ The shared source of truth is `content/site.mjs`. Customer-facing details are in
 
 Workflow cards link to full-HD frames in a keyboard-accessible viewport viewer, with image navigation, actual-size zoom and native image-link fallbacks. Preview images retain the original 16:9 proportions. The website uses self-hosted Inter 4.1 fonts; their OFL licence is included under `assets/fonts/`.
 
-The landing player uses `assets/infrayard-demo-with-music.mp4`, with quiet instrumental music and gentle fades. The original `assets/final_hq_infrayard.mp4` is preserved; the new version copies its video stream without re-encoding. Music attribution, licensing, sharing credit and optional offline rebuild instructions are in [the music credits](assets/music/credits.md). Keep that credit when reusing the video on another platform.
+The landing player uses `assets/infrayard-demo-with-music.mp4`, with quiet instrumental music and gentle fades. The original `assets/final_hq_infrayard.mp4` is preserved; the new version copies its video stream without re-encoding. The music's source, licence and optional offline rebuild instructions are in [the music notes](assets/music/credits.md). The licence needs no credit on the website.
 
 ## Documentation
 

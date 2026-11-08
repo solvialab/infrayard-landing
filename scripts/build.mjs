@@ -6,7 +6,7 @@ import { site, pricing, faqs, docs, money } from '../content/site.mjs';
 import { escapeHtml as e, jsonScript, header, docsHeader, docsSidebarLinks, docsFooter, footer, contactDialog, legalHeader, legalFooter, langSwitch, skOnlyLandingNote, englishTag, ui } from './templates.mjs';
 import { demo, docsTitles, docsDescriptions, resourceTitles, robotsRules, indexNowKey } from '../content/seo.mjs';
 import { skSite, skDemo, skFaqs, skOffers, skService, alternatesFor, languageOf } from '../content/sk.mjs';
-import { head, graph, breadcrumb, videoCredit, absolute, organization } from './seo.mjs';
+import { head, graph, breadcrumb, absolute, organization } from './seo.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const read = path => readFile(resolve(root, path), 'utf8');
@@ -46,7 +46,7 @@ for (const [lang, page] of Object.entries(landings)) {
   structuredData['@graph'].find(node => node['@type'] === 'WebPage').mainEntity = { '@id': absolute(home + '#subscription') };
   const values = {
     header: header({ lang, other: otherVersion(home, lang) }), footer: footer(lang), contactDialog: contactDialog(lang),
-    pricingData: jsonScript(pricing), videoCredit: videoCredit(lang),
+    pricingData: jsonScript(pricing),
     seoHead: head({ path: home, title: page.title, description: page.description, data: structuredData, preloadPoster: true, lang, alternates: alternatesFor(home) }),
     businessMonthly: amount(pricing.business.monthly), businessAnnual: amount(pricing.business.annual),
     foundingMonthly: amount(pricing.founding.monthly), foundingAnnual: amount(pricing.founding.annual),
@@ -62,7 +62,7 @@ for (const [lang, page] of Object.entries(landings)) {
 for (const [lang, page, source, output] of [['en', demo, 'src/demo.html', 'demo/index.html'], ['sk', { ...demo, ...skDemo }, 'src/sk/demo.html', 'sk/demo/index.html']]) {
   const crumbs = [homeCrumb(lang), [lang === 'sk' ? 'Ukážka produktu' : 'Product demo', page.path]];
   const values = {
-    header: header({ lang, base: ui[lang].home, other: otherVersion(page.path, lang) }), footer: footer(lang), contactDialog: contactDialog(lang), videoCredit: videoCredit(lang),
+    header: header({ lang, base: ui[lang].home, other: otherVersion(page.path, lang) }), footer: footer(lang), contactDialog: contactDialog(lang),
     breadcrumbs: breadcrumb(crumbs, 'docs-breadcrumb', ui[lang].breadcrumb),
     seoHead: head({ path: page.path, title: page.title, description: page.description, data: graph({ path: page.path, title: page.title, description: page.description, crumbs, lang }), preloadPoster: true, lang, alternates: alternatesFor(page.path) }),
   };

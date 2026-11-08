@@ -13,16 +13,16 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 SOURCE = ROOT / "assets/final_hq_infrayard.mp4"
 OUTPUT = ROOT / "assets/infrayard-demo-with-music.mp4"
-MUSIC_SHA256 = "f12cbb52bd4b92bd6cf8a343645567c119627e9cbf98108a3eb6ac2cc275ee46"
-CREDIT = (
-    'Music: "Dream Culture" by Kevin MacLeod (incompetech.com), '
-    "https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1300046. "
-    "Licensed under CC BY 4.0, https://creativecommons.org/licenses/by/4.0/. "
+MUSIC_SHA256 = "0abfb7007442c8f10335af1f0262b0b0c9b5ddfa637c5aacafe69c00a14ed31c"
+SOURCE_NOTE = (
+    'Music: "Summer Adventures" by SergePavkinMusic, '
+    "https://pixabay.com/music/corporate-summer-adventures-115949/. "
+    "Pixabay Content License, https://pixabay.com/service/license-summary/. "
     "Changes: excerpt, reduced volume, fade in and fade out."
 )
 
-parser = argparse.ArgumentParser(description="Add the credited instrumental to the original demo, preserving video packets.")
-parser.add_argument("--music", type=Path, required=True, help="Official Dream Culture.mp3 download; see assets/music/credits.md")
+parser = argparse.ArgumentParser(description="Add the instrumental to the original demo, preserving video packets.")
+parser.add_argument("--music", type=Path, required=True, help="Pixabay download of Summer Adventures; see assets/music/credits.md")
 parser.add_argument("--ffmpeg", help="FFmpeg executable; otherwise use PATH or optional local imageio-ffmpeg")
 args = parser.parse_args()
 ffmpeg = args.ffmpeg or shutil.which("ffmpeg")
@@ -34,7 +34,7 @@ if not ffmpeg:
     except ImportError:
         parser.error("Supply --ffmpeg or install FFmpeg. Website builds do not need this optional tool.")
 if hashlib.sha256(args.music.read_bytes()).hexdigest() != MUSIC_SHA256:
-    parser.error("Music does not match the verified official download. Check its provenance and credit before replacing it.")
+    parser.error("Music does not match the verified download. Check its provenance and licence before replacing it.")
 
 
 def run(*options):
@@ -71,7 +71,7 @@ audio_filter = (
 run("-y", "-i", SOURCE, "-i", args.music, "-map", "0:v:0", "-map", "1:a:0",
     "-c:v", "copy", "-af", audio_filter, "-c:a", "aac", "-b:a", "160k", "-ac", "2",
     "-t", f"{duration:.6f}", "-map_metadata", "0", "-metadata", "title=Infrayard product walkthrough",
-    "-metadata", f"comment={CREDIT}", "-metadata:s:a:0", "handler_name=Instrumental music",
+    "-metadata", f"comment={SOURCE_NOTE}", "-metadata:s:a:0", "handler_name=Instrumental music",
     "-movflags", "+faststart", OUTPUT)
 if video_signature(OUTPUT) != original:
     raise RuntimeError("Video packet data, timing or dimensions changed.")

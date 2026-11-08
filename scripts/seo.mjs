@@ -106,9 +106,3 @@ export function head({ path, title, description, type = 'website', data, preload
 export function breadcrumb(crumbs, className = 'docs-breadcrumb', label = 'Breadcrumb') {
   return `<nav class="${className}" aria-label="${label}">${crumbs.map(([name, href], index) => `${index ? '<span aria-hidden="true">/</span>' : ''}${index === crumbs.length - 1 ? `<span aria-current="page">${e(name)}</span>` : `<a href="${href}">${e(name)}</a>`}`).join('')}</nav>`;
 }
-
-const credit = {
-  en: ['Music', 'Trimmed, volume adjusted and faded.'],
-  sk: ['Hudba', 'Skrátené, s upravenou hlasitosťou a postupným stlmením.'],
-};
-export const videoCredit = (lang = 'en') => `<span class="video-music-credit">${credit[lang][0]}: <a href="https://incompetech.com/music/royalty-free/index.html?isrc=USUAN1300046">Dream Culture — Kevin MacLeod</a> · <a href="https://creativecommons.org/licenses/by/4.0/" rel="license">CC BY 4.0</a>. ${credit[lang][1]}</span>`;
