@@ -162,7 +162,7 @@ kubectl rollout status -n infrayard deploy/infrayard-api --timeout=180s
 <ol>
 <li>Read the release notes of the target version, especially for steps marked as required.</li>
 <li>Take a <a href="#backups">database backup</a>.</li>
-<li>Make sure no cluster operation is running (<strong>Admin → All Clusters</strong>).</li>
+<li>Make sure no cluster operation is running (<strong>Admin → All Clusters</strong>). A Kubernetes upgrade of an Enhanced cluster is running until every worker is replaced.</li>
 </ol>
 <p>The API applies database changes automatically when it starts. They cannot be undone by downgrading; a rollback means restoring the backup.</p>
 <pre><code class="language-bash">helm upgrade infrayard oci://registry.gitlab.com/solvialab/infrayard/charts/infrayard \

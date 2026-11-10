@@ -10,7 +10,7 @@ A full view of every cluster across all users — status, owner, CIDR, K8s versi
 
 - Click **Details** on any cluster to open its full detail view including kubeconfig and SSH key download
 - Click **Scale** on Active/Error clusters to adjust pools, nodes, and per-node resources
-- Click **Upgrade k8s** on Active/Error clusters to upgrade Kubernetes version
+- Click **Upgrade k8s** on running clusters to upgrade Kubernetes version
 - Click **Destroy** to destroy any cluster regardless of owner
 - Click **View logs** while an operation is running or after a failure
 - Click **New Cluster** to provision a cluster outside of normal user quotas
@@ -40,7 +40,7 @@ Platform-wide settings manageable at runtime — no redeployment needed:
 | OCPU / RAM / Storage | Max compute per node |
 | CIDR pool | Add, remove, and enable/disable /24 ranges available for cluster allocation |
 | VM shapes | Sync from OCI, plus add/remove/enable/disable shapes in the deploy form. Regular users can deploy only enabled shapes; while none is enabled, only administrators can deploy |
-| K8s versions | Add, remove, and enable/disable Kubernetes versions |
+| K8s versions | Add, remove, and enable/disable Kubernetes versions. Versions with patch number `0`, such as `1.37.0`, are Oracle preview releases and are marked **Preview** |
 | Node images | Add, remove, and enable/disable OCI compute images for worker node pools |
 
 > Note: Shape and image availability is region- and tenancy-specific. In **Admin → Configuration**, use **Sync from OCI** in the VM Shapes section first, then curate/label as needed. For CLI verification, fetch current OKE node pool options in the target region:
@@ -89,6 +89,7 @@ Infrayard does not read the list of roles from Keycloak, so the template form ha
 
 - Type it exactly as it appears in Keycloak. Names are case-sensitive: `Production` and `production` are different roles.
 - Infrayard saves any name without checking that the role exists. A misspelt name, or a role renamed later in Keycloak, hides the template from everyone, with no error message. If a template is missing, compare the two names first.
+- The role must come from the source Infrayard reads, by default realm roles. A client role with the same name does not count, and the template stays hidden. See [roles](/docs/keycloak/#roles).
 - A template takes one role. To show it to several teams, give them a shared role or group.
 - **Admin → Templates** lists every template. The deploy form shows administrators, like everyone else, only the templates whose role they hold. To check a template's visibility, sign in as a user with the role, or assign the role to yourself.
 - A role assigned in Keycloak reaches the user with their next token, within a few minutes, or at once after they sign in again.

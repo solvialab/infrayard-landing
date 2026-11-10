@@ -68,7 +68,7 @@ Before you start:
 
 1. Read the release notes of the target version, especially for steps marked as required.
 2. Take a [database backup](#backups).
-3. Make sure no cluster operation is running (**Admin → All Clusters**).
+3. Make sure no cluster operation is running (**Admin → All Clusters**). A Kubernetes upgrade of an Enhanced cluster is running until every worker is replaced.
 
 The API applies database changes automatically when it starts. They cannot be undone by downgrading; a rollback means restoring the backup.
 

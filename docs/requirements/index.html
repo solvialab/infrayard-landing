@@ -192,6 +192,8 @@
 <h2 id="oke-versions-shapes-and-images">OKE versions, shapes and images<a class="heading-link" href="#oke-versions-shapes-and-images" aria-label="Link to OKE versions, shapes and images">#</a></h2>
 <p>Which Kubernetes versions, shapes and node images exist depends on your region and tenancy. Administrators sync them from OCI in <strong>Admin → Configuration</strong> and enable what users may choose. Newly synced Kubernetes versions stay disabled until an administrator enables them.</p>
 <p>The deploy and template forms only offer Kubernetes versions that have a node image for the selected shape. If Infrayard cannot check this with OCI, deployment is blocked rather than allowing an unverified combination. See <a href="/docs/troubleshooting/#missing-versions-or-shapes">troubleshooting</a>.</p>
+<p>A version with patch number <code>0</code>, such as <code>1.37.0</code>, is an Oracle preview release with limited support and is not recommended for production. Infrayard marks these versions as preview in the portal.</p>
+<p>When no node image is selected, Infrayard picks the newest OKE image for the Kubernetes minor version and the shape&#39;s architecture: by date, then build, then Oracle Linux version.</p>
 <h2 id="basic-and-enhanced-clusters">Basic and Enhanced clusters<a class="heading-link" href="#basic-and-enhanced-clusters" aria-label="Link to Basic and Enhanced clusters">#</a></h2>
 <p>The platform can allow Basic, Enhanced or both OKE cluster types. These are Oracle service tiers, separate from Infrayard subscription plans.</p>
 <div class="table-wrap" tabindex="0" role="region" aria-label="Scrollable reference table"><table>
@@ -209,13 +211,13 @@
 </tr>
 <tr>
 <td>Change a pool&#39;s shape, OCPUs, memory or storage</td>
-<td>Needs rolling worker cycling</td>
-<td>Automatic rollout</td>
+<td>Needs <a href="/docs/cluster-lifecycle/#replace-workers-in-a-basic-cluster">worker replacement</a> in the OCI Console</td>
+<td>Needs <a href="/docs/cluster-lifecycle/#cycle-workers-in-an-enhanced-cluster">node pool cycling</a> in the OCI Console</td>
 </tr>
 <tr>
 <td>Kubernetes upgrade</td>
-<td>Control plane first, then a rolling worker refresh</td>
-<td>Automatic control plane and worker rollout</td>
+<td>Control plane first, then <a href="/docs/cluster-lifecycle/#replace-workers-in-a-basic-cluster">worker replacement</a> in the OCI Console</td>
+<td>Automatic: control plane first, then <a href="/docs/cluster-lifecycle/#automatic-worker-replacement-in-an-enhanced-cluster">rolling worker replacement</a>. Needs room for one extra node per pool</td>
 </tr>
 <tr>
 <td>OCI control-plane charges</td>

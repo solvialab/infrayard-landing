@@ -236,6 +236,10 @@ Which Kubernetes versions, shapes and node images exist depends on your region a
 
 The deploy and template forms only offer Kubernetes versions that have a node image for the selected shape. If Infrayard cannot check this with OCI, deployment is blocked rather than allowing an unverified combination. See [troubleshooting](https://www.infrayard.eu/docs/troubleshooting/#missing-versions-or-shapes).
 
+A version with patch number `0`, such as `1.37.0`, is an Oracle preview release with limited support and is not recommended for production. Infrayard marks these versions as preview in the portal.
+
+When no node image is selected, Infrayard picks the newest OKE image for the Kubernetes minor version and the shape's architecture: by date, then build, then Oracle Linux version.
+
 ### Basic and Enhanced clusters
 
 The platform can allow Basic, Enhanced or both OKE cluster types. These are Oracle service tiers, separate from Infrayard subscription plans.
@@ -243,8 +247,8 @@ The platform can allow Basic, Enhanced or both OKE cluster types. These are Orac
 | Operation | Basic | Enhanced |
 | --- | --- | --- |
 | Add or remove nodes and pools | Automatic | Automatic |
-| Change a pool's shape, OCPUs, memory or storage | Needs rolling worker cycling | Automatic rollout |
-| Kubernetes upgrade | Control plane first, then a rolling worker refresh | Automatic control plane and worker rollout |
+| Change a pool's shape, OCPUs, memory or storage | Needs [worker replacement](https://www.infrayard.eu/docs/cluster-lifecycle/#replace-workers-in-a-basic-cluster) in the OCI Console | Needs [node pool cycling](https://www.infrayard.eu/docs/cluster-lifecycle/#cycle-workers-in-an-enhanced-cluster) in the OCI Console |
+| Kubernetes upgrade | Control plane first, then [worker replacement](https://www.infrayard.eu/docs/cluster-lifecycle/#replace-workers-in-a-basic-cluster) in the OCI Console | Automatic: control plane first, then [rolling worker replacement](https://www.infrayard.eu/docs/cluster-lifecycle/#automatic-worker-replacement-in-an-enhanced-cluster). Needs room for one extra node per pool |
 | OCI control-plane charges | Oracle's Basic pricing | Oracle's Enhanced pricing |
 
 See [cluster lifecycle](https://www.infrayard.eu/docs/cluster-lifecycle/#cluster-tiers) for the steps.
@@ -1440,30 +1444,48 @@ The admin configures which cluster tier(s) the platform allows: **Basic only**, 
 | | Basic | Enhanced |
 |---|---|---|
 | Cost | Free | Oracle's current Enhanced control-plane rate |
-| Node scaling | ⚠️ Full — add/remove nodes or pools is automatic; resource-profile changes require manual cycling | ✅ Full in-place |
+| Node scaling | ⚠️ Full — add/remove nodes or pools is automatic; resource-profile changes require manual replacement | ✅ Full — add/remove nodes or pools is automatic; resource-profile changes require node pool cycling |
 | Cluster Autoscaler | ❌ | ✅ |
 | Best for | Dev/test, cost-sensitive teams | Production, automated scaling |
 
-**Basic cluster scaling:** Both Basic and Enhanced clusters support full scaling — nodes, OCPU, RAM, and storage. In Basic clusters, adding/removing nodes or node pools is automatic and does not require manual rotation. Manual cycling is required when changing per-node resources (shape, OCPU, RAM, storage), and is also recommended after a Kubernetes upgrade so workers pick up the new target image/version.
-
-**OKE → Cluster → Node Pool → Nodes → Cordon & drain → Terminate**
-
-Recommended rolling cycle for each affected Basic node pool (current size = `N`):
-1. Scale from `N` to `2N`
-2. Wait until the additional `N` nodes are `Ready/Active`
-3. Scale back from `2N` to `N` (OKE removes extra nodes automatically)
-4. Verify workloads and node health before moving to the next pool
-
-The portal shows tier-specific warnings/messages for this flow.
+**Basic cluster scaling:** Both Basic and Enhanced clusters support full scaling — nodes, OCPU, RAM, and storage. In Basic clusters, adding/removing nodes or node pools is automatic and does not require manual rotation. Changes to per-node resources (shape, OCPU, RAM, storage) and Kubernetes upgrades reach only new workers. Existing workers keep their old settings until you [replace them](#replace-workers-in-a-basic-cluster). In Enhanced clusters a Kubernetes upgrade replaces the workers automatically; after a change of per-node resources you [cycle the node pool](#cycle-workers-in-an-enhanced-cluster).
 
 **Kubernetes version upgrades:** Use **Upgrade k8s** on a running cluster. This updates the control plane and node-pool target Kubernetes/image configuration:
 - Direct upgrades are limited to the same or next minor version (for example `1.33.x -> 1.34.x`; not `1.33.x -> 1.35.x`).
-- Basic: perform rolling worker refresh per pool (`N -> 2N -> N`) after nodes become `Ready/Active`; the Upgrade modal shows live per-pool steps based on current node counts.
-- Enhanced: rollout is fully automated (control plane plus worker refresh), no manual cycling required.
+- Basic: existing workers keep the old version. After the upgrade, [replace them](#replace-workers-in-a-basic-cluster) one node pool at a time.
+- Enhanced: Infrayard [replaces the workers](#automatic-worker-replacement-in-an-enhanced-cluster) after the control plane. The upgrade finishes when every worker runs the new version.
 
 **Switching tiers:** Admins can switch the platform tier at any time in Configuration — Basic, Enhanced, or Both. The change applies to all new clusters; existing clusters retain the tier they were provisioned with.
 
 **Per-user tier override:** Admins can pin a specific user to Basic or to Enhanced, regardless of the global setting. The override is force-only (single tier per user); a user without an override inherits whatever the global setting allows, including the per-cluster picker when the global is **Both**.
+
+#### Replace workers in a Basic cluster
+
+Replace the workers in the OCI Console, one node pool at a time. `N` is the pool's current node count.
+
+1. Open the cluster, then **Node pools**, then the pool, and choose **Edit**. Raise **Node count** from `N` to `2N` and save.
+2. Wait until the `N` new nodes are `Active` and `Ready`. New nodes use the pool's current version and resources.
+3. On the **Nodes** tab, open the actions menu (three dots) of one old node and choose **Delete node**. Select **Decrease node pool size**, keep **Eviction grace period** above 0 so the node is cordoned and drained, and confirm.
+4. Wait until that node is gone and its workloads run elsewhere. Repeat step 3 for each remaining old node.
+5. The pool is now back at `N`. Check with `kubectl get nodes` that every node shows the expected version, then continue with the next pool.
+
+> Do not lower **Node count** back to `N` to remove the old nodes. OKE then deletes the new nodes and keeps the old ones. The Upgrade and Scale dialogs of Infrayard up to 1.0.3 suggest this shortcut; do not follow it.
+
+Infrayard still records the pool at `N` during these steps, so do not run **Scale** on the cluster until you finish. It would set the pool back to `N` and remove nodes.
+
+#### Cycle workers in an Enhanced cluster
+
+After a change of per-node resources, Infrayard updates the node pool but does not replace its workers. Cycle each node pool in the OCI Console, one pool at a time. Use the same steps to finish a Kubernetes upgrade whose [automatic worker replacement](#automatic-worker-replacement-in-an-enhanced-cluster) did not complete.
+
+1. Open the cluster, then **Node pools**, then the pool, and choose **Cycle nodes** from the **Actions** menu.
+2. Select **Replace nodes**.
+3. Set **Maximum surge** to `1` and **Maximum unavailable** to `0`, both as **Integer**.
+4. Start the cycle and follow it on the **Work requests** tab.
+5. Check with `kubectl get nodes` that every node shows the expected version, then continue with the next pool.
+
+With these values OKE adds one new node first. When it is active, OKE cordons, drains and removes one old node, so the pool never drops below its size. A higher **Maximum surge** finishes sooner but adds more temporary nodes and cost. A **Maximum unavailable** above `0` removes old nodes before their replacements are ready, so capacity drops during the cycle.
+
+A PodDisruptionBudget can block the drain of a node. If a node cannot be drained within the eviction grace period, 60 minutes by default, the node pool shows **Needs attention**. Do not run **Scale** or **Upgrade** in Infrayard until the cycle finishes.
 
 ### Kubernetes upgrades
 
@@ -1471,10 +1493,17 @@ The portal shows tier-specific warnings/messages for this flow.
 - **Shape-aware + allowlist-aware** — upgrade options are filtered to OCI-compatible versions enabled by admin config
 - **Sequential minors only** — direct upgrades allow same/next minor only; skip-minor upgrades are blocked with explicit error
 - **Control plane + node-pool target update** — upgrade action updates cluster Kubernetes and node-pool target version/image
-- **Basic upgrade behavior** — perform rolling worker refresh per pool (`N -> 2N -> N`) after new nodes are `Ready/Active`
-- **Enhanced upgrade behavior** — fully automated rollout (control plane + workers), no manual cycling required
+- **Basic upgrade behavior** — existing workers keep the old version until you [replace them](#replace-workers-in-a-basic-cluster)
+- **Enhanced upgrade behavior** — after the control plane, Infrayard replaces the workers of each node pool
 - **Tier guidance in UI** — Basic and Enhanced show upgrade-specific notes with rollout guidance
-- **Dynamic Basic rollout guidance** — Basic upgrade modal reads live pool/node counts and renders exact per-pool steps (for example `1 -> 2 -> 1` or `3 -> 6 -> 3`) instead of a static example
+
+#### Automatic worker replacement in an Enhanced cluster
+
+During a Kubernetes upgrade of an Enhanced cluster, Infrayard turns on node pool cycling with **Maximum surge** `1` and **Maximum unavailable** `0`. Each pool gets one extra node. When it is active, OKE cordons, drains and removes one old node, and repeats this until every worker is replaced. Pools are replaced at the same time, so the tenancy needs room for one extra node per pool. Each extra node is billed while it runs.
+
+The cluster stays in the upgrading state, and the job stays open, until every worker is active on the new version. Plan several minutes per node on top of the control plane upgrade.
+
+If OKE reports a problem with a node pool, or nothing changes for too long, the job ends as failed. A PodDisruptionBudget that blocks a drain and a tenancy without capacity for the extra node are the usual causes. The control plane is upgraded, the cluster keeps running, and the workers that were not replaced keep the old version. Fix the cause, then [cycle the node pool](#cycle-workers-in-an-enhanced-cluster) in the OCI Console.
 
 ### Expiry and cleanup
 
@@ -1499,7 +1528,7 @@ A full view of every cluster across all users — status, owner, CIDR, K8s versi
 
 - Click **Details** on any cluster to open its full detail view including kubeconfig and SSH key download
 - Click **Scale** on Active/Error clusters to adjust pools, nodes, and per-node resources
-- Click **Upgrade k8s** on Active/Error clusters to upgrade Kubernetes version
+- Click **Upgrade k8s** on running clusters to upgrade Kubernetes version
 - Click **Destroy** to destroy any cluster regardless of owner
 - Click **View logs** while an operation is running or after a failure
 - Click **New Cluster** to provision a cluster outside of normal user quotas
@@ -1529,7 +1558,7 @@ Platform-wide settings manageable at runtime — no redeployment needed:
 | OCPU / RAM / Storage | Max compute per node |
 | CIDR pool | Add, remove, and enable/disable /24 ranges available for cluster allocation |
 | VM shapes | Sync from OCI, plus add/remove/enable/disable shapes in the deploy form. Regular users can deploy only enabled shapes; while none is enabled, only administrators can deploy |
-| K8s versions | Add, remove, and enable/disable Kubernetes versions |
+| K8s versions | Add, remove, and enable/disable Kubernetes versions. Versions with patch number `0`, such as `1.37.0`, are Oracle preview releases and are marked **Preview** |
 | Node images | Add, remove, and enable/disable OCI compute images for worker node pools |
 
 > Note: Shape and image availability is region- and tenancy-specific. In **Admin → Configuration**, use **Sync from OCI** in the VM Shapes section first, then curate/label as needed. For CLI verification, fetch current OKE node pool options in the target region:
@@ -1578,6 +1607,7 @@ Infrayard does not read the list of roles from Keycloak, so the template form ha
 
 - Type it exactly as it appears in Keycloak. Names are case-sensitive: `Production` and `production` are different roles.
 - Infrayard saves any name without checking that the role exists. A misspelt name, or a role renamed later in Keycloak, hides the template from everyone, with no error message. If a template is missing, compare the two names first.
+- The role must come from the source Infrayard reads, by default realm roles. A client role with the same name does not count, and the template stays hidden. See [roles](https://www.infrayard.eu/docs/keycloak/#roles).
 - A template takes one role. To show it to several teams, give them a shared role or group.
 - **Admin → Templates** lists every template. The deploy form shows administrators, like everyone else, only the templates whose role they hold. To check a template's visibility, sign in as a user with the role, or assign the role to yourself.
 - A role assigned in Keycloak reaches the user with their next token, within a few minutes, or at once after they sign in again.
@@ -1694,7 +1724,7 @@ Before you start:
 
 1. Read the release notes of the target version, especially for steps marked as required.
 2. Take a [database backup](#backups).
-3. Make sure no cluster operation is running (**Admin → All Clusters**).
+3. Make sure no cluster operation is running (**Admin → All Clusters**). A Kubernetes upgrade of an Enhanced cluster is running until every worker is replaced.
 
 The API applies database changes automatically when it starts. They cannot be undone by downgrading; a rollback means restoring the backup.
 
@@ -1828,7 +1858,7 @@ Note the time and the exact error before you retry, and check what actually exis
 | "Your account is not allowed to use Infrayard" | The user lacks the access role (`requiredRole`). Assign it in Keycloak; it takes effect at the next sign-in |
 | No **Admin** menu | The user lacks the admin role, or `rolesClaim` points to the wrong claim |
 | Sign-in works but data does not load | The issuer setting does not match the token. See [Keycloak troubleshooting](https://www.infrayard.eu/docs/keycloak/#troubleshooting) |
-| A template is missing for a user | The template requires a role the user does not hold, or its role name differs from the one in Keycloak. Names are case-sensitive and are not checked when the template is saved. The deploy form hides such templates from administrators too. See [required role names](https://www.infrayard.eu/docs/administration/#required-role-names) |
+| A template is missing for a user | The template requires a role the user does not hold, or its role name differs from the one in Keycloak. Names are case-sensitive and are not checked when the template is saved. The role must also come from the source Infrayard reads, by default realm roles, so a client role with the same name does not count. The deploy form hides such templates from administrators too. See [required role names](https://www.infrayard.eu/docs/administration/#required-role-names) |
 | A role change has no effect | Roles are read from the token; the user gets the change with the next token, within the token lifetime (5 minutes by default) |
 | "Invalid username or password" although the password is right | After 5 failed sign-ins the bundled Keycloak locks the account for a minute or longer and shows the same message meanwhile. To unlock it at once, open the user in the Keycloak admin console and turn off **Temporarily locked** |
 | Keycloak refuses a new password | Passwords need at least 12 characters and must differ from the user name, the e-mail and the last five passwords |
@@ -1869,7 +1899,9 @@ Check the global default, the user's own limit and the template. Users can reque
 
 ### A cluster operation fails
 
-Read the Terraform log, then check the resources in OCI. A failed deployment offers a cleanup action that removes partial resources; check what it will remove first. For Basic clusters, changes to nodes or a Kubernetes upgrade need a rolling worker refresh.
+Read the Terraform log, then check the resources in OCI. A failed deployment offers a cleanup action that removes partial resources; check what it will remove first. For Basic clusters, changes to per-node resources or a Kubernetes upgrade need a [worker replacement](https://www.infrayard.eu/docs/cluster-lifecycle/#replace-workers-in-a-basic-cluster).
+
+On an Enhanced cluster, a Kubernetes upgrade replaces the workers automatically. If its log ends with `Worker replacement failed`, the control plane is already upgraded and the cluster keeps running. Fix the cause and finish the replacement by hand; see [automatic worker replacement](https://www.infrayard.eu/docs/cluster-lifecycle/#automatic-worker-replacement-in-an-enhanced-cluster).
 
 Do not repair Infrayard-managed resources by hand in the OCI Console as a routine fix; the next Terraform run overwrites the changes. If you must intervene, contact support before running further operations on that cluster.
 

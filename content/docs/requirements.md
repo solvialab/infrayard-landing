@@ -64,6 +64,10 @@ Which Kubernetes versions, shapes and node images exist depends on your region a
 
 The deploy and template forms only offer Kubernetes versions that have a node image for the selected shape. If Infrayard cannot check this with OCI, deployment is blocked rather than allowing an unverified combination. See [troubleshooting](/docs/troubleshooting/#missing-versions-or-shapes).
 
+A version with patch number `0`, such as `1.37.0`, is an Oracle preview release with limited support and is not recommended for production. Infrayard marks these versions as preview in the portal.
+
+When no node image is selected, Infrayard picks the newest OKE image for the Kubernetes minor version and the shape's architecture: by date, then build, then Oracle Linux version.
+
 ## Basic and Enhanced clusters
 
 The platform can allow Basic, Enhanced or both OKE cluster types. These are Oracle service tiers, separate from Infrayard subscription plans.
@@ -71,8 +75,8 @@ The platform can allow Basic, Enhanced or both OKE cluster types. These are Orac
 | Operation | Basic | Enhanced |
 | --- | --- | --- |
 | Add or remove nodes and pools | Automatic | Automatic |
-| Change a pool's shape, OCPUs, memory or storage | Needs rolling worker cycling | Automatic rollout |
-| Kubernetes upgrade | Control plane first, then a rolling worker refresh | Automatic control plane and worker rollout |
+| Change a pool's shape, OCPUs, memory or storage | Needs [worker replacement](/docs/cluster-lifecycle/#replace-workers-in-a-basic-cluster) in the OCI Console | Needs [node pool cycling](/docs/cluster-lifecycle/#cycle-workers-in-an-enhanced-cluster) in the OCI Console |
+| Kubernetes upgrade | Control plane first, then [worker replacement](/docs/cluster-lifecycle/#replace-workers-in-a-basic-cluster) in the OCI Console | Automatic: control plane first, then [rolling worker replacement](/docs/cluster-lifecycle/#automatic-worker-replacement-in-an-enhanced-cluster). Needs room for one extra node per pool |
 | OCI control-plane charges | Oracle's Basic pricing | Oracle's Enhanced pricing |
 
 See [cluster lifecycle](/docs/cluster-lifecycle/#cluster-tiers) for the steps.

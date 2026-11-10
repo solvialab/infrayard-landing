@@ -65,30 +65,48 @@ The admin configures which cluster tier(s) the platform allows: **Basic only**, 
 | | Basic | Enhanced |
 |---|---|---|
 | Cost | Free | Oracle's current Enhanced control-plane rate |
-| Node scaling | ⚠️ Full — add/remove nodes or pools is automatic; resource-profile changes require manual cycling | ✅ Full in-place |
+| Node scaling | ⚠️ Full — add/remove nodes or pools is automatic; resource-profile changes require manual replacement | ✅ Full — add/remove nodes or pools is automatic; resource-profile changes require node pool cycling |
 | Cluster Autoscaler | ❌ | ✅ |
 | Best for | Dev/test, cost-sensitive teams | Production, automated scaling |
 
-**Basic cluster scaling:** Both Basic and Enhanced clusters support full scaling — nodes, OCPU, RAM, and storage. In Basic clusters, adding/removing nodes or node pools is automatic and does not require manual rotation. Manual cycling is required when changing per-node resources (shape, OCPU, RAM, storage), and is also recommended after a Kubernetes upgrade so workers pick up the new target image/version.
-
-**OKE → Cluster → Node Pool → Nodes → Cordon & drain → Terminate**
-
-Recommended rolling cycle for each affected Basic node pool (current size = `N`):
-1. Scale from `N` to `2N`
-2. Wait until the additional `N` nodes are `Ready/Active`
-3. Scale back from `2N` to `N` (OKE removes extra nodes automatically)
-4. Verify workloads and node health before moving to the next pool
-
-The portal shows tier-specific warnings/messages for this flow.
+**Basic cluster scaling:** Both Basic and Enhanced clusters support full scaling — nodes, OCPU, RAM, and storage. In Basic clusters, adding/removing nodes or node pools is automatic and does not require manual rotation. Changes to per-node resources (shape, OCPU, RAM, storage) and Kubernetes upgrades reach only new workers. Existing workers keep their old settings until you [replace them](#replace-workers-in-a-basic-cluster). In Enhanced clusters a Kubernetes upgrade replaces the workers automatically; after a change of per-node resources you [cycle the node pool](#cycle-workers-in-an-enhanced-cluster).
 
 **Kubernetes version upgrades:** Use **Upgrade k8s** on a running cluster. This updates the control plane and node-pool target Kubernetes/image configuration:
 - Direct upgrades are limited to the same or next minor version (for example `1.33.x -> 1.34.x`; not `1.33.x -> 1.35.x`).
-- Basic: perform rolling worker refresh per pool (`N -> 2N -> N`) after nodes become `Ready/Active`; the Upgrade modal shows live per-pool steps based on current node counts.
-- Enhanced: rollout is fully automated (control plane plus worker refresh), no manual cycling required.
+- Basic: existing workers keep the old version. After the upgrade, [replace them](#replace-workers-in-a-basic-cluster) one node pool at a time.
+- Enhanced: Infrayard [replaces the workers](#automatic-worker-replacement-in-an-enhanced-cluster) after the control plane. The upgrade finishes when every worker runs the new version.
 
 **Switching tiers:** Admins can switch the platform tier at any time in Configuration — Basic, Enhanced, or Both. The change applies to all new clusters; existing clusters retain the tier they were provisioned with.
 
 **Per-user tier override:** Admins can pin a specific user to Basic or to Enhanced, regardless of the global setting. The override is force-only (single tier per user); a user without an override inherits whatever the global setting allows, including the per-cluster picker when the global is **Both**.
+
+### Replace workers in a Basic cluster
+
+Replace the workers in the OCI Console, one node pool at a time. `N` is the pool's current node count.
+
+1. Open the cluster, then **Node pools**, then the pool, and choose **Edit**. Raise **Node count** from `N` to `2N` and save.
+2. Wait until the `N` new nodes are `Active` and `Ready`. New nodes use the pool's current version and resources.
+3. On the **Nodes** tab, open the actions menu (three dots) of one old node and choose **Delete node**. Select **Decrease node pool size**, keep **Eviction grace period** above 0 so the node is cordoned and drained, and confirm.
+4. Wait until that node is gone and its workloads run elsewhere. Repeat step 3 for each remaining old node.
+5. The pool is now back at `N`. Check with `kubectl get nodes` that every node shows the expected version, then continue with the next pool.
+
+> Do not lower **Node count** back to `N` to remove the old nodes. OKE then deletes the new nodes and keeps the old ones. The Upgrade and Scale dialogs of Infrayard up to 1.0.3 suggest this shortcut; do not follow it.
+
+Infrayard still records the pool at `N` during these steps, so do not run **Scale** on the cluster until you finish. It would set the pool back to `N` and remove nodes.
+
+### Cycle workers in an Enhanced cluster
+
+After a change of per-node resources, Infrayard updates the node pool but does not replace its workers. Cycle each node pool in the OCI Console, one pool at a time. Use the same steps to finish a Kubernetes upgrade whose [automatic worker replacement](#automatic-worker-replacement-in-an-enhanced-cluster) did not complete.
+
+1. Open the cluster, then **Node pools**, then the pool, and choose **Cycle nodes** from the **Actions** menu.
+2. Select **Replace nodes**.
+3. Set **Maximum surge** to `1` and **Maximum unavailable** to `0`, both as **Integer**.
+4. Start the cycle and follow it on the **Work requests** tab.
+5. Check with `kubectl get nodes` that every node shows the expected version, then continue with the next pool.
+
+With these values OKE adds one new node first. When it is active, OKE cordons, drains and removes one old node, so the pool never drops below its size. A higher **Maximum surge** finishes sooner but adds more temporary nodes and cost. A **Maximum unavailable** above `0` removes old nodes before their replacements are ready, so capacity drops during the cycle.
+
+A PodDisruptionBudget can block the drain of a node. If a node cannot be drained within the eviction grace period, 60 minutes by default, the node pool shows **Needs attention**. Do not run **Scale** or **Upgrade** in Infrayard until the cycle finishes.
 
 ## Kubernetes upgrades
 
@@ -96,10 +114,17 @@ The portal shows tier-specific warnings/messages for this flow.
 - **Shape-aware + allowlist-aware** — upgrade options are filtered to OCI-compatible versions enabled by admin config
 - **Sequential minors only** — direct upgrades allow same/next minor only; skip-minor upgrades are blocked with explicit error
 - **Control plane + node-pool target update** — upgrade action updates cluster Kubernetes and node-pool target version/image
-- **Basic upgrade behavior** — perform rolling worker refresh per pool (`N -> 2N -> N`) after new nodes are `Ready/Active`
-- **Enhanced upgrade behavior** — fully automated rollout (control plane + workers), no manual cycling required
+- **Basic upgrade behavior** — existing workers keep the old version until you [replace them](#replace-workers-in-a-basic-cluster)
+- **Enhanced upgrade behavior** — after the control plane, Infrayard replaces the workers of each node pool
 - **Tier guidance in UI** — Basic and Enhanced show upgrade-specific notes with rollout guidance
-- **Dynamic Basic rollout guidance** — Basic upgrade modal reads live pool/node counts and renders exact per-pool steps (for example `1 -> 2 -> 1` or `3 -> 6 -> 3`) instead of a static example
+
+### Automatic worker replacement in an Enhanced cluster
+
+During a Kubernetes upgrade of an Enhanced cluster, Infrayard turns on node pool cycling with **Maximum surge** `1` and **Maximum unavailable** `0`. Each pool gets one extra node. When it is active, OKE cordons, drains and removes one old node, and repeats this until every worker is replaced. Pools are replaced at the same time, so the tenancy needs room for one extra node per pool. Each extra node is billed while it runs.
+
+The cluster stays in the upgrading state, and the job stays open, until every worker is active on the new version. Plan several minutes per node on top of the control plane upgrade.
+
+If OKE reports a problem with a node pool, or nothing changes for too long, the job ends as failed. A PodDisruptionBudget that blocks a drain and a tenancy without capacity for the extra node are the usual causes. The control plane is upgraded, the cluster keeps running, and the workers that were not replaced keep the old version. Fix the cause, then [cycle the node pool](#cycle-workers-in-an-enhanced-cluster) in the OCI Console.
 
 ## Expiry and cleanup
 

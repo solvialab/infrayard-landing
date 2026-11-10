@@ -77,7 +77,7 @@
 <ul>
 <li>Click <strong>Details</strong> on any cluster to open its full detail view including kubeconfig and SSH key download</li>
 <li>Click <strong>Scale</strong> on Active/Error clusters to adjust pools, nodes, and per-node resources</li>
-<li>Click <strong>Upgrade k8s</strong> on Active/Error clusters to upgrade Kubernetes version</li>
+<li>Click <strong>Upgrade k8s</strong> on running clusters to upgrade Kubernetes version</li>
 <li>Click <strong>Destroy</strong> to destroy any cluster regardless of owner</li>
 <li>Click <strong>View logs</strong> while an operation is running or after a failure</li>
 <li>Click <strong>New Cluster</strong> to provision a cluster outside of normal user quotas</li>
@@ -131,7 +131,7 @@
 </tr>
 <tr>
 <td>K8s versions</td>
-<td>Add, remove, and enable/disable Kubernetes versions</td>
+<td>Add, remove, and enable/disable Kubernetes versions. Versions with patch number <code>0</code>, such as <code>1.37.0</code>, are Oracle preview releases and are marked <strong>Preview</strong></td>
 </tr>
 <tr>
 <td>Node images</td>
@@ -203,6 +203,7 @@
 <ul>
 <li>Type it exactly as it appears in Keycloak. Names are case-sensitive: <code>Production</code> and <code>production</code> are different roles.</li>
 <li>Infrayard saves any name without checking that the role exists. A misspelt name, or a role renamed later in Keycloak, hides the template from everyone, with no error message. If a template is missing, compare the two names first.</li>
+<li>The role must come from the source Infrayard reads, by default realm roles. A client role with the same name does not count, and the template stays hidden. See <a href="/docs/keycloak/#roles">roles</a>.</li>
 <li>A template takes one role. To show it to several teams, give them a shared role or group.</li>
 <li><strong>Admin → Templates</strong> lists every template. The deploy form shows administrators, like everyone else, only the templates whose role they hold. To check a template&#39;s visibility, sign in as a user with the role, or assign the role to yourself.</li>
 <li>A role assigned in Keycloak reaches the user with their next token, within a few minutes, or at once after they sign in again.</li>

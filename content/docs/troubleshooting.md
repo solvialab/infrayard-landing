@@ -35,7 +35,7 @@ Note the time and the exact error before you retry, and check what actually exis
 | "Your account is not allowed to use Infrayard" | The user lacks the access role (`requiredRole`). Assign it in Keycloak; it takes effect at the next sign-in |
 | No **Admin** menu | The user lacks the admin role, or `rolesClaim` points to the wrong claim |
 | Sign-in works but data does not load | The issuer setting does not match the token. See [Keycloak troubleshooting](/docs/keycloak/#troubleshooting) |
-| A template is missing for a user | The template requires a role the user does not hold, or its role name differs from the one in Keycloak. Names are case-sensitive and are not checked when the template is saved. The deploy form hides such templates from administrators too. See [required role names](/docs/administration/#required-role-names) |
+| A template is missing for a user | The template requires a role the user does not hold, or its role name differs from the one in Keycloak. Names are case-sensitive and are not checked when the template is saved. The role must also come from the source Infrayard reads, by default realm roles, so a client role with the same name does not count. The deploy form hides such templates from administrators too. See [required role names](/docs/administration/#required-role-names) |
 | A role change has no effect | Roles are read from the token; the user gets the change with the next token, within the token lifetime (5 minutes by default) |
 | "Invalid username or password" although the password is right | After 5 failed sign-ins the bundled Keycloak locks the account for a minute or longer and shows the same message meanwhile. To unlock it at once, open the user in the Keycloak admin console and turn off **Temporarily locked** |
 | Keycloak refuses a new password | Passwords need at least 12 characters and must differ from the user name, the e-mail and the last five passwords |
@@ -76,7 +76,9 @@ Check the global default, the user's own limit and the template. Users can reque
 
 ## A cluster operation fails
 
-Read the Terraform log, then check the resources in OCI. A failed deployment offers a cleanup action that removes partial resources; check what it will remove first. For Basic clusters, changes to nodes or a Kubernetes upgrade need a rolling worker refresh.
+Read the Terraform log, then check the resources in OCI. A failed deployment offers a cleanup action that removes partial resources; check what it will remove first. For Basic clusters, changes to per-node resources or a Kubernetes upgrade need a [worker replacement](/docs/cluster-lifecycle/#replace-workers-in-a-basic-cluster).
+
+On an Enhanced cluster, a Kubernetes upgrade replaces the workers automatically. If its log ends with `Worker replacement failed`, the control plane is already upgraded and the cluster keeps running. Fix the cause and finish the replacement by hand; see [automatic worker replacement](/docs/cluster-lifecycle/#automatic-worker-replacement-in-an-enhanced-cluster).
 
 Do not repair Infrayard-managed resources by hand in the OCI Console as a routine fix; the next Terraform run overwrites the changes. If you must intervene, contact support before running further operations on that cluster.
 
